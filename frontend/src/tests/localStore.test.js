@@ -5,6 +5,7 @@ import {
   localVisits,
   localSettings,
   dataBackup,
+  getLocalDateString,
 } from '../services/localStore';
 
 // In-memory localStorage polyfill for node test environment
@@ -261,10 +262,10 @@ describe('localStore Data Service', () => {
         contact: '9876501234',
       });
 
-      const today = new Date().toISOString().split('T')[0];
+      const today = getLocalDateString();
       const nextWeek = new Date();
       nextWeek.setDate(nextWeek.getDate() + 7);
-      const nextWeekStr = nextWeek.toISOString().split('T')[0];
+      const nextWeekStr = getLocalDateString(nextWeek);
 
       const visit = localVisits.save({
         patientId: patient.id,
@@ -340,7 +341,7 @@ describe('localStore Data Service', () => {
       const p = localPatients.add({ name: 'Follow-up Test Patient' });
 
       const now = new Date();
-      const formatDate = (d) => d.toISOString().split('T')[0];
+      const formatDate = (d) => getLocalDateString(d);
 
       const yesterday = new Date(now);
       yesterday.setDate(now.getDate() - 1);

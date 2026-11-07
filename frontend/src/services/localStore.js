@@ -35,11 +35,18 @@ const generateRxId = () => {
   return `RX-${yyyy}${mm}${dd}-${randPart}`;
 };
 
+const getLocalDateString = (d = new Date()) => {
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+};
+
 const calculateFollowUpDate = (days) => {
   if (!days || isNaN(days)) return null;
   const d = new Date();
   d.setDate(d.getDate() + Number(days));
-  return d.toISOString().split('T')[0];
+  return getLocalDateString(d);
 };
 
 // ─── Default Clinic & Print Settings ──────────────────────────────────────────
@@ -503,9 +510,9 @@ export const localPatients = {
     if (!q || !q.toString().trim()) return patients;
     const query = q.toString().trim().toLowerCase();
     return patients.filter((p) => {
-      const name = (p.name || '').toLowerCase();
-      const contact = (p.contact || p.mobile || '').toLowerCase();
-      const id = (p.id || '').toLowerCase();
+      const name = String(p.name || '').toLowerCase();
+      const contact = String(p.contact || p.mobile || '').toLowerCase();
+      const id = String(p.id || '').toLowerCase();
       return name.includes(query) || contact.includes(query) || id.includes(query);
     });
   },
@@ -629,10 +636,10 @@ export const localMedicines = {
     if (!q || !q.toString().trim()) return list;
     const query = q.toString().trim().toLowerCase();
     return list.filter((m) => {
-      const name = (m.name || '').toLowerCase();
-      const form = (m.form || '').toLowerCase();
-      const strength = (m.strength || '').toLowerCase();
-      const category = (m.category || '').toLowerCase();
+      const name = String(m.name || '').toLowerCase();
+      const form = String(m.form || '').toLowerCase();
+      const strength = String(m.strength || '').toLowerCase();
+      const category = String(m.category || '').toLowerCase();
       return (
         name.includes(query) ||
         form.includes(query) ||
@@ -753,7 +760,7 @@ export const localVisits = {
       followUpDate = calculateFollowUpDate(data.followUpDays);
     }
 
-    const todayDate = new Date().toISOString().split('T')[0];
+    const todayDate = getLocalDateString();
 
     const visit = {
       id: data.id || generateRxId(),
@@ -894,3 +901,5 @@ export const dataBackup = {
     }
   },
 };
+
+export { getLocalDateString, calculateFollowUpDate };
