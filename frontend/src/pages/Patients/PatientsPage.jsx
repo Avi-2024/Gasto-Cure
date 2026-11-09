@@ -1,9 +1,25 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ChevronLeft, ChevronRight, FileText, Plus, Search, UserRound, X } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+  Plus,
+  Search,
+  UserRound,
+  Users,
+  UserCheck,
+  CalendarClock,
+  MessageCircle,
+  Edit,
+  X,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import StatusBadge from '../../components/ui/StatusBadge';
 import usePagination from '../../hooks/usePagination';
 import { localAppointments, localPatients } from '../../services/localStore';
+import { cleanPhoneNumber } from '../../utils/whatsappHelper';
+import EditPatientModal from './components/EditPatientModal';
+import PatientProfileDrawer from './components/PatientProfileDrawer';
 
 const statusVariantMap = {
   Active: 'success',
@@ -13,6 +29,21 @@ const statusVariantMap = {
 };
 
 const emptyForm = { name: '', age: '', gender: 'Male', contact: '', address: '' };
+
+const formatDisplayDate = (dateStr) => {
+  if (!dateStr) return '';
+  try {
+    const d = new Date(dateStr.includes('T') ? dateStr : `${dateStr}T00:00:00`);
+    if (isNaN(d.getTime())) return dateStr;
+    return d.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  } catch {
+    return dateStr;
+  }
+};
 
 function PatientsPage() {
   const navigate = useNavigate();
@@ -25,18 +56,32 @@ function PatientsPage() {
   const [formError, setFormError] = useState('');
   const [queueMsg, setQueueMsg] = useState('');
 
+  // Selected patient states for Profile Drawer & Edit Modal
+  const [profilePatient, setProfilePatient] = useState(null);
+  const [editingPatient, setEditingPatient] = useState(null);
+
   useEffect(() => {
     localPatients.seed();
     setPatients(localPatients.getAll());
   }, []);
 
+  // Quick Stats
+  const stats = useMemo(() => {
+    const total = patients.length;
+    const active = patients.filter((p) => p.status === 'Active').length;
+    const scheduledFollowUps = patients.filter(
+      (p) => Boolean(p.nextFollowUp) || p.status === 'Follow-up'
+    ).length;
+    return { total, active, scheduledFollowUps };
+  }, [patients]);
+
   const filteredPatients = useMemo(
     () =>
       patients.filter((patient) => {
         const matchesSearch =
-          patient.name.toLowerCase().includes(search.toLowerCase()) ||
+          (patient.name || '').toLowerCase().includes(search.toLowerCase()) ||
           (patient.id || '').toLowerCase().includes(search.toLowerCase()) ||
-          (patient.contact || '').toLowerCase().includes(search.toLowerCase());
+          (patient.contact || patient.mobile || '').toLowerCase().includes(search.toLowerCase());
 
         const age = Number(patient.age);
         const matchesAge =
@@ -74,8 +119,57 @@ function PatientsPage() {
     setTimeout(() => setQueueMsg(''), 4000);
   };
 
+  const handlePatientSaved = (updated) => {
+    const all = localPatients.getAll();
+    setPatients(all);
+    if (profilePatient && profilePatient.id === updated.id) {
+      setProfilePatient(updated);
+    }
+  };
+
+  const handleOpenWhatsApp = (patient) => {
+    const clean = cleanPhoneNumber(patient.contact || patient.mobile);
+    if (!clean) return;
+    const waUrl = `https://wa.me/91${clean}`;
+    window.open(waUrl, '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <div className="space-y-6">
+      {/* Quick Stats Strip */}
+      <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="app-card p-5 flex items-center gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
+            <Users size={22} />
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Patients</p>
+            <p className="text-2xl font-bold text-slate-900 mt-0.5">{stats.total}</p>
+          </div>
+        </div>
+
+        <div className="app-card p-5 flex items-center gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
+            <UserCheck size={22} />
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Active</p>
+            <p className="text-2xl font-bold text-slate-900 mt-0.5">{stats.active}</p>
+          </div>
+        </div>
+
+        <div className="app-card p-5 flex items-center gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-50 text-amber-700">
+            <CalendarClock size={22} />
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Scheduled Follow-ups</p>
+            <p className="text-2xl font-bold text-slate-900 mt-0.5">{stats.scheduledFollowUps}</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Header and Filters Section */}
       <section className="app-card p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -124,6 +218,7 @@ function PatientsPage() {
         </div>
       </section>
 
+      {/* Patients Table */}
       <section className="app-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full border-collapse">
@@ -133,75 +228,103 @@ function PatientsPage() {
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Age</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Contact</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Last Visit</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Next Follow-Up</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Status</th>
                 <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {paginated.map((patient) => (
-                <tr key={patient.id} className="border-t border-medical-border bg-white">
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-3">
-                      <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
-                        <UserRound size={16} />
-                      </span>
-                      <div>
-                        <p className="text-sm font-semibold text-slate-900">{patient.name}</p>
-                        <p className="text-xs uppercase tracking-[0.08em] text-slate-400">{patient.id}</p>
+              {paginated.map((patient) => {
+                const cleanPhone = cleanPhoneNumber(patient.contact || patient.mobile);
+                return (
+                  <tr key={patient.id} className="border-t border-medical-border bg-white hover:bg-slate-50/60 transition">
+                    <td className="px-4 py-4">
+                      <div className="flex items-center gap-3">
+                        <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
+                          <UserRound size={16} />
+                        </span>
+                        <div>
+                          <p className="text-sm font-semibold text-slate-900">{patient.name}</p>
+                          <p className="text-xs uppercase tracking-[0.08em] text-slate-400">{patient.id}</p>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 text-sm text-slate-700">{patient.age}</td>
-                  <td className="px-4 py-4 text-sm text-slate-700">{patient.contact}</td>
-                  <td className="px-4 py-4 text-sm text-slate-700">
-                    {new Date(`${patient.lastVisit}T00:00:00`).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric',
-                    })}
-                  </td>
-                  <td className="px-4 py-4">
-                    <StatusBadge label={patient.status} variant={statusVariantMap[patient.status] || 'info'} />
-                  </td>
-                  <td className="px-4 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        type="button"
-                        className="btn-primary"
-                        onClick={() => navigate(`/prescription/new?patientId=${patient.id}`)}
-                        title="Start Prescription"
-                      >
-                        <FileText size={14} />
-                        Prescription
-                      </button>
-                      <button
-                        type="button"
-                        className="btn-primary"
-                        onClick={() => {
-                          localAppointments.addToQueue(patient.id, patient.name, patient.age, 'Consultation');
-                          window.location.href = '/doctor/consultation';
-                        }}
-                      >
-                        Start Consultation
-                      </button>
-                      <button
-                        type="button"
-                        className="btn-secondary"
-                        onClick={() => {
-                          localAppointments.addToQueue(patient.id, patient.name, patient.age, 'Follow-up visit');
-                          setQueueMsg(`${patient.name} added to waiting queue.`);
-                          setTimeout(() => setQueueMsg(''), 4000);
-                        }}
-                      >
-                        Add to Queue
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-4 py-4 text-sm text-slate-700">{patient.age}</td>
+                    <td className="px-4 py-4 text-sm text-slate-700">{patient.contact || patient.mobile || '-'}</td>
+                    <td className="px-4 py-4 text-sm text-slate-700">
+                      {formatDisplayDate(patient.lastVisit) || '-'}
+                    </td>
+                    <td className="px-4 py-4 text-sm">
+                      {patient.nextFollowUp ? (
+                        <span className="font-semibold text-emerald-700">
+                          {formatDisplayDate(patient.nextFollowUp)}
+                        </span>
+                      ) : (
+                        <span className="text-slate-400">None</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-4">
+                      <StatusBadge label={patient.status} variant={statusVariantMap[patient.status] || 'info'} />
+                    </td>
+                    <td className="px-4 py-4 text-right">
+                      <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                        {cleanPhone ? (
+                          <button
+                            type="button"
+                            onClick={() => handleOpenWhatsApp(patient)}
+                            className="p-1.5 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition"
+                            title="Chat on WhatsApp"
+                          >
+                            <MessageCircle size={15} />
+                          </button>
+                        ) : null}
+
+                        <button
+                          type="button"
+                          className="btn-secondary text-xs py-1.5 px-3"
+                          onClick={() => setProfilePatient(patient)}
+                        >
+                          Profile
+                        </button>
+
+                        <button
+                          type="button"
+                          className="btn-secondary text-xs py-1.5 px-3"
+                          onClick={() => setEditingPatient(patient)}
+                        >
+                          Edit
+                        </button>
+
+                        <button
+                          type="button"
+                          className="btn-primary text-xs py-1.5 px-3"
+                          onClick={() => navigate(`/prescription/new?patientId=${patient.id}`)}
+                          title="Start Prescription"
+                        >
+                          <FileText size={14} />
+                          Prescription
+                        </button>
+
+                        <button
+                          type="button"
+                          className="btn-secondary text-xs py-1.5 px-2.5"
+                          onClick={() => {
+                            localAppointments.addToQueue(patient.id, patient.name, patient.age, 'Follow-up visit');
+                            setQueueMsg(`${patient.name} added to waiting queue.`);
+                            setTimeout(() => setQueueMsg(''), 4000);
+                          }}
+                          title="Add to Reception Queue"
+                        >
+                          Queue
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
               {paginated.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-sm text-slate-500">
+                  <td colSpan={7} className="px-4 py-8 text-center text-sm text-slate-500">
                     No patients found for the selected filters.
                   </td>
                 </tr>
@@ -287,6 +410,24 @@ function PatientsPage() {
           </div>
         </div>
       ) : null}
+
+      {/* Patient Profile Drawer */}
+      <PatientProfileDrawer
+        isOpen={Boolean(profilePatient)}
+        patient={profilePatient}
+        onClose={() => setProfilePatient(null)}
+        onEdit={(pt) => {
+          setEditingPatient(pt);
+        }}
+      />
+
+      {/* Edit Patient Modal */}
+      <EditPatientModal
+        isOpen={Boolean(editingPatient)}
+        patient={editingPatient}
+        onClose={() => setEditingPatient(null)}
+        onSave={handlePatientSaved}
+      />
     </div>
   );
 }
