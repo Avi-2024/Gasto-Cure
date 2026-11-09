@@ -52,7 +52,7 @@ function PrescriptionPage() {
 
   // Medicines
   const [medicines, setMedicines] = useState([
-    { id: 1, name: '', dosage: '', frequency: '1-0-1', duration: '', remarks: '' },
+    { id: 1, name: '', dosage: '', frequency: '1-0-1', timing: '', duration: '', remarks: '' },
   ]);
 
   // Calculate follow-up date
@@ -80,21 +80,25 @@ function PrescriptionPage() {
   };
 
   const addMedicineRow = () => {
-    const newId = medicines.length > 0 ? Math.max(...medicines.map((m) => m.id)) + 1 : 1;
-    setMedicines([
-      ...medicines,
-      { id: newId, name: '', dosage: '', frequency: '', duration: '', remarks: '' },
-    ]);
+    setMedicines((prev) => {
+      const newId = prev.length > 0 ? Math.max(...prev.map((m) => m.id)) + 1 : 1;
+      return [
+        ...prev,
+        { id: newId, name: '', dosage: '', frequency: '', timing: '', duration: '', remarks: '' },
+      ];
+    });
   };
 
   const removeMedicineRow = (id) => {
-    if (medicines.length > 1) {
-      setMedicines(medicines.filter((med) => med.id !== id));
-    }
+    setMedicines((prev) => (prev.length > 1 ? prev.filter((med) => med.id !== id) : prev));
   };
 
   const updateMedicine = (id, field, value) => {
-    setMedicines(medicines.map((med) => (med.id === id ? { ...med, [field]: value } : med)));
+    setMedicines((prev) => prev.map((med) => (med.id === id ? { ...med, [field]: value } : med)));
+  };
+
+  const updateMedicineFull = (id, fullData) => {
+    setMedicines((prev) => prev.map((med) => (med.id === id ? { ...med, ...fullData } : med)));
   };
 
   const handlePrint = () => {
@@ -256,7 +260,7 @@ function PrescriptionPage() {
             </button>
           </div>
 
-          <MedicineTable medicines={medicines} onUpdate={updateMedicine} onRemove={removeMedicineRow} />
+          <MedicineTable medicines={medicines} onUpdate={updateMedicine} onUpdateMedicineFull={updateMedicineFull} onRemove={removeMedicineRow} />
         </section>
 
         {/* 6. Follow-up / Next Visit - Auto Calculate */}

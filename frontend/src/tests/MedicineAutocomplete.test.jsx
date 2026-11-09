@@ -73,6 +73,29 @@ describe('MedicineAutocomplete Component', () => {
     expect(selected.defaultInstruction).toBe('Take empty stomach in the morning');
   });
 
+  it('does not select option on Enter when no option is highlighted, preserving typed input', async () => {
+    const handleSelect = vi.fn();
+    render(<MedicineAutocomplete placeholder="Search medicine" onSelect={handleSelect} debounceMs={0} />);
+
+    const input = screen.getByPlaceholderText('Search medicine');
+    // Doctor types matching letters
+    fireEvent.change(input, { target: { value: 'Panto' } });
+
+    await waitFor(() => {
+      expect(screen.getByRole('listbox')).toBeTruthy();
+    });
+
+    // Directly press Enter without using ArrowDown to highlight
+    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
+
+    // Must NOT auto-select results[0]
+    expect(handleSelect).not.toHaveBeenCalled();
+    // Dropdown should dismiss
+    expect(screen.queryByRole('listbox')).toBeNull();
+    // What the doctor typed must be preserved
+    expect(input.value).toBe('Panto');
+  });
+
   it('selects option on mouse click and passes complete medicine defaults', async () => {
     const handleSelect = vi.fn();
     render(<MedicineAutocomplete placeholder="Search medicine" onSelect={handleSelect} debounceMs={0} />);
@@ -185,6 +208,45 @@ describe('MedicineTable with MedicineAutocomplete Integration', () => {
         remarks: 'Take empty stomach in the morning',
       })
     );
+  });
+
+  it('calls onUpdate for each field without corrupted property when onUpdateMedicineFull is not provided', async () => {
+    const onUpdate = vi.fn();
+    const medicines = [
+      { id: 201, name: '', dosage: '', frequency: '', timing: '', duration: '', remarks: '' },
+    ];
+
+    render(
+      <MedicineTable
+        medicines={medicines}
+        onUpdate={onUpdate}
+        onRemove={vi.fn()}
+      />
+    );
+
+    const input = screen.getByPlaceholderText('Medicine name');
+    fireEvent.change(input, { target: { value: 'Panto' } });
+
+    await waitFor(() => {
+      expect(screen.getByRole('listbox')).toBeTruthy();
+    });
+
+    const option = screen.getByText(/Pantoprazole 40mg/i);
+    fireEvent.mouseDown(option);
+
+    // Verify onUpdate was called for individual fields
+    expect(onUpdate).toHaveBeenCalledWith(201, 'name', expect.stringMatching(/Pantoprazole/i));
+    expect(onUpdate).toHaveBeenCalledWith(201, 'dosage', '40mg');
+    expect(onUpdate).toHaveBeenCalledWith(201, 'frequency', '1-0-0');
+    expect(onUpdate).toHaveBeenCalledWith(201, 'timing', 'Before Food');
+    expect(onUpdate).toHaveBeenCalledWith(201, 'duration', '5 Days');
+    expect(onUpdate).toHaveBeenCalledWith(201, 'remarks', 'Take empty stomach in the morning');
+
+    // Crucial check: verify onUpdate was NEVER called with an object as the 2nd argument
+    onUpdate.mock.calls.forEach((call) => {
+      expect(typeof call[1]).toBe('string');
+      expect(call[1]).not.toBe('[object Object]');
+    });
   });
 
   it('allows direct editing of individual row cells', () => {

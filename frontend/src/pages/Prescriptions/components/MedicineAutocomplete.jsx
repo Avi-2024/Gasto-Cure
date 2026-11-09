@@ -125,10 +125,12 @@ export default function MedicineAutocomplete({
         e.preventDefault();
         setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : results.length - 1));
       } else if (e.key === 'Enter') {
-        e.preventDefault();
-        const targetIndex = highlightedIndex >= 0 ? highlightedIndex : 0;
-        if (results[targetIndex]) {
-          handleSelect(results[targetIndex]);
+        if (highlightedIndex >= 0 && results[highlightedIndex]) {
+          e.preventDefault();
+          handleSelect(results[highlightedIndex]);
+        } else {
+          // If no option highlighted, close dropdown and preserve what the doctor typed
+          setIsOpen(false);
         }
       }
     }

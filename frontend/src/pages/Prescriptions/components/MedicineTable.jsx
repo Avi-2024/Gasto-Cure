@@ -64,9 +64,6 @@ function MedicineTable({ medicines = [], onUpdate, onRemove, onUpdateMedicineFul
     if (typeof onUpdateMedicineFull === 'function') {
       onUpdateMedicineFull(medicineId, fullData);
     } else if (typeof onUpdate === 'function') {
-      // Support patch object if caller supports it
-      onUpdate(medicineId, fullData);
-      // Support standard (id, field, value) signature
       Object.entries(fullData).forEach(([field, value]) => {
         onUpdate(medicineId, field, value);
       });
