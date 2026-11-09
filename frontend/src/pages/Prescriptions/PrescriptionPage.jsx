@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Printer, Plus, X } from 'lucide-react';
+import { Printer, Plus, X, Sliders } from 'lucide-react';
 import MedicineTable from './components/MedicineTable';
 import AutoResizeTextarea from './components/AutoResizeTextarea';
-import { localPatients } from '../../services/localStore';
+import { localPatients, localSettings } from '../../services/localStore';
+import { applyPrintSettings } from '../../utils/printStyles';
 import './PrescriptionPage.css';
 
 /**
@@ -23,12 +24,16 @@ import './PrescriptionPage.css';
  * - Auto-expanding textareas
  * - Direct editing of fields
  * - Professional medical design
- * - Print-optimized (180px offset for pre-printed header)
+ * - Configurable print alignment engine (top offset slider & pad mode toggle)
  */
 function PrescriptionPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const patientId = searchParams.get('patientId');
+
+  // Clinic and Print Settings
+  const [clinicSettings, setClinicSettings] = useState(() => localSettings.get());
+  const [printSettings, setPrintSettings] = useState(() => localSettings.get().print || { topOffsetMm: 60, padMode: true });
 
   // Patient Info
   const [patient, setPatient] = useState(null);
@@ -64,6 +69,11 @@ function PrescriptionPage() {
     return futureDate.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
   };
 
+  // Apply print settings on mount and when changed
+  useEffect(() => {
+    applyPrintSettings(printSettings);
+  }, [printSettings]);
+
   // Load patient data
   useEffect(() => {
     if (patientId) {
@@ -74,6 +84,27 @@ function PrescriptionPage() {
       }
     }
   }, [patientId]);
+
+  const handleQuickOffsetChange = (e) => {
+    const newOffset = Number(e.target.value);
+    const updated = {
+      ...printSettings,
+      topOffsetMm: newOffset,
+    };
+    setPrintSettings(updated);
+    localSettings.update({ print: updated });
+    applyPrintSettings(updated);
+  };
+
+  const handleTogglePadMode = (padMode) => {
+    const updated = {
+      ...printSettings,
+      padMode,
+    };
+    setPrintSettings(updated);
+    localSettings.update({ print: updated });
+    applyPrintSettings(updated);
+  };
 
   const handleVitalChange = (field, value) => {
     setVitals((prev) => ({ ...prev, [field]: value }));
@@ -102,6 +133,7 @@ function PrescriptionPage() {
   };
 
   const handlePrint = () => {
+    applyPrintSettings(printSettings);
     window.print();
   };
 
@@ -119,7 +151,7 @@ function PrescriptionPage() {
   }
 
   return (
-    <div className="prescription-page">
+    <div className={`prescription-page ${printSettings.padMode ? 'pad-mode' : 'digital-mode'}`}>
       {/* Screen-only controls */}
       <div className="prescription-controls no-print">
         <div className="controls-left">
@@ -128,6 +160,50 @@ function PrescriptionPage() {
             Cancel
           </button>
         </div>
+
+        {/* Quick Print Alignment Bar */}
+        <div className="prescription-quick-alignment">
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              className={`prescription-mode-toggle-btn ${printSettings.padMode ? 'is-active' : ''}`}
+              onClick={() => handleTogglePadMode(true)}
+              title="Print for doctor letterhead pad (skips top logo area)"
+            >
+              Pad Mode
+            </button>
+            <button
+              type="button"
+              className={`prescription-mode-toggle-btn ${!printSettings.padMode ? 'is-active' : ''}`}
+              onClick={() => handleTogglePadMode(false)}
+              title="Print clinic letterhead header on plain paper"
+            >
+              Digital Header
+            </button>
+          </div>
+
+          {printSettings.padMode && (
+            <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
+              <label htmlFor="quick-top-offset">
+                <Sliders size={13} className="text-slate-400" />
+                Offset:
+              </label>
+              <input
+                id="quick-top-offset"
+                type="range"
+                min="20"
+                max="140"
+                step="5"
+                value={printSettings.topOffsetMm || 60}
+                onChange={handleQuickOffsetChange}
+              />
+              <span className="prescription-offset-badge">
+                {printSettings.topOffsetMm || 60} mm
+              </span>
+            </div>
+          )}
+        </div>
+
         <div className="controls-right">
           <button type="button" className="btn-primary" onClick={handlePrint}>
             <Printer size={16} />
@@ -138,6 +214,25 @@ function PrescriptionPage() {
 
       {/* Printable Content Area - Content Driven Layout */}
       <div className="prescription-content">
+        {/* Digital Letterhead Header (Rendered on plain paper when padMode is false) */}
+        <div className="digital-letterhead">
+          <div className="letterhead-header">
+            <div>
+              <h1 className="letterhead-clinic-name">{clinicSettings.clinicName || 'ClinicRx Medical Centre'}</h1>
+              <p className="letterhead-clinic-details">{clinicSettings.address}</p>
+              <p className="letterhead-clinic-details">Phone: {clinicSettings.phone}</p>
+            </div>
+            <div className="letterhead-doctor-info">
+              <h2 className="letterhead-doctor-name">{clinicSettings.doctorName || 'Dr. Aarav Sharma'}</h2>
+              <p className="letterhead-doctor-details">{clinicSettings.qualification || 'MBBS, MD'}</p>
+              <p className="letterhead-doctor-details">Reg. No: {clinicSettings.regNumber}</p>
+              {clinicSettings.timing && (
+                <p className="letterhead-doctor-details">Timings: {clinicSettings.timing}</p>
+              )}
+            </div>
+          </div>
+        </div>
+
         {/* 1. Patient Information Section */}
         <section className="prescription-section patient-info-section">
           <div className="patient-info-grid">

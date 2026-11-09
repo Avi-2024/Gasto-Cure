@@ -654,20 +654,40 @@
   }
 
   /* ═════════════════════════════════════════════════════════
-     CRITICAL: 180px offset for pre-printed header
+     CRITICAL: Configurable print alignment using CSS variables
+     Default: 60mm top offset for pre-printed letterhead pads
      ═════════════════════════════════════════════════════════ */
 
   .prescription-content {
     margin: 0;
     padding: 0;
-    padding-top: 180px; /* Space for pre-printed header */
-    padding-left: 50px;
-    padding-right: 40px;
-    padding-bottom: 40px;
+    padding-top: var(--print-top-offset, 60mm) !important;
+    padding-left: var(--print-left-margin, 15mm) !important;
+    padding-right: var(--print-right-margin, 15mm) !important;
+    padding-bottom: var(--print-bottom-margin, 20mm) !important;
     max-width: 100%;
     box-shadow: none;
     border-radius: 0;
     border: none;
+  }
+
+  /* Pre-printed Pad Mode: Hide digital letterhead header */
+  .pad-mode .digital-letterhead,
+  [data-pad-mode="true"] .digital-letterhead,
+  .prescription-page.pad-mode .digital-letterhead {
+    display: none !important;
+  }
+
+  /* Digital Letterhead Mode (Plain Paper): Show header, use standard top margin */
+  :not(.pad-mode) .digital-letterhead,
+  [data-pad-mode="false"] .digital-letterhead,
+  .prescription-page.digital-mode .digital-letterhead {
+    display: block !important;
+  }
+
+  .prescription-page.digital-mode .prescription-content,
+  [data-pad-mode="false"] .prescription-content {
+    padding-top: var(--print-top-margin, 12mm) !important;
   }
 
   /* Section spacing for print */
@@ -955,3 +975,365 @@
     padding: 6px;
   }
 }
+
+/* ═════════════════════════════════════════════════════════════
+   Digital Letterhead (Plain Paper Mode)
+   ═════════════════════════════════════════════════════════════ */
+
+.digital-letterhead {
+  border-bottom: 2px solid #0f172a;
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.pad-mode .digital-letterhead {
+  display: none;
+}
+
+.letterhead-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.letterhead-clinic-name {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+  letter-spacing: -0.5px;
+}
+
+.letterhead-clinic-details {
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.letterhead-doctor-info {
+  text-align: right;
+}
+
+.letterhead-doctor-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 2px 0;
+}
+
+.letterhead-doctor-details {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* ═════════════════════════════════════════════════════════════
+   Quick Print Alignment Controls in Prescription Bar
+   ═════════════════════════════════════════════════════════════ */
+
+.prescription-quick-alignment {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #334155;
+}
+
+.prescription-quick-alignment label {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.prescription-quick-alignment input[type="range"] {
+  width: 90px;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+
+.prescription-offset-badge {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: #2563eb;
+  min-width: 48px;
+}
+
+.prescription-mode-toggle-btn {
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #475569;
+  transition: all 0.15s;
+}
+
+.prescription-mode-toggle-btn.is-active {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+
+/* ═════════════════════════════════════════════════════════════
+   Calibration Sheet & Modal Styles
+   ═════════════════════════════════════════════════════════════ */
+
+.test-print-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.test-print-modal {
+  background: #ffffff;
+  border-radius: 16px;
+  max-width: 920px;
+  width: 100%;
+  max-height: 94vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.test-print-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.test-print-sheet-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  background: #94a3b8;
+  display: flex;
+  justify-content: center;
+}
+
+.test-print-sheet {
+  background: #ffffff;
+  width: 210mm;
+  min-height: 297mm;
+  position: relative;
+  box-sizing: border-box;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #0f172a;
+}
+
+.calibration-header {
+  padding: 10mm 15mm 4mm;
+  border-bottom: 2px solid #0f172a;
+}
+
+.calibration-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.calibration-badge {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #2563eb;
+  background: #eff6ff;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.calibration-paper-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.calibration-main-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.calibration-subtitle {
+  font-size: 11px;
+  color: #64748b;
+  margin: 2px 0 0;
+}
+
+.calibration-guide-box {
+  margin: 4mm 15mm 0;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 11px;
+}
+
+.calibration-steps {
+  margin: 4px 0 0;
+  padding-left: 0;
+  list-style: none;
+  color: #475569;
+  line-height: 1.5;
+}
+
+.calibration-ruler-area {
+  position: relative;
+  width: 100%;
+  height: 160mm;
+  margin-top: 0;
+}
+
+.calibration-line-marker {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+.calibration-line-marker.is-default .marker-badge {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #1d4ed8;
+}
+
+.calibration-line-marker.is-default .marker-rule {
+  border-top: 2px solid #2563eb;
+}
+
+.calibration-line-marker.is-default .marker-center-crosshair {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #1d4ed8;
+}
+
+.marker-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  background: #ffffff;
+  border: 1px solid #0f172a;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.marker-badge-left {
+  margin-left: 10mm;
+}
+
+.marker-badge-right {
+  margin-right: 10mm;
+}
+
+.marker-tag {
+  font-size: 8px;
+  background: #ffffff;
+  color: #2563eb;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-weight: 800;
+}
+
+.marker-rule {
+  flex: 1;
+  border-top: 1px dashed #64748b;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.marker-center-crosshair {
+  background: #ffffff;
+  padding: 1px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+}
+
+.calibration-footer {
+  position: absolute;
+  bottom: 8mm;
+  left: 15mm;
+  right: 15mm;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #cbd5e1;
+  padding-top: 6px;
+  font-size: 10px;
+  color: #64748b;
+}
+
+/* Print Specific Rules for Calibration Sheet */
+@media print {
+  body.printing-calibration .prescription-page,
+  body.printing-calibration header,
+  body.printing-calibration nav,
+  body.printing-calibration .app-header,
+  body.printing-calibration .sidebar,
+  body.printing-calibration .no-print {
+    display: none !important;
+  }
+
+  body.printing-calibration .test-print-modal-overlay {
+    position: static;
+    background: transparent;
+    padding: 0;
+    overflow: visible;
+  }
+
+  body.printing-calibration .test-print-modal {
+    box-shadow: none;
+    border-radius: 0;
+    max-width: 100%;
+    overflow: visible;
+  }
+
+  body.printing-calibration .test-print-sheet-wrapper {
+    background: white;
+    padding: 0;
+    overflow: visible;
+  }
+
+  body.printing-calibration .test-print-sheet {
+    box-shadow: none;
+    width: 210mm;
+    height: 297mm;
+    margin: 0;
+    page-break-after: avoid;
+  }
+}
+
