@@ -1,89 +1,196 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Printer, Plus, X, Sliders } from 'lucide-react';
+import {
+  Printer,
+  Plus,
+  X,
+  Sliders,
+  MessageCircle,
+  Eye,
+  Save,
+  Check,
+  User,
+  Calendar,
+  ArrowLeft,
+} from 'lucide-react';
 import MedicineTable from './components/MedicineTable';
 import AutoResizeTextarea from './components/AutoResizeTextarea';
-import { localPatients, localSettings } from '../../services/localStore';
+import PrintPreviewModal from './components/PrintPreviewModal';
+import { localPatients, localVisits, localSettings } from '../../services/localStore';
 import { applyPrintSettings } from '../../utils/printStyles';
+import { generatePrescriptionWhatsAppLink } from '../../utils/whatsappHelper';
 import './PrescriptionPage.css';
 
 /**
- * Prescription Page Component
- * 
- * Professional medical prescription form that behaves like a real prescription pad.
- * 
- * Layout:
- * 1. Patient Information (name, age, gender, phone)
- * 2. Basic Vitals (BP, weight, height, pulse)
- * 3. Chief Complaints/Symptoms (auto-expanding textarea)
- * 4. Diagnosis (auto-expanding textarea)
- * 5. Prescription/RX (dynamic medicine table)
- * 
- * Features:
- * - Content-driven layout (no fixed heights)
- * - Auto-expanding textareas
- * - Direct editing of fields
- * - Professional medical design
- * - Configurable print alignment engine (top offset slider & pad mode toggle)
+ * PrescriptionPage Component
+ *
+ * Comprehensive Prescription Builder & Permanent Visit Storage.
+ * - Full Vitals inputs: BP, Weight, Blood Sugar, Temperature, Pulse, SpO2
+ * - Dynamic Medicine Table with autocomplete
+ * - In-screen Quick Top Margin slider and Pad Mode toggle
+ * - Follow-up Selector with quick chips (7 Days, 14 Days, 30 Days, Custom)
+ * - Permanent saving to localVisits and patient update
+ * - Direct Print, Print Preview Modal, and 1-Click WhatsApp sharing
  */
 function PrescriptionPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const patientId = searchParams.get('patientId');
+  const patientIdParam = searchParams.get('patientId');
+  const visitIdParam = searchParams.get('visitId') || searchParams.get('rxId');
 
   // Clinic and Print Settings
   const [clinicSettings, setClinicSettings] = useState(() => localSettings.get());
-  const [printSettings, setPrintSettings] = useState(() => localSettings.get().print || { topOffsetMm: 60, padMode: true });
+  const [printSettings, setPrintSettings] = useState(
+    () => localSettings.get().print || { topOffsetMm: 60, padMode: true }
+  );
+
+  // Current Rx / Visit ID if saved or loaded
+  const [currentRxId, setCurrentRxId] = useState('');
+  const [saveFeedback, setSaveFeedback] = useState(null);
 
   // Patient Info
   const [patient, setPatient] = useState(null);
+  const [allPatients, setAllPatients] = useState([]);
+  const [patientSearchQuery, setPatientSearchQuery] = useState('');
 
-  // Vitals
+  // Vitals: Full 6 inputs
   const [vitals, setVitals] = useState({
     bloodPressure: '',
     weight: '',
+    bloodSugar: '',
+    temperature: '',
     pulseRate: '',
     spo2: '',
   });
 
-  // Medical Content
+  // Clinical Details
   const [symptoms, setSymptoms] = useState('');
   const [diagnosis, setDiagnosis] = useState('');
+  const [advice, setAdvice] = useState('');
   const [notes, setNotes] = useState('');
 
   // Follow-up
-  const [followUpDays, setFollowUpDays] = useState(30);
+  const [followUpOption, setFollowUpOption] = useState('14'); // '7' | '14' | '30' | 'custom'
   const [followUpCustomDays, setFollowUpCustomDays] = useState('');
+  const [followUpCustomDate, setFollowUpCustomDate] = useState('');
 
   // Medicines
   const [medicines, setMedicines] = useState([
     { id: 1, name: '', dosage: '', frequency: '1-0-1', timing: '', duration: '', remarks: '' },
   ]);
 
-  // Calculate follow-up date
-  const getFollowUpDate = () => {
-    const days = followUpCustomDays ? parseInt(followUpCustomDays) : followUpDays;
-    if (!days || isNaN(days)) return '';
-    const futureDate = new Date();
-    futureDate.setDate(futureDate.getDate() + days);
-    return futureDate.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
-  };
+  // Preview Modal
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   // Apply print settings on mount and when changed
   useEffect(() => {
     applyPrintSettings(printSettings);
   }, [printSettings]);
 
-  // Load patient data
+  // Load all patients for selection fallback
   useEffect(() => {
-    if (patientId) {
-      const patients = localPatients.getAll();
-      const foundPatient = patients.find((p) => p.id === patientId);
+    setAllPatients(localPatients.getAll());
+  }, []);
+
+  // Load patient or visit data
+  useEffect(() => {
+    if (visitIdParam) {
+      const visit = localVisits.getById(visitIdParam);
+      if (visit) {
+        setCurrentRxId(visit.id);
+        if (visit.patientId) {
+          const pt = localPatients.getById(visit.patientId);
+          setPatient(
+            pt || {
+              id: visit.patientId,
+              name: visit.patientName,
+              contact: visit.patientMobile,
+              age: visit.patientAge,
+              gender: visit.patientGender,
+            }
+          );
+        } else {
+          setPatient({
+            name: visit.patientName,
+            contact: visit.patientMobile,
+            age: visit.patientAge,
+            gender: visit.patientGender,
+          });
+        }
+
+        if (visit.vitals) {
+          setVitals({
+            bloodPressure: visit.vitals.bloodPressure || '',
+            weight: visit.vitals.weight || '',
+            bloodSugar: visit.vitals.bloodSugar || '',
+            temperature: visit.vitals.temperature || '',
+            pulseRate: visit.vitals.pulseRate || '',
+            spo2: visit.vitals.spo2 || '',
+          });
+        }
+        if (visit.symptoms) setSymptoms(visit.symptoms);
+        if (visit.diagnosis) setDiagnosis(visit.diagnosis);
+        if (visit.advice) setAdvice(visit.advice);
+        if (visit.notes) setNotes(visit.notes);
+        if (Array.isArray(visit.medicines) && visit.medicines.length > 0) {
+          setMedicines(visit.medicines.map((m, idx) => ({ id: m.id || idx + 1, ...m })));
+        }
+        if (visit.followUpDays) {
+          const daysStr = String(visit.followUpDays);
+          if (['7', '14', '30'].includes(daysStr)) {
+            setFollowUpOption(daysStr);
+          } else {
+            setFollowUpOption('custom');
+            setFollowUpCustomDays(daysStr);
+          }
+        } else if (visit.followUpDate) {
+          setFollowUpOption('custom');
+          setFollowUpCustomDate(visit.followUpDate);
+        }
+      }
+    } else if (patientIdParam) {
+      const foundPatient = localPatients.getById(patientIdParam);
       if (foundPatient) {
         setPatient(foundPatient);
       }
     }
-  }, [patientId]);
+  }, [patientIdParam, visitIdParam]);
+
+  // Calculate follow-up dates
+  const getFollowUpIsoDate = () => {
+    if (followUpOption === 'custom') {
+      if (followUpCustomDate) return followUpCustomDate;
+      const days = parseInt(followUpCustomDays, 10);
+      if (days && !isNaN(days)) {
+        const d = new Date();
+        d.setDate(d.getDate() + days);
+        return d.toISOString().split('T')[0];
+      }
+      return '';
+    }
+
+    const days = parseInt(followUpOption, 10);
+    if (days && !isNaN(days)) {
+      const d = new Date();
+      d.setDate(d.getDate() + days);
+      return d.toISOString().split('T')[0];
+    }
+    return '';
+  };
+
+  const getFollowUpFormattedDisplay = () => {
+    const iso = getFollowUpIsoDate();
+    if (!iso) return '';
+    try {
+      const parts = iso.split('-');
+      if (parts.length === 3) {
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+      }
+      return iso;
+    } catch {
+      return iso;
+    }
+  };
 
   const handleQuickOffsetChange = (e) => {
     const newOffset = Number(e.target.value);
@@ -132,33 +239,189 @@ function PrescriptionPage() {
     setMedicines((prev) => prev.map((med) => (med.id === id ? { ...med, ...fullData } : med)));
   };
 
-  const handlePrint = () => {
-    applyPrintSettings(printSettings);
-    window.print();
+  /**
+   * Validates and saves prescription permanently to localVisits.
+   * Updates patient's lastVisit and nextFollowUp.
+   */
+  const handleSavePrescription = (status = 'SAVED', triggerPrint = false) => {
+    if (!patient) {
+      alert('Please select a patient before saving.');
+      return null;
+    }
+
+    const validMeds = medicines.filter((m) => m && (m.name || m.dosage));
+    if (validMeds.length === 0 && !diagnosis.trim() && !symptoms.trim()) {
+      alert('Please enter at least one medicine or a diagnosis before saving.');
+      return null;
+    }
+
+    const calculatedFollowUpDate = getFollowUpIsoDate();
+    let computedDays = null;
+    if (followUpOption === 'custom' && followUpCustomDays) {
+      computedDays = Number(followUpCustomDays);
+    } else if (followUpOption !== 'custom') {
+      computedDays = Number(followUpOption);
+    }
+
+    const visitPayload = {
+      id: currentRxId || undefined,
+      patientId: patient.id,
+      patientName: patient.name,
+      patientMobile: patient.contact || patient.mobile || '',
+      patientAge: patient.age,
+      patientGender: patient.gender,
+      vitals,
+      symptoms,
+      diagnosis,
+      advice,
+      notes,
+      medicines: validMeds,
+      followUpDays: computedDays,
+      followUpDate: calculatedFollowUpDate || null,
+      nextFollowUp: calculatedFollowUpDate || null,
+      status: status,
+    };
+
+    const savedVisit = localVisits.save(visitPayload);
+    setCurrentRxId(savedVisit.id);
+
+    setSaveFeedback({
+      type: 'success',
+      message: `Prescription saved permanently (${savedVisit.id})`,
+    });
+    setTimeout(() => setSaveFeedback(null), 4000);
+
+    if (triggerPrint) {
+      applyPrintSettings(printSettings);
+      window.print();
+    }
+
+    return savedVisit;
   };
 
+  const handlePrint = () => {
+    handleSavePrescription('PRINTED', true);
+  };
+
+  const handleShareWhatsApp = () => {
+    const visit = handleSavePrescription(currentRxId ? 'SAVED' : 'SAVED', false);
+    if (!visit) return;
+    const waUrl = generatePrescriptionWhatsAppLink(patient, visit, clinicSettings);
+    window.open(waUrl, '_blank');
+  };
+
+  const handleSelectPatientFromList = (selectedPt) => {
+    setPatient(selectedPt);
+    setPatientSearchQuery('');
+  };
+
+  const filteredPatients = patientSearchQuery
+    ? allPatients.filter(
+        (p) =>
+          (p.name && p.name.toLowerCase().includes(patientSearchQuery.toLowerCase())) ||
+          (p.contact && p.contact.includes(patientSearchQuery)) ||
+          (p.id && p.id.toLowerCase().includes(patientSearchQuery.toLowerCase()))
+      )
+    : allPatients.slice(0, 5);
+
+  // If no patient selected yet, show quick selection screen
   if (!patient) {
     return (
       <div className="prescription-page">
         <div className="prescription-error">
-          <p>No patient selected. Please select a patient first.</p>
-          <button type="button" className="btn-primary" onClick={() => navigate('/patients')}>
-            Go to Patients
-          </button>
+          <div className="flex items-center justify-center w-12 h-12 mx-auto mb-3 bg-blue-50 text-blue-600 rounded-full">
+            <User size={24} />
+          </div>
+          <h2 className="text-xl font-bold text-slate-800 mb-2">Select a Patient for Prescription</h2>
+          <p className="text-sm text-slate-500 mb-5">
+            Choose an existing patient or search by name / mobile to begin.
+          </p>
+
+          <div className="mb-4 text-left">
+            <input
+              type="text"
+              placeholder="Search patient name, phone, or ID..."
+              value={patientSearchQuery}
+              onChange={(e) => setPatientSearchQuery(e.target.value)}
+              className="vital-input w-full mb-3"
+              autoFocus
+            />
+
+            <div className="border border-slate-200 rounded-lg divide-y divide-slate-100 max-h-56 overflow-y-auto bg-slate-50">
+              {filteredPatients.length > 0 ? (
+                filteredPatients.map((p) => (
+                  <div
+                    key={p.id}
+                    onClick={() => handleSelectPatientFromList(p)}
+                    className="p-3 hover:bg-blue-50 cursor-pointer flex justify-between items-center transition-colors"
+                  >
+                    <div>
+                      <p className="font-semibold text-slate-900 text-sm">{p.name}</p>
+                      <p className="text-xs text-slate-500">
+                        {p.age ? `${p.age} Yrs` : ''} • {p.gender || 'N/A'} • {p.contact || p.mobile}
+                      </p>
+                    </div>
+                    <span className="text-xs font-semibold px-2 py-1 bg-white border border-slate-200 rounded text-blue-600">
+                      Select
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div className="p-4 text-center text-sm text-slate-400">No patients found.</div>
+              )}
+            </div>
+          </div>
+
+          <div className="flex justify-center gap-3 mt-4">
+            <button type="button" className="btn-secondary" onClick={() => navigate('/patients')}>
+              Go to Patients Directory
+            </button>
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={() => {
+                const walkIn = {
+                  id: `PT-${Date.now().toString().slice(-6)}`,
+                  name: 'Walk-in Patient',
+                  age: 30,
+                  gender: 'Male',
+                  contact: '',
+                };
+                setPatient(walkIn);
+              }}
+            >
+              Start as Walk-in
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
+  const followUpDisplay = getFollowUpFormattedDisplay();
+
   return (
     <div className={`prescription-page ${printSettings.padMode ? 'pad-mode' : 'digital-mode'}`}>
-      {/* Screen-only controls */}
+      {/* Save Notification Banner */}
+      {saveFeedback && (
+        <div className="prescription-toast-notification no-print">
+          <Check size={16} className="text-emerald-500 mr-2" />
+          <span>{saveFeedback.message}</span>
+        </div>
+      )}
+
+      {/* Screen-only controls bar */}
       <div className="prescription-controls no-print">
         <div className="controls-left">
           <button type="button" className="btn-secondary" onClick={() => navigate(-1)}>
-            <X size={16} />
-            Cancel
+            <ArrowLeft size={15} />
+            Back
           </button>
+          {currentRxId && (
+            <span className="inline-flex items-center px-2.5 py-1 text-xs font-mono font-semibold rounded bg-slate-100 text-slate-700 border border-slate-200">
+              Rx: {currentRxId}
+            </span>
+          )}
         </div>
 
         {/* Quick Print Alignment Bar */}
@@ -168,7 +431,7 @@ function PrescriptionPage() {
               type="button"
               className={`prescription-mode-toggle-btn ${printSettings.padMode ? 'is-active' : ''}`}
               onClick={() => handleTogglePadMode(true)}
-              title="Print for doctor letterhead pad (skips top logo area)"
+              title="Print for doctor letterhead pad (leaves top margin for pad logo)"
             >
               Pad Mode
             </button>
@@ -184,9 +447,9 @@ function PrescriptionPage() {
 
           {printSettings.padMode && (
             <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
-              <label htmlFor="quick-top-offset">
+              <label htmlFor="quick-top-offset" className="flex items-center gap-1 text-xs font-semibold text-slate-600">
                 <Sliders size={13} className="text-slate-400" />
-                Offset:
+                Pad Offset:
               </label>
               <input
                 id="quick-top-offset"
@@ -196,6 +459,7 @@ function PrescriptionPage() {
                 step="5"
                 value={printSettings.topOffsetMm || 60}
                 onChange={handleQuickOffsetChange}
+                className="w-24 accent-blue-600 cursor-pointer"
               />
               <span className="prescription-offset-badge">
                 {printSettings.topOffsetMm || 60} mm
@@ -204,9 +468,45 @@ function PrescriptionPage() {
           )}
         </div>
 
+        {/* Action Buttons */}
         <div className="controls-right">
-          <button type="button" className="btn-primary" onClick={handlePrint}>
-            <Printer size={16} />
+          <button
+            type="button"
+            className="btn-preview"
+            onClick={() => setIsPreviewOpen(true)}
+            title="Preview how prescription will look when printed"
+          >
+            <Eye size={15} />
+            Preview
+          </button>
+
+          <button
+            type="button"
+            className="btn-whatsapp"
+            onClick={handleShareWhatsApp}
+            title="Save and share prescription via WhatsApp"
+          >
+            <MessageCircle size={15} />
+            Share WhatsApp
+          </button>
+
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={() => handleSavePrescription('SAVED', false)}
+            title="Save prescription record to database"
+          >
+            <Save size={15} />
+            Save
+          </button>
+
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={handlePrint}
+            title="Save and print prescription"
+          >
+            <Printer size={15} />
             Print Prescription
           </button>
         </div>
@@ -238,24 +538,28 @@ function PrescriptionPage() {
           <div className="patient-info-grid">
             <div className="info-item">
               <span className="info-label">Name:</span>
-              <span className="info-value">{patient.name}</span>
+              <span className="info-value font-semibold">{patient.name}</span>
             </div>
             <div className="info-item">
-              <span className="info-label">Age:</span>
-              <span className="info-value">{patient.age} years</span>
-            </div>
-            <div className="info-item">
-              <span className="info-label">Gender:</span>
-              <span className="info-value">{patient.gender || 'N/A'}</span>
+              <span className="info-label">Age/Sex:</span>
+              <span className="info-value">
+                {patient.age ? `${patient.age} Yrs` : 'N/A'} / {patient.gender || 'N/A'}
+              </span>
             </div>
             <div className="info-item">
               <span className="info-label">Phone:</span>
-              <span className="info-value">{patient.contact}</span>
+              <span className="info-value">{patient.contact || patient.mobile || 'N/A'}</span>
+            </div>
+            <div className="info-item">
+              <span className="info-label">Date:</span>
+              <span className="info-value">
+                {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+              </span>
             </div>
           </div>
         </section>
 
-        {/* 2. Basic Vitals Section - Single Row */}
+        {/* 2. Full Vitals Section - 6 Inputs (BP, Weight, Blood Sugar, Temp, Pulse, SpO2) */}
         <section className="prescription-section vitals-section">
           <h3 className="section-title">Vitals</h3>
           <div className="vitals-grid">
@@ -282,7 +586,29 @@ function PrescriptionPage() {
               />
             </div>
             <div className="vital-item">
-              <label htmlFor="pulse">Pulse Rate:</label>
+              <label htmlFor="bloodSugar">Blood Sugar:</label>
+              <input
+                id="bloodSugar"
+                type="text"
+                placeholder="mg/dL"
+                value={vitals.bloodSugar}
+                onChange={(e) => handleVitalChange('bloodSugar', e.target.value)}
+                className="vital-input"
+              />
+            </div>
+            <div className="vital-item">
+              <label htmlFor="temperature">Temp:</label>
+              <input
+                id="temperature"
+                type="text"
+                placeholder="°F"
+                value={vitals.temperature}
+                onChange={(e) => handleVitalChange('temperature', e.target.value)}
+                className="vital-input"
+              />
+            </div>
+            <div className="vital-item">
+              <label htmlFor="pulse">Pulse:</label>
               <input
                 id="pulse"
                 type="text"
@@ -326,88 +652,155 @@ function PrescriptionPage() {
             id="diagnosis"
             value={diagnosis}
             onChange={(e) => setDiagnosis(e.target.value)}
-            placeholder="Enter diagnosis..."
+            placeholder="Enter clinical diagnosis..."
             minRows={2}
             className="prescription-textarea"
           />
         </section>
 
-        {/* 4.5. Additional Notes - Optional */}
-        <section className="prescription-section">
-          <h3 className="section-title">Notes</h3>
-          <AutoResizeTextarea
-            id="notes"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Enter additional notes (optional)..."
-            minRows={2}
-            className="prescription-textarea"
-          />
-        </section>
-
-        {/* 5. Prescription / Medicines - Dynamic Table */}
+        {/* 5. Prescription / Medicines - Dynamic Table with Autocomplete */}
         <section className="prescription-section medicines-section">
           <div className="section-header">
-            <h3 className="section-title">Rx</h3>
+            <h3 className="section-title">Rx (Medicines)</h3>
             <button type="button" className="btn-add-medicine no-print" onClick={addMedicineRow}>
               <Plus size={14} />
               Add Medicine
             </button>
           </div>
 
-          <MedicineTable medicines={medicines} onUpdate={updateMedicine} onUpdateMedicineFull={updateMedicineFull} onRemove={removeMedicineRow} />
+          <MedicineTable
+            medicines={medicines}
+            onUpdate={updateMedicine}
+            onUpdateMedicineFull={updateMedicineFull}
+            onRemove={removeMedicineRow}
+          />
         </section>
 
-        {/* 6. Follow-up / Next Visit - Auto Calculate */}
+        {/* 6. Advice / Dietary Instructions */}
+        <section className="prescription-section">
+          <h3 className="section-title">Advice & Instructions</h3>
+          <AutoResizeTextarea
+            id="advice"
+            value={advice}
+            onChange={(e) => setAdvice(e.target.value)}
+            placeholder="Enter patient advice, dietary directions, lifestyle recommendations..."
+            minRows={2}
+            className="prescription-textarea"
+          />
+        </section>
+
+        {/* 6.5. Internal Notes (Optional) */}
+        <section className="prescription-section no-print">
+          <h3 className="section-title text-slate-500">Internal Doctor Notes (Not Printed)</h3>
+          <AutoResizeTextarea
+            id="notes"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Doctor's private observations or review notes..."
+            minRows={1}
+            className="prescription-textarea text-slate-600 bg-slate-50"
+          />
+        </section>
+
+        {/* 7. Follow-up / Next Visit - Quick Chips & Date Calculation */}
         <section className="prescription-section followup-section">
           <h3 className="section-title">Next Follow-Up</h3>
-          <div className="followup-grid">
-            <div className="followup-item">
-              <label htmlFor="followup-days">Follow-up in:</label>
-              <select
-                id="followup-days"
-                value={followUpCustomDays ? 'custom' : followUpDays}
-                onChange={(e) => {
-                  if (e.target.value === 'custom') {
-                    setFollowUpDays(0);
-                  } else {
-                    setFollowUpDays(parseInt(e.target.value));
-                    setFollowUpCustomDays('');
-                  }
-                }}
-                className="followup-select"
-              >
-                <option value="7">7 Days</option>
-                <option value="14">14 Days</option>
-                <option value="30">30 Days</option>
-                <option value="45">45 Days</option>
-                <option value="60">60 Days</option>
-                <option value="custom">Custom</option>
-              </select>
-            </div>
 
-            {(!followUpDays || followUpDays === 0) && (
-              <div className="followup-item">
-                <label htmlFor="custom-days">Custom Days:</label>
-                <input
-                  id="custom-days"
-                  type="number"
-                  min="1"
-                  placeholder="Enter days"
-                  value={followUpCustomDays}
-                  onChange={(e) => setFollowUpCustomDays(e.target.value)}
-                  className="followup-input"
-                />
+          {/* Quick Selection Chips (Screen Only) */}
+          <div className="followup-chips no-print">
+            {['7', '14', '30'].map((chipDays) => (
+              <button
+                key={chipDays}
+                type="button"
+                className={`followup-chip ${followUpOption === chipDays ? 'active' : ''}`}
+                onClick={() => {
+                  setFollowUpOption(chipDays);
+                  setFollowUpCustomDays('');
+                  setFollowUpCustomDate('');
+                }}
+              >
+                {chipDays} Days
+              </button>
+            ))}
+            <button
+              type="button"
+              className={`followup-chip ${followUpOption === 'custom' ? 'active' : ''}`}
+              onClick={() => setFollowUpOption('custom')}
+            >
+              Custom
+            </button>
+          </div>
+
+          <div className="followup-grid">
+            {followUpOption === 'custom' && (
+              <div className="followup-item no-print">
+                <label htmlFor="custom-days">Custom Days or Pick Date:</label>
+                <div className="flex gap-2">
+                  <input
+                    id="custom-days"
+                    type="number"
+                    min="1"
+                    placeholder="Days (e.g. 10)"
+                    value={followUpCustomDays}
+                    onChange={(e) => {
+                      setFollowUpCustomDays(e.target.value);
+                      setFollowUpCustomDate('');
+                    }}
+                    className="followup-input w-28"
+                  />
+                  <input
+                    id="custom-date"
+                    type="date"
+                    value={followUpCustomDate}
+                    onChange={(e) => {
+                      setFollowUpCustomDate(e.target.value);
+                      setFollowUpCustomDays('');
+                    }}
+                    className="followup-input flex-1"
+                  />
+                </div>
               </div>
             )}
 
             <div className="followup-item">
-              <label>Scheduled Date:</label>
-              <span className="followup-date">{getFollowUpDate() || 'Select days above'}</span>
+              <label>Scheduled Follow-up Date:</label>
+              <div className="followup-date">
+                <Calendar size={15} className="text-blue-600 mr-2 inline" />
+                <span>{followUpDisplay || 'No follow-up scheduled'}</span>
+              </div>
             </div>
           </div>
         </section>
+
+        {/* Doctor Signature Block (Prints at bottom) */}
+        <div className="prescription-doctor-signature">
+          <div className="signature-line">
+            <p className="signature-doctor">{clinicSettings.doctorName || 'Dr. Aarav Sharma'}</p>
+            <p className="signature-clinic">{clinicSettings.clinicName || 'ClinicRx Medical Centre'}</p>
+          </div>
+        </div>
       </div>
+
+      {/* Print Preview Modal */}
+      <PrintPreviewModal
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        patient={patient}
+        vitals={vitals}
+        symptoms={symptoms}
+        diagnosis={diagnosis}
+        advice={advice}
+        medicines={medicines}
+        followUpDate={followUpDisplay}
+        rxId={currentRxId}
+        printSettings={printSettings}
+        clinicSettings={clinicSettings}
+        onPrint={() => {
+          setIsPreviewOpen(false);
+          handlePrint();
+        }}
+        onShareWhatsApp={handleShareWhatsApp}
+      />
     </div>
   );
 }

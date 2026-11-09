@@ -131,21 +131,34 @@
 
 .vitals-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 1024px) {
+  .vitals-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .vitals-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .vital-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
 }
 
 .vital-item label {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   color: #334155;
-  min-width: 70px;
+  min-width: auto;
+  white-space: nowrap;
   flex-shrink: 0;
 }
 
