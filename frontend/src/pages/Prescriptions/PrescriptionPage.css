@@ -1143,8 +1143,40 @@
   color: #0f172a;
 }
 
+.calibration-ruler-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 125mm;
+  pointer-events: none;
+}
+
+.calibration-top-edge-marker {
+  position: absolute;
+  top: 0;
+  left: 10mm;
+  right: 10mm;
+  border-top: 2px solid #0f172a;
+  text-align: center;
+  font-size: 8px;
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 1px;
+  line-height: 1.2;
+  padding-top: 1.5mm;
+}
+
+.calibration-info-section {
+  position: absolute;
+  top: 130mm;
+  left: 0;
+  right: 0;
+  padding: 0 15mm;
+}
+
 .calibration-header {
-  padding: 10mm 15mm 4mm;
+  padding: 0 0 4mm 0;
   border-bottom: 2px solid #0f172a;
 }
 
@@ -1185,7 +1217,7 @@
 }
 
 .calibration-guide-box {
-  margin: 4mm 15mm 0;
+  margin: 4mm 0 0 0;
   padding: 8px 12px;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
@@ -1199,13 +1231,6 @@
   list-style: none;
   color: #475569;
   line-height: 1.5;
-}
-
-.calibration-ruler-area {
-  position: relative;
-  width: 100%;
-  height: 160mm;
-  margin-top: 0;
 }
 
 .calibration-line-marker {
@@ -1333,7 +1358,18 @@
     width: 210mm;
     height: 297mm;
     margin: 0;
+    padding: 0;
+    position: relative;
+    top: 0;
+    left: 0;
     page-break-after: avoid;
+  }
+
+  body.printing-calibration .calibration-ruler-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
   }
 }
 

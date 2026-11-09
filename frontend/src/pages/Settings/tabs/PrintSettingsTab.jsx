@@ -70,19 +70,34 @@ export function PrintSettingsTab() {
   };
 
   const handleResetDefaults = () => {
-    handlePrintChange('topOffsetMm', DEFAULT_PRINT_SETTINGS.topOffsetMm);
-    handlePrintChange('leftMarginMm', DEFAULT_PRINT_SETTINGS.leftMarginMm);
-    handlePrintChange('rightMarginMm', DEFAULT_PRINT_SETTINGS.rightMarginMm);
-    handlePrintChange('bottomOffsetMm', DEFAULT_PRINT_SETTINGS.bottomOffsetMm);
-    handlePrintChange('padMode', DEFAULT_PRINT_SETTINGS.padMode);
+    setSettings((prev) => {
+      const updatedPrint = {
+        ...(prev.print || {}),
+        topOffsetMm: DEFAULT_PRINT_SETTINGS.topOffsetMm,
+        leftMarginMm: DEFAULT_PRINT_SETTINGS.leftMarginMm,
+        rightMarginMm: DEFAULT_PRINT_SETTINGS.rightMarginMm,
+        bottomOffsetMm: DEFAULT_PRINT_SETTINGS.bottomOffsetMm,
+        bottomMarginMm: DEFAULT_PRINT_SETTINGS.bottomMarginMm,
+        padMode: DEFAULT_PRINT_SETTINGS.padMode,
+      };
+      applyPrintSettings(updatedPrint);
+      return {
+        ...prev,
+        print: updatedPrint,
+      };
+    });
+    setSavedSuccess(false);
   };
 
   const handleTestPrint = () => {
     document.body.classList.add('printing-calibration');
-    window.print();
-    setTimeout(() => {
+    const cleanup = () => {
       document.body.classList.remove('printing-calibration');
-    }, 1000);
+      window.removeEventListener('afterprint', cleanup);
+    };
+    window.addEventListener('afterprint', cleanup);
+    window.print();
+    setTimeout(cleanup, 60000); // 60s safety fallback
   };
 
   const printConfig = settings.print || DEFAULT_PRINT_SETTINGS;

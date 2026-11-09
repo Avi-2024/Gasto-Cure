@@ -214,7 +214,7 @@ describe('Print Settings & Alignment Engine', () => {
   });
 
   describe('5. TestPrintSheet Component', () => {
-    it('renders calibration marks at 30mm, 40mm, 50mm, 60mm, 70mm, 80mm, 90mm, 100mm, 110mm, 120mm', () => {
+    it('renders calibration marks at 30mm, 40mm, 50mm, 60mm, 70mm, 80mm, 90mm, 100mm, 110mm, 120mm measuring from page top (0mm)', () => {
       const onPrint = vi.fn();
       const onClose = vi.fn();
 
@@ -224,11 +224,23 @@ describe('Print Settings & Alignment Engine', () => {
       expect(screen.getByText(/Print Alignment Calibration Sheet/i)).toBeTruthy();
       expect(screen.getByText(/Doctor Letterhead Stationery Alignment Sheet/i)).toBeTruthy();
 
-      // Check all calibration millimeter lines are rendered
+      // Verify physical zero reference marker
+      expect(screen.getByText(/PHYSICAL TOP EDGE OF A4 PAPER/i)).toBeTruthy();
+
+      // Verify ruler area is present and properly positioned
+      const rulerArea = screen.getByTestId('calibration-ruler-area');
+      expect(rulerArea).toBeTruthy();
+      expect(rulerArea.className).toContain('calibration-ruler-area');
+
+      // Check all calibration millimeter lines are rendered with exact millimeter styles
       const requiredMarks = [30, 40, 50, 60, 70, 80, 90, 100, 110, 120];
       requiredMarks.forEach((mm) => {
         const matches = screen.getAllByText(new RegExp(`${mm}\\s*mm`, 'i'));
         expect(matches.length).toBeGreaterThan(0);
+
+        const markerEl = document.querySelector(`.calibration-line-marker[data-mm="${mm}"]`);
+        expect(markerEl).toBeTruthy();
+        expect(markerEl.style.top).toBe(`${mm}mm`);
       });
 
       // Check trigger print button
@@ -239,6 +251,14 @@ describe('Print Settings & Alignment Engine', () => {
       // Check close button
       const closeBtn = screen.getByTitle(/Close/i);
       fireEvent.click(closeBtn);
+      expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('closes TestPrintSheet on Escape key press', () => {
+      const onClose = vi.fn();
+      render(React.createElement(TestPrintSheet, { onClose }));
+
+      fireEvent.keyDown(window, { key: 'Escape' });
       expect(onClose).toHaveBeenCalledTimes(1);
     });
   });
@@ -276,6 +296,19 @@ describe('Print Settings & Alignment Engine', () => {
 
       // CSS variable should have been applied live
       expect(document.documentElement.style.getPropertyValue('--print-top-offset')).toBe('85mm');
+    });
+
+    it('resets print margins to default in a single batch when clicking Reset Defaults', () => {
+      render(React.createElement(PrintSettingsTab));
+
+      const topOffsetSlider = screen.getByLabelText(/Top Header Offset/i);
+      fireEvent.change(topOffsetSlider, { target: { value: '95' } });
+      expect(document.documentElement.style.getPropertyValue('--print-top-offset')).toBe('95mm');
+
+      const resetBtn = screen.getByTitle(/Reset to 60mm default/i);
+      fireEvent.click(resetBtn);
+
+      expect(document.documentElement.style.getPropertyValue('--print-top-offset')).toBe('60mm');
     });
 
     it('toggles to digital letterhead mode and back to pad mode', () => {
