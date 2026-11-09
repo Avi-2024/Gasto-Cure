@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import {
   CalendarDays,
   ClipboardList,
+  FileText,
   LayoutDashboard,
   LogOut,
   Pill,
@@ -19,7 +20,8 @@ const menuItems = [
   { label: 'Consultation', to: '/doctor/consultation', icon: ClipboardList, roles: ['CLINIC_OWNER', 'DOCTOR'] },
   { label: 'Patients', to: '/patients', icon: Users, roles: ['CLINIC_OWNER', 'DOCTOR', 'RECEPTIONIST'] },
   { label: 'Appointments', to: '/appointments', icon: CalendarDays, roles: ['CLINIC_OWNER', 'DOCTOR', 'RECEPTIONIST'] },
-  { label: 'Prescriptions', to: '/prescriptions', icon: Pill, roles: ['CLINIC_OWNER', 'DOCTOR'] },
+  { label: 'Prescriptions', to: '/prescriptions', icon: FileText, roles: ['CLINIC_OWNER', 'DOCTOR'] },
+  { label: 'Medicines', to: '/medicines', icon: Pill, roles: ['CLINIC_OWNER', 'DOCTOR'] },
 ];
 
 function Sidebar({ isOpen, onClose }) {
