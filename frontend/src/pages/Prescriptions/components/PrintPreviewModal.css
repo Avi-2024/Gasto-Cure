@@ -16,6 +16,12 @@
   animation: fadeIn 0.2s ease-out;
 }
 
+@media print {
+  .preview-modal-overlay {
+    display: none !important;
+  }
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

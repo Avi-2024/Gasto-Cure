@@ -36,6 +36,8 @@ describe('Prescription & WhatsApp Workflow Tests', () => {
       expect(cleanPhoneNumber(null)).toBe('');
       expect(cleanPhoneNumber(undefined)).toBe('');
       expect(cleanPhoneNumber('')).toBe('');
+      expect(cleanPhoneNumber('N/A')).toBe('');
+      expect(cleanPhoneNumber('na')).toBe('');
     });
   });
 
@@ -199,6 +201,17 @@ describe('Prescription & WhatsApp Workflow Tests', () => {
       const updatedPatient = localPatients.getById('PT-501');
       expect(updatedPatient.lastVisit).toBeDefined();
       expect(updatedPatient.nextFollowUp).toBe('2026-11-23');
+
+      // 3. Resaving the same prescription with same ID updates the visit without creating duplicate
+      const reSaved = localVisits.save({
+        ...savedVisit,
+        diagnosis: 'Dyspepsia - Resolved',
+      });
+      expect(reSaved.id).toBe(savedVisit.id);
+      expect(reSaved.diagnosis).toBe('Dyspepsia - Resolved');
+      const allVisitsAfterUpdate = localVisits.getAll();
+      expect(allVisitsAfterUpdate.length).toBe(1);
+      expect(allVisitsAfterUpdate[0].diagnosis).toBe('Dyspepsia - Resolved');
     });
   });
 });

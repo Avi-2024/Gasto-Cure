@@ -15,7 +15,18 @@
  */
 export const cleanPhoneNumber = (phone) => {
   if (!phone) return '';
-  let cleaned = String(phone).trim().replace(/[\s\-\(\)\.]+/g, '');
+  let str = String(phone).trim();
+  if (
+    str.toLowerCase() === 'n/a' ||
+    str.toLowerCase() === 'na' ||
+    str.toLowerCase() === 'null' ||
+    str.toLowerCase() === 'undefined'
+  ) {
+    return '';
+  }
+
+  // Strip non-digit characters except leading +
+  let cleaned = str.replace(/[^\d+]/g, '');
 
   if (cleaned.startsWith('+')) {
     cleaned = cleaned.slice(1);
@@ -29,6 +40,10 @@ export const cleanPhoneNumber = (phone) => {
   // If 11 digits starting with 0 (e.g. 09876543210)
   if (cleaned.length === 11 && cleaned.startsWith('0')) {
     cleaned = cleaned.slice(1);
+  }
+
+  if (!/^\d+$/.test(cleaned)) {
+    return '';
   }
 
   return cleaned;

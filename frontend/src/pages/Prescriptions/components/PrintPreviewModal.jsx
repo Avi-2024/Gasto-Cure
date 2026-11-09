@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { X, Printer, MessageCircle, FileText, CheckCircle2 } from 'lucide-react';
 import './PrintPreviewModal.css';
 
@@ -14,6 +14,7 @@ function PrintPreviewModal({
   isOpen,
   onClose,
   patient,
+  prescriptionDate,
   vitals = {},
   symptoms = '',
   diagnosis = '',
@@ -26,17 +27,38 @@ function PrintPreviewModal({
   onPrint,
   onShareWhatsApp,
 }) {
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const padMode = Boolean(printSettings?.padMode);
   const topOffsetMm = Number(printSettings?.topOffsetMm) || 60;
   const doctorName = clinicSettings?.doctorName || 'Dr. Aarav Sharma';
   const clinicName = clinicSettings?.clinicName || 'ClinicRx Medical Centre';
-  const todayFormatted = new Date().toLocaleDateString('en-IN', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  });
+
+  let formattedDate = '';
+  if (prescriptionDate) {
+    if (prescriptionDate.includes('T')) {
+      formattedDate = prescriptionDate.split('T')[0];
+    } else {
+      formattedDate = prescriptionDate;
+    }
+  } else {
+    formattedDate = new Date().toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
+  }
 
   const validMedicines = medicines.filter((m) => m && (m.name || m.dosage));
 
@@ -50,7 +72,7 @@ function PrintPreviewModal({
   );
 
   return (
-    <div className="preview-modal-overlay" onClick={onClose} role="dialog" aria-modal="true">
+    <div className="preview-modal-overlay no-print" onClick={onClose} role="dialog" aria-modal="true">
       <div className="preview-modal-window" onClick={(e) => e.stopPropagation()}>
         {/* Header Bar */}
         <div className="preview-modal-header">
@@ -156,7 +178,7 @@ function PrintPreviewModal({
                 </div>
                 <div>
                   <span className="label">Date:</span>
-                  <span className="value">{todayFormatted}</span>
+                  <span className="value">{formattedDate}</span>
                 </div>
                 {rxId && (
                   <div>

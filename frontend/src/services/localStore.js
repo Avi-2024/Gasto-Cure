@@ -762,30 +762,50 @@ export const localVisits = {
 
     const todayDate = getLocalDateString();
 
-    const visit = {
-      id: data.id || generateRxId(),
-      patientId: data.patientId,
-      patientName: data.patientName || '',
-      patientAge: data.patientAge !== undefined ? data.patientAge : '',
-      patientGender: data.patientGender || '',
-      patientMobile: data.patientMobile || data.patientContact || '',
-      appointmentId: data.appointmentId || null,
-      date: data.date || new Date().toISOString(),
-      vitals: data.vitals || {},
-      symptoms: data.symptoms || data.complaints || '',
-      diagnosis: data.diagnosis || '',
-      notes: data.notes || '',
-      medicines: Array.isArray(data.medicines) ? JSON.parse(JSON.stringify(data.medicines)) : [],
-      tests: Array.isArray(data.tests) ? [...data.tests] : [],
-      advice: data.advice || '',
-      followUpDays: data.followUpDays || null,
-      followUpDate,
-      nextFollowUp: followUpDate,
-      status: data.status || 'SAVED',
-      createdAt: new Date().toISOString(),
-    };
+    const existingIndex = data.id ? visits.findIndex((v) => v.id === data.id) : -1;
+    let visit;
 
-    visits.unshift(visit);
+    if (existingIndex >= 0) {
+      visit = {
+        ...visits[existingIndex],
+        ...data,
+        id: data.id,
+        vitals: data.vitals || visits[existingIndex].vitals || {},
+        medicines: Array.isArray(data.medicines)
+          ? JSON.parse(JSON.stringify(data.medicines))
+          : visits[existingIndex].medicines,
+        followUpDate,
+        nextFollowUp: followUpDate,
+        status: data.status || visits[existingIndex].status || 'SAVED',
+        updatedAt: new Date().toISOString(),
+      };
+      visits[existingIndex] = visit;
+    } else {
+      visit = {
+        id: data.id || generateRxId(),
+        patientId: data.patientId,
+        patientName: data.patientName || '',
+        patientAge: data.patientAge !== undefined ? data.patientAge : '',
+        patientGender: data.patientGender || '',
+        patientMobile: data.patientMobile || data.patientContact || '',
+        appointmentId: data.appointmentId || null,
+        date: data.date || new Date().toISOString(),
+        vitals: data.vitals || {},
+        symptoms: data.symptoms || data.complaints || '',
+        diagnosis: data.diagnosis || '',
+        notes: data.notes || '',
+        medicines: Array.isArray(data.medicines) ? JSON.parse(JSON.stringify(data.medicines)) : [],
+        tests: Array.isArray(data.tests) ? [...data.tests] : [],
+        advice: data.advice || '',
+        followUpDays: data.followUpDays || null,
+        followUpDate,
+        nextFollowUp: followUpDate,
+        status: data.status || 'SAVED',
+        createdAt: data.createdAt || new Date().toISOString(),
+      };
+      visits.unshift(visit);
+    }
+
     save(KEYS.visits, visits);
 
     // Side effect: update patient record

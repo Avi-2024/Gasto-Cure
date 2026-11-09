@@ -5,406 +5,380 @@ import {
   Search,
   Plus,
   Printer,
+  MessageCircle,
   Calendar,
   User,
-  MessageCircle,
-  Eye,
-  ChevronLeft,
-  ChevronRight,
   Pill,
-  Clock,
-  Sparkles,
+  Filter,
+  CheckCircle,
 } from 'lucide-react';
 import { localVisits, localPatients, localSettings } from '../../services/localStore';
 import { generatePrescriptionWhatsAppLink } from '../../utils/whatsappHelper';
-import usePagination from '../../hooks/usePagination';
 
-export default function PrescriptionsPage() {
+/**
+ * Convert any date input into a local YYYY-MM-DD string,
+ * avoiding UTC timezone boundary mismatches.
+ */
+const toLocalDateStr = (dateInput) => {
+  if (!dateInput) return '';
+  try {
+    const d = new Date(dateInput);
+    if (isNaN(d.getTime())) {
+      return String(dateInput).split('T')[0];
+    }
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  } catch {
+    return String(dateInput).split('T')[0];
+  }
+};
+
+const formatDisplayDate = (dateInput) => {
+  if (!dateInput) return '-';
+  try {
+    const d = new Date(dateInput);
+    if (isNaN(d.getTime())) return String(dateInput);
+    return d.toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  } catch {
+    return String(dateInput);
+  }
+};
+
+/**
+ * PrescriptionsPage Component
+ *
+ * Active prescriptions repository and history management.
+ * - Displays all past prescriptions chronologically
+ * - Search by patient name, phone, or RX ID
+ * - Filters: All, Today, Past 7 Days
+ * - Quick Actions: View / Reprint, Share via WhatsApp
+ */
+function PrescriptionsPage() {
   const navigate = useNavigate();
-  const [prescriptions, setPrescriptions] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [dateFilter, setDateFilter] = useState('all'); // all, today, thisWeek, thisMonth
-  const [clinicSettings, setClinicSettings] = useState(() => localSettings.get());
 
+  const [prescriptions, setPrescriptions] = useState([]);
+  const [clinicSettings, setClinicSettings] = useState(() => localSettings.get());
+  const [searchQuery, setSearchQuery] = useState('');
+  const [dateFilter, setDateFilter] = useState('all'); // 'all' | 'today' | 'week'
+  const [copiedId, setCopiedId] = useState(null);
+
+  // Load visits
   useEffect(() => {
-    // Seed sample patients/visits if needed
-    localPatients.seed();
-    setPrescriptions(localVisits.getAll());
+    const visits = localVisits.getAll();
+    setPrescriptions(visits);
     setClinicSettings(localSettings.get());
   }, []);
 
-  // Filtered prescriptions
-  const filtered = useMemo(() => {
-    const q = searchQuery.toLowerCase().trim();
-    const now = new Date();
-    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(
-      now.getDate()
-    ).padStart(2, '0')}`;
+  const todayStr = useMemo(() => toLocalDateStr(new Date()), []);
 
+  const sevenDaysAgoStr = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 7);
+    return toLocalDateStr(d);
+  }, []);
+
+  // Filtered Prescriptions
+  const filteredPrescriptions = useMemo(() => {
     return prescriptions.filter((rx) => {
-      // Text match
-      const rxId = String(rx.id || '').toLowerCase();
-      const patientName = String(rx.patientName || '').toLowerCase();
-      const patientMobile = String(rx.patientMobile || '').toLowerCase();
-      const diagnosis = String(rx.diagnosis || '').toLowerCase();
-      const symptoms = String(rx.symptoms || '').toLowerCase();
-
+      // Search filter
+      const q = searchQuery.trim().toLowerCase();
       const matchesSearch =
         !q ||
-        rxId.includes(q) ||
-        patientName.includes(q) ||
-        patientMobile.includes(q) ||
-        diagnosis.includes(q) ||
-        symptoms.includes(q);
+        (rx.id && rx.id.toLowerCase().includes(q)) ||
+        (rx.patientName && rx.patientName.toLowerCase().includes(q)) ||
+        (rx.patientMobile && rx.patientMobile.includes(q)) ||
+        (rx.diagnosis && rx.diagnosis.toLowerCase().includes(q));
 
       if (!matchesSearch) return false;
 
-      // Date filter
-      if (dateFilter === 'all') return true;
-
-      const rxDateStr = rx.date ? rx.date.split('T')[0] : '';
+      // Date filter with timezone-safe conversion
       if (dateFilter === 'today') {
+        const rxDateStr = toLocalDateStr(rx.date || rx.createdAt);
         return rxDateStr === todayStr;
       }
-      if (dateFilter === 'thisWeek') {
-        const rxDate = new Date(rx.date || rx.createdAt);
-        const diffTime = Math.abs(now - rxDate);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        return diffDays <= 7;
-      }
-      if (dateFilter === 'thisMonth') {
-        const rxDate = new Date(rx.date || rx.createdAt);
-        return (
-          rxDate.getFullYear() === now.getFullYear() && rxDate.getMonth() === now.getMonth()
-        );
+
+      if (dateFilter === 'week') {
+        const rxDateStr = toLocalDateStr(rx.date || rx.createdAt);
+        return rxDateStr >= sevenDaysAgoStr && rxDateStr <= todayStr;
       }
 
       return true;
     });
-  }, [prescriptions, searchQuery, dateFilter]);
+  }, [prescriptions, searchQuery, dateFilter, todayStr, sevenDaysAgoStr]);
 
-  const { page, totalPages, paginated, prevPage, nextPage, goToPage } = usePagination(filtered, 8);
-
-  useEffect(() => {
-    goToPage(1);
-  }, [searchQuery, dateFilter, goToPage]);
-
-  // Quick stats
+  // Statistics
   const stats = useMemo(() => {
-    const now = new Date();
-    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(
-      now.getDate()
-    ).padStart(2, '0')}`;
-
+    const total = prescriptions.length;
     const todayCount = prescriptions.filter(
-      (rx) => rx.date && rx.date.split('T')[0] === todayStr
+      (rx) => toLocalDateStr(rx.date || rx.createdAt) === todayStr
     ).length;
+    const uniquePatients = new Set(prescriptions.map((rx) => rx.patientId || rx.patientName)).size;
 
-    const followUpCount = prescriptions.filter(
-      (rx) => rx.followUpDate || rx.nextFollowUp
-    ).length;
-
-    return {
-      total: prescriptions.length,
-      today: todayCount,
-      withFollowUp: followUpCount,
-    };
-  }, [prescriptions]);
+    return { total, todayCount, uniquePatients };
+  }, [prescriptions, todayStr]);
 
   const handleShareWhatsApp = (rx) => {
-    const patientObj = localPatients.getById(rx.patientId) || {
-      name: rx.patientName,
-      contact: rx.patientMobile,
-    };
-    const link = generatePrescriptionWhatsAppLink(patientObj, rx, clinicSettings);
-    window.open(link, '_blank', 'noopener,noreferrer');
+    let patient = null;
+    if (rx.patientId) {
+      patient = localPatients.getById(rx.patientId);
+    }
+    if (!patient) {
+      patient = {
+        name: rx.patientName,
+        contact: rx.patientMobile,
+        age: rx.patientAge,
+        gender: rx.patientGender,
+      };
+    }
+    const waUrl = generatePrescriptionWhatsAppLink(patient, rx, clinicSettings);
+    window.open(waUrl, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleViewPrescription = (rxId) => {
+    navigate(`/prescription?visitId=${encodeURIComponent(rxId)}`);
   };
 
   return (
     <div className="space-y-6">
-      {/* Header section */}
-      <section className="app-card p-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <div className="flex items-center gap-3">
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-50 text-sky-700 shadow-sm">
-                <FileText size={22} />
-              </span>
-              <div>
-                <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-                  Prescription Records
-                </h1>
-                <p className="text-sm text-slate-500">
-                  Search, review past prescriptions, reprint on pre-printed pad, or send via WhatsApp
-                </p>
-              </div>
-            </div>
-          </div>
+      {/* Header Bar */}
+      <section className="app-card p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-blue-600">
+            Medical Records
+          </p>
+          <h1 className="mt-1 text-2xl font-bold text-slate-900">Prescription Repository</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Search, review, reprint, or share past patient prescriptions.
+          </p>
+        </div>
 
-          <div className="flex items-center gap-3">
+        <button
+          type="button"
+          className="btn-primary inline-flex items-center gap-2"
+          onClick={() => navigate('/prescription')}
+        >
+          <Plus size={16} />
+          New Prescription
+        </button>
+      </section>
+
+      {/* KPI Cards */}
+      <section className="grid gap-4 sm:grid-cols-3">
+        <article className="app-card p-4 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+            <FileText size={22} />
+          </div>
+          <div>
+            <p className="text-xs font-medium text-slate-500">Total Prescriptions</p>
+            <p className="text-2xl font-bold text-slate-900">{stats.total}</p>
+          </div>
+        </article>
+
+        <article className="app-card p-4 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+            <Calendar size={22} />
+          </div>
+          <div>
+            <p className="text-xs font-medium text-slate-500">Issued Today</p>
+            <p className="text-2xl font-bold text-emerald-700">{stats.todayCount}</p>
+          </div>
+        </article>
+
+        <article className="app-card p-4 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+            <User size={22} />
+          </div>
+          <div>
+            <p className="text-xs font-medium text-slate-500">Unique Patients</p>
+            <p className="text-2xl font-bold text-slate-900">{stats.uniquePatients}</p>
+          </div>
+        </article>
+      </section>
+
+      {/* Filter and Search Bar */}
+      <section className="app-card p-4 flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+        <div className="relative flex-1">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search by patient name, phone, RX number, or diagnosis..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-semibold text-slate-500 flex items-center gap-1">
+            <Filter size={13} />
+            Date:
+          </span>
+          <div className="inline-flex rounded-lg border border-slate-200 p-0.5 bg-slate-50">
             <button
               type="button"
-              className="btn-primary inline-flex items-center gap-2 shadow-sm"
-              onClick={() => navigate('/prescription/new')}
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                dateFilter === 'all'
+                  ? 'bg-white text-blue-600 shadow-sm font-semibold'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+              onClick={() => setDateFilter('all')}
             >
-              <Plus size={18} />
-              <span>Create Prescription</span>
+              All Time
+            </button>
+            <button
+              type="button"
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                dateFilter === 'today'
+                  ? 'bg-white text-blue-600 shadow-sm font-semibold'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+              onClick={() => setDateFilter('today')}
+            >
+              Today
+            </button>
+            <button
+              type="button"
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                dateFilter === 'week'
+                  ? 'bg-white text-blue-600 shadow-sm font-semibold'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+              onClick={() => setDateFilter('week')}
+            >
+              Past 7 Days
             </button>
           </div>
         </div>
-
-        {/* Stats strip */}
-        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="rounded-2xl border border-medical-border bg-slate-50/60 p-4">
-            <div className="flex items-center justify-between">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                Total Prescriptions
-              </p>
-              <FileText size={16} className="text-sky-600" />
-            </div>
-            <p className="mt-2 text-2xl font-bold text-slate-900">{stats.total}</p>
-          </div>
-
-          <div className="rounded-2xl border border-medical-border bg-slate-50/60 p-4">
-            <div className="flex items-center justify-between">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                Created Today
-              </p>
-              <Clock size={16} className="text-emerald-600" />
-            </div>
-            <p className="mt-2 text-2xl font-bold text-slate-900">{stats.today}</p>
-          </div>
-
-          <div className="rounded-2xl border border-medical-border bg-slate-50/60 p-4">
-            <div className="flex items-center justify-between">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                With Scheduled Follow-Up
-              </p>
-              <Calendar size={16} className="text-amber-600" />
-            </div>
-            <p className="mt-2 text-2xl font-bold text-slate-900">{stats.withFollowUp}</p>
-          </div>
-        </div>
-
-        {/* Filter & Search Bar */}
-        <div className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-[1fr_200px]">
-          <div className="relative">
-            <Search
-              size={16}
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-            />
-            <input
-              type="search"
-              className="w-full rounded-xl border border-medical-border bg-white py-2 pl-9 pr-4 text-sm focus:border-medical-primary focus:outline-none focus:ring-2 focus:ring-medical-primary/20"
-              placeholder="Search by RX ID, patient name, contact, or diagnosis..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-
-          <select
-            className="rounded-xl border border-medical-border bg-white px-3 py-2 text-sm focus:border-medical-primary focus:outline-none focus:ring-2 focus:ring-medical-primary/20"
-            value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value)}
-          >
-            <option value="all">All Dates</option>
-            <option value="today">Today Only</option>
-            <option value="thisWeek">Past 7 Days</option>
-            <option value="thisMonth">This Month</option>
-          </select>
-        </div>
       </section>
 
-      {/* Table section */}
+      {/* Prescriptions Table */}
       <section className="app-card overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-medical-border">
-            <thead className="bg-slate-50">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-slate-50 text-xs font-bold uppercase text-slate-500 border-b border-slate-200">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
-                  Prescription
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
-                  Patient
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
-                  Diagnosis / Complaints
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
-                  Medicines (Rx)
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
-                  Follow-Up
-                </th>
-                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">
-                  Actions
-                </th>
+                <th className="py-3 px-4">Rx Number</th>
+                <th className="py-3 px-4">Date</th>
+                <th className="py-3 px-4">Patient</th>
+                <th className="py-3 px-4">Diagnosis</th>
+                <th className="py-3 px-4">Medicines</th>
+                <th className="py-3 px-4">Follow-up</th>
+                <th className="py-3 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-medical-border bg-white">
-              {paginated.map((rx) => {
-                const rxDate = rx.date
-                  ? new Date(rx.date).toLocaleDateString('en-IN', {
-                      day: '2-digit',
-                      month: 'short',
-                      year: 'numeric',
-                    })
-                  : 'N/A';
+            <tbody className="divide-y divide-slate-100">
+              {filteredPrescriptions.length > 0 ? (
+                filteredPrescriptions.map((rx) => {
+                  const medCount = Array.isArray(rx.medicines) ? rx.medicines.length : 0;
+                  return (
+                    <tr key={rx.id} className="hover:bg-slate-50/70 transition-colors">
+                      {/* Rx ID */}
+                      <td className="py-3.5 px-4 font-mono font-semibold text-xs text-blue-700">
+                        {rx.id}
+                      </td>
 
-                const medCount = Array.isArray(rx.medicines) ? rx.medicines.length : 0;
+                      {/* Date */}
+                      <td className="py-3.5 px-4 text-slate-600 whitespace-nowrap">
+                        {formatDisplayDate(rx.date || rx.createdAt)}
+                      </td>
 
-                return (
-                  <tr key={rx.id} className="transition hover:bg-slate-50/60">
-                    {/* RX ID & Date */}
-                    <td className="px-4 py-3.5">
-                      <div className="flex items-center gap-2">
-                        <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-sky-50 text-sky-700">
-                          <FileText size={16} />
-                        </span>
-                        <div>
-                          <p className="font-mono text-xs font-bold text-slate-900">{rx.id}</p>
-                          <p className="text-xs text-slate-400">{rxDate}</p>
+                      {/* Patient */}
+                      <td className="py-3.5 px-4">
+                        <div className="font-semibold text-slate-900">
+                          {rx.patientName || 'Walk-in'}
                         </div>
-                      </div>
-                    </td>
+                        <div className="text-xs text-slate-400">
+                          {rx.patientAge ? `${rx.patientAge} Yrs • ` : ''}
+                          {rx.patientMobile || 'No contact'}
+                        </div>
+                      </td>
 
-                    {/* Patient Details */}
-                    <td className="px-4 py-3.5">
-                      <div>
-                        <p className="text-sm font-semibold text-slate-900">{rx.patientName}</p>
-                        <p className="text-xs text-slate-500">
-                          {rx.patientAge ? `${rx.patientAge}y` : ''}
-                          {rx.patientGender ? ` • ${rx.patientGender}` : ''}
-                          {rx.patientMobile ? ` • ${rx.patientMobile}` : ''}
-                        </p>
-                      </div>
-                    </td>
+                      {/* Diagnosis */}
+                      <td className="py-3.5 px-4">
+                        <span className="font-medium text-slate-800 line-clamp-1 max-w-[220px]">
+                          {rx.diagnosis || 'General Consultation'}
+                        </span>
+                      </td>
 
-                    {/* Diagnosis / Complaints */}
-                    <td className="px-4 py-3.5">
-                      <div className="max-w-[220px]">
-                        <p className="truncate text-sm font-medium text-slate-800">
-                          {rx.diagnosis || 'No formal diagnosis'}
-                        </p>
-                        {rx.symptoms ? (
-                          <p className="truncate text-xs text-slate-400">{rx.symptoms}</p>
-                        ) : null}
-                      </div>
-                    </td>
-
-                    {/* Medicines count and preview */}
-                    <td className="px-4 py-3.5">
-                      <div className="flex items-center gap-1.5">
-                        <span className="inline-flex items-center gap-1 rounded-full border border-sky-200 bg-sky-50 px-2.5 py-0.5 text-xs font-semibold text-sky-700">
-                          <Pill size={12} />
+                      {/* Medicines Count */}
+                      <td className="py-3.5 px-4">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                          <Pill size={12} className="text-blue-500" />
                           {medCount} {medCount === 1 ? 'med' : 'meds'}
                         </span>
-                      </div>
-                    </td>
+                      </td>
 
-                    {/* Follow-up date */}
-                    <td className="px-4 py-3.5">
-                      {rx.followUpDate || rx.nextFollowUp ? (
-                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-700">
-                          <Calendar size={13} className="text-amber-500" />
-                          {rx.followUpDate || rx.nextFollowUp}
-                        </span>
-                      ) : (
-                        <span className="text-xs text-slate-400">None scheduled</span>
-                      )}
-                    </td>
+                      {/* Follow-up */}
+                      <td className="py-3.5 px-4 whitespace-nowrap text-xs text-slate-600">
+                        {rx.followUpDate || rx.nextFollowUp ? (
+                          <span className="font-medium text-emerald-700">
+                            {formatDisplayDate(rx.followUpDate || rx.nextFollowUp)}
+                          </span>
+                        ) : (
+                          <span className="text-slate-400">None</span>
+                        )}
+                      </td>
 
-                    {/* Action buttons */}
-                    <td className="px-4 py-3.5 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        {/* View / Print button */}
-                        <button
-                          type="button"
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-medical-border bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-medical-primary"
-                          onClick={() => navigate(`/prescription/new?visitId=${rx.id}`)}
-                          title="View / Print Prescription"
-                        >
-                          <Printer size={13} />
-                          <span>Print</span>
-                        </button>
-
-                        {/* WhatsApp button */}
-                        <button
-                          type="button"
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1.5 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100"
-                          onClick={() => handleShareWhatsApp(rx)}
-                          title="Share Prescription via WhatsApp"
-                        >
-                          <MessageCircle size={13} />
-                          <span>WhatsApp</span>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-
-              {paginated.length === 0 ? (
+                      {/* Actions */}
+                      <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                        <div className="inline-flex items-center gap-1.5 justify-end">
+                          <button
+                            type="button"
+                            onClick={() => handleShareWhatsApp(rx)}
+                            className="p-1.5 rounded-md hover:bg-emerald-50 text-emerald-600 border border-emerald-200 transition-colors"
+                            title="Share prescription via WhatsApp"
+                          >
+                            <MessageCircle size={15} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleViewPrescription(rx.id)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs transition-colors"
+                            title="View or print prescription"
+                          >
+                            <Printer size={13} />
+                            View / Print
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
                 <tr>
-                  <td colSpan={6} className="px-4 py-12 text-center text-sm text-slate-500">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <FileText size={32} className="text-slate-300" />
-                      <p className="font-semibold text-slate-700">No prescriptions found</p>
-                      <p className="text-xs text-slate-400">
-                        {searchQuery
-                          ? 'Try adjusting your search criteria.'
-                          : 'Create your first prescription by clicking the button above.'}
-                      </p>
+                  <td colSpan={7} className="py-12 text-center text-slate-400">
+                    <FileText size={36} className="mx-auto mb-2 text-slate-300" />
+                    <p className="font-semibold text-slate-600">No prescriptions found</p>
+                    <p className="text-xs text-slate-400 mt-1">
+                      {searchQuery
+                        ? 'Try adjusting your search criteria.'
+                        : 'Create your first prescription to see it listed here.'}
+                    </p>
+                    {!searchQuery && (
                       <button
                         type="button"
-                        className="btn-primary mt-2 inline-flex items-center gap-1.5 text-xs"
-                        onClick={() => navigate('/prescription/new')}
+                        className="btn-primary text-xs mt-3 inline-flex items-center gap-1.5"
+                        onClick={() => navigate('/prescription')}
                       >
                         <Plus size={14} />
-                        <span>Create Prescription</span>
+                        New Prescription
                       </button>
-                    </div>
+                    )}
                   </td>
                 </tr>
-              ) : null}
+              )}
             </tbody>
           </table>
         </div>
-
-        {/* Pagination controls */}
-        {filtered.length > 0 ? (
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-medical-border bg-slate-50 px-4 py-3">
-            <p className="text-xs text-slate-500">
-              Showing <span className="font-semibold text-slate-700">{paginated.length}</span> of{' '}
-              <span className="font-semibold text-slate-700">{filtered.length}</span> prescriptions
-            </p>
-
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                className="btn-secondary py-1 text-xs"
-                onClick={prevPage}
-                disabled={page === 1}
-              >
-                <ChevronLeft size={14} />
-                <span>Prev</span>
-              </button>
-              <span className="rounded-lg border border-medical-border bg-white px-2.5 py-1 text-xs font-semibold text-slate-700">
-                Page {page} of {totalPages}
-              </span>
-              <button
-                type="button"
-                className="btn-secondary py-1 text-xs"
-                onClick={nextPage}
-                disabled={page === totalPages}
-              >
-                <span>Next</span>
-                <ChevronRight size={14} />
-              </button>
-            </div>
-          </div>
-        ) : null}
       </section>
     </div>
   );
 }
+
+export default PrescriptionsPage;

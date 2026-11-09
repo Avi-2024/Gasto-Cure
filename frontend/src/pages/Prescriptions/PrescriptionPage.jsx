@@ -46,6 +46,7 @@ function PrescriptionPage() {
 
   // Current Rx / Visit ID if saved or loaded
   const [currentRxId, setCurrentRxId] = useState('');
+  const [prescriptionDate, setPrescriptionDate] = useState(() => new Date().toISOString());
   const [saveFeedback, setSaveFeedback] = useState(null);
 
   // Patient Info
@@ -98,6 +99,9 @@ function PrescriptionPage() {
       const visit = localVisits.getById(visitIdParam);
       if (visit) {
         setCurrentRxId(visit.id);
+        if (visit.date || visit.createdAt) {
+          setPrescriptionDate(visit.date || visit.createdAt);
+        }
         if (visit.patientId) {
           const pt = localPatients.getById(visit.patientId);
           setPatient(
@@ -270,6 +274,7 @@ function PrescriptionPage() {
       patientMobile: patient.contact || patient.mobile || '',
       patientAge: patient.age,
       patientGender: patient.gender,
+      date: prescriptionDate || new Date().toISOString(),
       vitals,
       symptoms,
       diagnosis,
@@ -307,7 +312,7 @@ function PrescriptionPage() {
     const visit = handleSavePrescription(currentRxId ? 'SAVED' : 'SAVED', false);
     if (!visit) return;
     const waUrl = generatePrescriptionWhatsAppLink(patient, visit, clinicSettings);
-    window.open(waUrl, '_blank');
+    window.open(waUrl, '_blank', 'noopener,noreferrer');
   };
 
   const handleSelectPatientFromList = (selectedPt) => {
@@ -553,7 +558,9 @@ function PrescriptionPage() {
             <div className="info-item">
               <span className="info-label">Date:</span>
               <span className="info-value">
-                {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                {prescriptionDate
+                  ? (prescriptionDate.includes('T') ? prescriptionDate.split('T')[0] : prescriptionDate)
+                  : new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}
               </span>
             </div>
           </div>
@@ -786,6 +793,7 @@ function PrescriptionPage() {
         isOpen={isPreviewOpen}
         onClose={() => setIsPreviewOpen(false)}
         patient={patient}
+        prescriptionDate={prescriptionDate}
         vitals={vitals}
         symptoms={symptoms}
         diagnosis={diagnosis}
@@ -797,7 +805,7 @@ function PrescriptionPage() {
         clinicSettings={clinicSettings}
         onPrint={() => {
           setIsPreviewOpen(false);
-          handlePrint();
+          setTimeout(() => handlePrint(), 50);
         }}
         onShareWhatsApp={handleShareWhatsApp}
       />
