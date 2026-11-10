@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,17 +6,31 @@
 
 @layer base {
   :root {
-    --medical-primary: #2563eb;
-    --medical-secondary: #0ea5e9;
-    --medical-bg: #f1f5f9;
-    --medical-card: #ffffff;
-    --medical-sidebar: #0f172a;
-    --medical-border: #e2e8f0;
-    --medical-text-primary: #1e293b;
-    --medical-text-secondary: #64748b;
-    --medical-success: #10b981;
-    --medical-warning: #f59e0b;
-    --medical-danger: #ef4444;
+    --nivara-primary: #123A3A;
+    --nivara-secondary: #287C75;
+    --nivara-accent: #C9A45C;
+    --nivara-canvas: #F7FAF8;
+    --nivara-surface: #FFFFFF;
+    --nivara-border: #D9E6E2;
+    --nivara-text-primary: #10201F;
+    --nivara-text-secondary: #4E6460;
+    --nivara-text-muted: #7D908C;
+    --nivara-success: #2E7D5B;
+    --nivara-warning: #B7791F;
+    --nivara-danger: #B94A48;
+
+    /* Maintain backwards compatibility */
+    --medical-primary: #123A3A;
+    --medical-secondary: #287C75;
+    --medical-bg: #F7FAF8;
+    --medical-card: #FFFFFF;
+    --medical-sidebar: #123A3A;
+    --medical-border: #D9E6E2;
+    --medical-text-primary: #10201F;
+    --medical-text-secondary: #4E6460;
+    --medical-success: #2E7D5B;
+    --medical-warning: #B7791F;
+    --medical-danger: #B94A48;
   }
 
   * {
@@ -31,7 +45,9 @@
 
   body {
     font-family: 'Inter', sans-serif;
-    @apply bg-medical-background text-slate-800 antialiased;
+    background-color: var(--nivara-canvas);
+    color: var(--nivara-text-primary);
+    @apply antialiased;
   }
 
   h1,
@@ -58,7 +74,7 @@
   input,
   select,
   textarea {
-    @apply w-full rounded-2xl border border-medical-border bg-white px-4 py-2 text-sm text-slate-700 outline-none transition focus:border-medical-primary focus:ring-2 focus:ring-medical-primary/20;
+    @apply w-full rounded-xl border border-nivara-border bg-white px-3.5 py-2.5 text-sm text-[#10201F] outline-none transition focus:border-nivara-secondary focus:ring-2 focus:ring-nivara-secondary/20 placeholder:text-nivara-subtle;
   }
 
   textarea {
@@ -68,35 +84,43 @@
 
 @layer components {
   .app-card {
-    @apply rounded-2xl border border-medical-border bg-white shadow-soft;
+    @apply rounded-2xl border border-nivara-border bg-white shadow-nivara-xs transition-shadow hover:shadow-nivara-sm;
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-medical-primary px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:scale-100 hover:bg-blue-700 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-medical-primary/30 disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-nivara-secondary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1f635d] active:scale-[0.98] shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nivara-secondary/30 disabled:cursor-not-allowed disabled:opacity-60;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-2xl border border-medical-border bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:scale-100 hover:border-slate-300 hover:bg-slate-50 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-medical-primary/30 disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-nivara-border bg-white px-4 py-2.5 text-sm font-semibold text-nivara-text transition hover:border-slate-300 hover:bg-slate-50 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nivara-secondary/30 disabled:cursor-not-allowed disabled:opacity-60;
   }
 
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 rounded-2xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-100 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-200 disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm font-semibold text-rose-600 transition hover:bg-rose-100 active:scale-[0.98];
   }
 
   .icon-button {
-    @apply inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-medical-border bg-white text-slate-600 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-medical-primary/30;
+    @apply inline-flex h-9 w-9 items-center justify-center rounded-xl border border-nivara-border bg-white text-nivara-muted transition hover:bg-slate-50 hover:text-nivara-text;
   }
 
   .field-label {
-    @apply mb-2 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-slate-500;
+    @apply mb-1.5 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-nivara-muted;
   }
 
   .page-title {
-    @apply text-2xl font-semibold text-slate-900;
+    @apply font-heading text-2xl font-bold tracking-tight text-nivara-text;
   }
 
   .page-subtitle {
-    @apply mt-2 text-sm text-slate-500;
+    @apply mt-1 text-sm text-nivara-muted;
+  }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .font-heading {
+    font-family: 'Manrope', sans-serif;
   }
 
   .status-chip {
@@ -127,15 +151,15 @@
   }
 
   .module-kicker {
-    @apply text-xs font-semibold uppercase tracking-[0.08em] text-slate-500;
+    @apply text-xs font-semibold uppercase tracking-[0.08em] text-nivara-muted;
   }
 
   .module-copy {
-    @apply mt-2 text-sm text-slate-500;
+    @apply mt-2 text-sm text-nivara-muted;
   }
 
   .panel-title {
-    @apply text-lg font-semibold text-slate-900;
+    @apply font-heading text-lg font-semibold text-nivara-text;
   }
 
   .form-grid,
@@ -149,7 +173,7 @@
   }
 
   .input-icon {
-    @apply pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400;
+    @apply pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-nivara-subtle;
   }
 
   .input-wrap input {
@@ -177,11 +201,11 @@
   }
 
   .auth-card {
-    @apply w-full max-w-md rounded-2xl border border-medical-border bg-white p-6 shadow-soft;
+    @apply w-full max-w-md rounded-2xl border border-nivara-border bg-white p-6 shadow-soft;
   }
 
   .auth-subtitle {
-    @apply mt-2 text-sm text-slate-500;
+    @apply mt-2 text-sm text-nivara-muted;
   }
 
   .auth-actions {
@@ -189,6 +213,6 @@
   }
 
   .auth-actions label {
-    @apply grid gap-2 text-sm font-medium text-slate-700;
+    @apply grid gap-2 text-sm font-medium text-nivara-text;
   }
 }
