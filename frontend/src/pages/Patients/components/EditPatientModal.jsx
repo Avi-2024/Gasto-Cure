@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, Phone, MapPin, HeartPulse, AlertCircle, FileText } from 'lucide-react';
+import { X, User, AlertCircle } from 'lucide-react';
 import { localPatients } from '../../../services/localStore';
 
 const BLOOD_GROUPS = ['', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
@@ -20,7 +20,7 @@ function EditPatientModal({ isOpen, patient, onClose, onSave }) {
   const [form, setForm] = useState(INITIAL_FORM);
   const [error, setError] = useState('');
 
-  // Sync form when patient prop changes or modal opens
+  // Sync form state when patient prop changes or modal opens
   useEffect(() => {
     if (patient) {
       setForm({
@@ -41,7 +41,7 @@ function EditPatientModal({ isOpen, patient, onClose, onSave }) {
     }
   }, [patient, isOpen]);
 
-  // Handle ESC key to close modal
+  // Handle ESC key to dismiss modal
   useEffect(() => {
     if (!isOpen) return;
 
@@ -99,33 +99,35 @@ function EditPatientModal({ isOpen, patient, onClose, onSave }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs transition-opacity"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs transition-opacity"
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
       aria-labelledby="edit-patient-title"
     >
       <div
-        className="w-full max-w-lg rounded-2xl bg-white shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+        className="w-full max-w-lg rounded-2xl bg-white border border-[#D9E6E2] shadow-nivara-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4 bg-slate-50/80">
-          <div className="flex items-center gap-2.5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-100 text-blue-700">
+        <div className="flex items-center justify-between border-b border-[#D9E6E2] px-6 py-4 bg-[#F7FAF8]">
+          <div className="flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-50 text-[#287C75] border border-teal-100 shadow-nivara-xs">
               <User size={18} />
             </span>
             <div>
-              <h2 id="edit-patient-title" className="text-base font-bold text-slate-900">
+              <h2 id="edit-patient-title" className="font-heading text-base font-bold text-[#10201F]">
                 Edit Patient Details
               </h2>
-              <p className="text-xs font-mono text-slate-400">{patient.id}</p>
+              <p className="text-xs font-mono font-semibold text-[#287C75] bg-teal-50/70 px-1.5 py-0.5 rounded border border-teal-100/60 inline-block mt-0.5">
+                {patient.id}
+              </p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl p-1.5 text-slate-400 hover:bg-slate-200/70 hover:text-slate-600 transition"
+            className="rounded-xl p-1.5 text-[#7D908C] hover:bg-slate-100 hover:text-[#10201F] transition"
             aria-label="Close dialog"
           >
             <X size={18} />
@@ -135,7 +137,7 @@ function EditPatientModal({ isOpen, patient, onClose, onSave }) {
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[calc(85vh-130px)] overflow-y-auto">
           {error && (
-            <div className="flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs font-semibold text-rose-700">
+            <div className="flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs font-semibold text-[#B94A48] shadow-xs">
               <AlertCircle size={15} className="shrink-0" />
               <span>{error}</span>
             </div>
@@ -149,7 +151,7 @@ function EditPatientModal({ isOpen, patient, onClose, onSave }) {
             <input
               id="edit-pt-name"
               type="text"
-              placeholder="e.g. Ramesh Chandra"
+              placeholder="e.g. Rajesh Kumar"
               value={form.name}
               onChange={(e) => handleChange('name', e.target.value)}
               required
@@ -214,16 +216,14 @@ function EditPatientModal({ isOpen, patient, onClose, onSave }) {
               <label className="field-label" htmlFor="edit-pt-contact">
                 Mobile Number *
               </label>
-              <div className="relative">
-                <input
-                  id="edit-pt-contact"
-                  type="tel"
-                  placeholder="10-digit mobile"
-                  value={form.contact}
-                  onChange={(e) => handleChange('contact', e.target.value)}
-                  required
-                />
-              </div>
+              <input
+                id="edit-pt-contact"
+                type="tel"
+                placeholder="10-digit mobile"
+                value={form.contact}
+                onChange={(e) => handleChange('contact', e.target.value)}
+                required
+              />
             </div>
 
             <div>
@@ -259,7 +259,7 @@ function EditPatientModal({ isOpen, patient, onClose, onSave }) {
 
           {/* Allergies Alert */}
           <div>
-            <label className="field-label text-rose-600 flex items-center gap-1.5" htmlFor="edit-pt-allergies">
+            <label className="field-label text-[#B94A48] flex items-center gap-1.5" htmlFor="edit-pt-allergies">
               <AlertCircle size={13} />
               Drug Allergies / Contraindications
             </label>
@@ -269,7 +269,7 @@ function EditPatientModal({ isOpen, patient, onClose, onSave }) {
               placeholder="e.g. Penicillin, Sulfa, Aspirin (or None)"
               value={form.allergies}
               onChange={(e) => handleChange('allergies', e.target.value)}
-              className="border-rose-200 focus:border-rose-500 focus:ring-rose-500/20"
+              className="border-rose-200 focus:border-[#B94A48] focus:ring-[#B94A48]/20"
             />
           </div>
 
@@ -284,12 +284,12 @@ function EditPatientModal({ isOpen, patient, onClose, onSave }) {
               placeholder="Past medical history, chronic conditions, regular medications..."
               value={form.notes}
               onChange={(e) => handleChange('notes', e.target.value)}
-              className="min-h-[80px]"
+              className="min-h-[85px]"
             />
           </div>
 
           {/* Modal Actions */}
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
+          <div className="pt-3 border-t border-[#D9E6E2] flex items-center justify-end gap-3">
             <button
               type="button"
               className="btn-secondary px-5"
