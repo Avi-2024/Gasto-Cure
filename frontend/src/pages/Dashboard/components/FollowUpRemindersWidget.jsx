@@ -4,13 +4,11 @@ import {
   MessageCircle,
   CheckCircle2,
   Phone,
-  AlertCircle,
   Clock,
-  User,
   Stethoscope,
 } from 'lucide-react';
 import { localPatients, localVisits, localSettings } from '../../../services/localStore';
-import { generateFollowUpReminderWhatsAppLink, cleanPhoneNumber } from '../../../utils/whatsappHelper';
+import { generateFollowUpReminderWhatsAppLink } from '../../../utils/whatsappHelper';
 
 /**
  * Calculate difference in whole calendar days between target date and today.

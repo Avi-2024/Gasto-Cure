@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.superpowers/
+.gemini/
+.env.local
+.DS_Store

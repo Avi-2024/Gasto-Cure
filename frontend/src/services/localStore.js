@@ -631,6 +631,8 @@ export const localPatients = {
 export const localMedicines = {
   getAll: () => load(KEYS.medicines),
 
+  getById: (id) => (!id ? null : load(KEYS.medicines).find((m) => m.id === id) || null),
+
   search: (q) => {
     const list = load(KEYS.medicines);
     if (!q || !q.toString().trim()) return list;

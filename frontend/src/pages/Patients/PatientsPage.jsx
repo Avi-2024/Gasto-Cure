@@ -10,10 +10,9 @@ import {
   UserCheck,
   CalendarClock,
   MessageCircle,
-  Edit,
   X,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import StatusBadge from '../../components/ui/StatusBadge';
 import usePagination from '../../hooks/usePagination';
 import { localAppointments, localPatients } from '../../services/localStore';
@@ -47,6 +46,7 @@ const formatDisplayDate = (dateStr) => {
 
 function PatientsPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [search, setSearch] = useState('');
   const [ageFilter, setAgeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -62,8 +62,23 @@ function PatientsPage() {
 
   useEffect(() => {
     localPatients.seed();
-    setPatients(localPatients.getAll());
-  }, []);
+    const all = localPatients.getAll();
+    setPatients(all);
+
+    const action = searchParams.get('action');
+    const patientId = searchParams.get('patientId');
+
+    if (action === 'new') {
+      setShowModal(true);
+    }
+
+    if (patientId) {
+      const found = all.find((p) => p.id === patientId);
+      if (found) {
+        setProfilePatient(found);
+      }
+    }
+  }, [searchParams]);
 
   // Quick Stats
   const stats = useMemo(() => {

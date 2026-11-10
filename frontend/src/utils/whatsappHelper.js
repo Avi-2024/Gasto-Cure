@@ -188,7 +188,7 @@ export const generateFollowUpReminderWhatsAppLink = (patient = {}, clinic = {}, 
   } else if (daysLeft === 1) {
     timingText = followUpDate ? `for tomorrow (${followUpDate})` : 'for tomorrow';
   } else if (typeof daysLeft === 'number' && daysLeft > 1) {
-    timingText = `for in ${daysLeft} days (${followUpDate || 'scheduled'})`;
+    timingText = `in ${daysLeft} days (${followUpDate || 'scheduled'})`;
   } else if (typeof daysLeft === 'number' && daysLeft < 0) {
     timingText = `for ${followUpDate || 'previously'} (Overdue)`;
   } else if (followUpDate) {

@@ -8,8 +8,6 @@ import {
   Phone,
   Calendar,
   X,
-  ArrowRight,
-  ExternalLink,
 } from 'lucide-react';
 import { localPatients } from '../../../services/localStore';
 
@@ -32,15 +30,24 @@ export default function QuickPatientSearch() {
     setIsOpen(true);
   }, [query]);
 
-  // Click outside listener to close dropdown
+  // Click outside and Escape key listener to close dropdown
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (containerRef.current && !containerRef.current.contains(e.target)) {
         setIsOpen(false);
       }
     };
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false);
+      }
+    };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   const handleClear = () => {
