@@ -14,45 +14,63 @@ import SettingsPage from '../pages/Settings/SettingsPage';
 import DoctorDashboardPage from '../pages/Doctor/DoctorDashboardPage';
 import ConsultationPage from '../pages/Doctor/ConsultationPage';
 import ReceptionistDashboardPage from '../pages/Receptionist/ReceptionistDashboardPage';
+import { useAuth } from '../contexts/AuthContext';
+
+/**
+ * Directs authenticated users to their role-specific operational workspace.
+ */
+function RoleHomeRedirect() {
+  const { isAuthenticated, user } = useAuth();
+  if (!isAuthenticated) return <Navigate to="/auth/login" replace />;
+
+  if (user?.role === 'DOCTOR') return <Navigate to="/doctor" replace />;
+  if (user?.role === 'RECEPTIONIST') return <Navigate to="/reception" replace />;
+  return <Navigate to="/dashboard" replace />;
+}
 
 function AppRouter() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/" element={<RoleHomeRedirect />} />
       <Route path="/auth/login" element={<LoginPage />} />
 
+      {/* Shared Clinic Operations (All authenticated roles) */}
       <Route element={<ProtectedRoute allowedRoles={['CLINIC_OWNER', 'DOCTOR', 'RECEPTIONIST']} />}>
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/appointments" element={<AppointmentsPage />} />
           <Route path="/patients" element={<PatientsPage />} />
-          <Route path="/doctor" element={<DoctorDashboardPage />} />
-          <Route path="/reception" element={<ReceptionistDashboardPage />} />
         </Route>
       </Route>
 
+      {/* Doctor & Clinic Owner Clinical Workspaces */}
+      <Route element={<ProtectedRoute allowedRoles={['CLINIC_OWNER', 'DOCTOR']} />}>
+        <Route element={<DashboardLayout />}>
+          <Route path="/doctor" element={<DoctorDashboardPage />} />
+          <Route path="/doctor/consultation" element={<ConsultationPage />} />
+          <Route path="/prescriptions" element={<PrescriptionsPage />} />
+          <Route path="/prescription" element={<PrescriptionPage />} />
+          <Route path="/prescription/new" element={<PrescriptionPage />} />
+          <Route path="/medicines" element={<MedicinesPage />} />
+        </Route>
+      </Route>
+
+      {/* Reception Desk & Billing Workspaces */}
       <Route element={<ProtectedRoute allowedRoles={['CLINIC_OWNER', 'RECEPTIONIST']} />}>
         <Route element={<DashboardLayout />}>
+          <Route path="/reception" element={<ReceptionistDashboardPage />} />
           <Route path="/billing" element={<BillingPage />} />
         </Route>
       </Route>
 
-      <Route element={<ProtectedRoute allowedRoles={['CLINIC_OWNER', 'DOCTOR']} />}>
-        <Route element={<DashboardLayout />}>
-          <Route path="/prescriptions" element={<PrescriptionsPage />} />
-          <Route path="/prescription/new" element={<PrescriptionPage />} />
-          <Route path="/medicines" element={<MedicinesPage />} />
-          <Route path="/doctor/consultation" element={<ConsultationPage />} />
-        </Route>
-      </Route>
-
+      {/* Clinic Owner Configuration Only */}
       <Route element={<ProtectedRoute allowedRoles={['CLINIC_OWNER']} />}>
         <Route element={<DashboardLayout />}>
           <Route path="/settings" element={<SettingsPage />} />
         </Route>
       </Route>
 
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<RoleHomeRedirect />} />
     </Routes>
   );
 }

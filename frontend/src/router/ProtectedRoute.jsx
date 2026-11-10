@@ -10,7 +10,14 @@ function ProtectedRoute({ allowedRoles = [] }) {
   }
 
   if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
-    return <Navigate to="/dashboard" replace />;
+    // Redirect unauthorized user to their role-specific home panel
+    const roleHome =
+      user?.role === 'DOCTOR'
+        ? '/doctor'
+        : user?.role === 'RECEPTIONIST'
+        ? '/reception'
+        : '/dashboard';
+    return <Navigate to={roleHome} replace />;
   }
 
   return <Outlet />;

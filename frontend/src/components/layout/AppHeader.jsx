@@ -61,7 +61,7 @@ export default function AppHeader({ onMenuClick, navigate: customNavigate }) {
   }, []);
 
   return (
-    <header className="mb-6 rounded-2xl border border-[#D9E6E2] bg-white/85 p-3.5 shadow-nivara-xs backdrop-blur-md transition-all sm:p-4">
+    <header className="mb-0 rounded-2xl border border-[#D9E6E2] bg-white/85 p-3.5 shadow-nivara-xs backdrop-blur-md transition-all sm:p-4">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         {/* Left: Mobile Menu Toggle & Global Search */}
         <div className="flex items-center gap-3">

@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
+  Activity,
   CalendarDays,
   ClipboardList,
   FileText,
@@ -54,6 +55,12 @@ const navigationGroups = [
         label: 'New Prescription',
         to: '/prescription/new',
         icon: PlusCircle,
+        roles: ['CLINIC_OWNER', 'DOCTOR'],
+      },
+      {
+        label: 'Doctor Console',
+        to: '/doctor',
+        icon: Activity,
         roles: ['CLINIC_OWNER', 'DOCTOR'],
       },
       {
@@ -146,7 +153,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
       {/* Main Sidebar Shell */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-[268px] shrink-0 flex-col bg-[#123A3A] p-4 text-slate-100 shadow-2xl transition-transform duration-300 ease-in-out md:static md:translate-x-0 md:shadow-none ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-[268px] shrink-0 flex-col bg-[#123A3A] p-4 text-slate-100 shadow-2xl transition-transform duration-300 ease-in-out md:sticky md:top-0 md:h-screen md:translate-x-0 md:shadow-none overflow-hidden ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         aria-label="Main Navigation"

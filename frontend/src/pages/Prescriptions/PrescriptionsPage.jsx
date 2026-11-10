@@ -147,85 +147,88 @@ function PrescriptionsPage() {
   return (
     <div className="space-y-6">
       {/* Header Bar */}
-      <section className="app-card p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <section className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-nivara-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-blue-600">
-            Medical Records
-          </p>
-          <h1 className="mt-1 text-2xl font-bold text-slate-900">Prescription Repository</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Search, review, reprint, or share past patient prescriptions.
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#287C75]/25 bg-[#287C75]/10 px-2.5 py-0.5 text-xs font-semibold text-[#287C75]">
+              <FileText size={13} />
+              Medical Records & Repository
+            </span>
+          </div>
+          <h1 className="mt-2 font-heading text-2xl font-bold tracking-tight text-[#10201F] sm:text-3xl">Prescription Repository</h1>
+          <p className="mt-1 text-sm text-[#4E6460]">
+            Search, review, reprint, or share past patient prescriptions with calibrated letterheads.
           </p>
         </div>
 
         <button
           type="button"
-          className="btn-primary inline-flex items-center gap-2"
-          onClick={() => navigate('/prescription')}
+          className="inline-flex items-center gap-2 rounded-xl bg-[#123A3A] px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-[#287C75] transition shrink-0"
+          onClick={() => navigate('/prescription/new')}
         >
           <Plus size={16} />
-          New Prescription
+          <span>New Prescription</span>
         </button>
       </section>
 
       {/* KPI Cards */}
       <section className="grid gap-4 sm:grid-cols-3">
-        <article className="app-card p-4 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+        <article className="rounded-2xl border border-[#D9E6E2] bg-white p-5 shadow-2xs flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-[#287C75]/10 text-[#287C75] flex items-center justify-center font-bold">
             <FileText size={22} />
           </div>
           <div>
-            <p className="text-xs font-medium text-slate-500">Total Prescriptions</p>
-            <p className="text-2xl font-bold text-slate-900">{stats.total}</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-[#7D908C]">Total Prescriptions</p>
+            <p className="font-heading text-2xl font-bold text-[#10201F] tabular-nums">{stats.total}</p>
           </div>
         </article>
 
-        <article className="app-card p-4 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+        <article className="rounded-2xl border border-[#D9E6E2] bg-white p-5 shadow-2xs flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
             <Calendar size={22} />
           </div>
           <div>
-            <p className="text-xs font-medium text-slate-500">Issued Today</p>
-            <p className="text-2xl font-bold text-emerald-700">{stats.todayCount}</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-[#7D908C]">Issued Today</p>
+            <p className="font-heading text-2xl font-bold text-emerald-700 tabular-nums">{stats.todayCount}</p>
           </div>
         </article>
 
-        <article className="app-card p-4 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+        <article className="rounded-2xl border border-[#D9E6E2] bg-white p-5 shadow-2xs flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold">
             <User size={22} />
           </div>
           <div>
-            <p className="text-xs font-medium text-slate-500">Unique Patients</p>
-            <p className="text-2xl font-bold text-slate-900">{stats.uniquePatients}</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-[#7D908C]">Unique Patients</p>
+            <p className="font-heading text-2xl font-bold text-[#10201F] tabular-nums">{stats.uniquePatients}</p>
           </div>
         </article>
       </section>
 
       {/* Filter and Search Bar */}
-      <section className="app-card p-4 flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+      <section className="rounded-2xl border border-[#D9E6E2] bg-white p-4 shadow-2xs flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
         <div className="relative flex-1">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#7D908C]" />
           <input
             type="text"
             placeholder="Search by patient name, phone, RX number, or diagnosis..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            className="w-full pl-10 pr-4 py-2 border border-[#D9E6E2] rounded-xl text-xs sm:text-sm font-medium text-[#10201F] placeholder-[#7D908C] focus:outline-none focus:ring-2 focus:ring-[#287C75]/20 focus:border-[#287C75] bg-[#F7FAF8] focus:bg-white transition"
           />
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-slate-500 flex items-center gap-1">
+          <span className="text-xs font-bold uppercase tracking-wider text-[#7D908C] flex items-center gap-1">
             <Filter size={13} />
             Date:
           </span>
-          <div className="inline-flex rounded-lg border border-slate-200 p-0.5 bg-slate-50">
+          <div className="inline-flex rounded-xl border border-[#D9E6E2] p-0.5 bg-[#F7FAF8]">
             <button
               type="button"
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
                 dateFilter === 'all'
-                  ? 'bg-white text-blue-600 shadow-sm font-semibold'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#123A3A] text-white shadow-xs'
+                  : 'text-[#4E6460] hover:text-[#10201F]'
               }`}
               onClick={() => setDateFilter('all')}
             >
@@ -233,10 +236,10 @@ function PrescriptionsPage() {
             </button>
             <button
               type="button"
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
                 dateFilter === 'today'
-                  ? 'bg-white text-blue-600 shadow-sm font-semibold'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#123A3A] text-white shadow-xs'
+                  : 'text-[#4E6460] hover:text-[#10201F]'
               }`}
               onClick={() => setDateFilter('today')}
             >
@@ -244,10 +247,10 @@ function PrescriptionsPage() {
             </button>
             <button
               type="button"
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
                 dateFilter === 'week'
-                  ? 'bg-white text-blue-600 shadow-sm font-semibold'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#123A3A] text-white shadow-xs'
+                  : 'text-[#4E6460] hover:text-[#10201F]'
               }`}
               onClick={() => setDateFilter('week')}
             >
@@ -258,10 +261,10 @@ function PrescriptionsPage() {
       </section>
 
       {/* Prescriptions Table */}
-      <section className="app-card overflow-hidden">
+      <section className="rounded-3xl border border-[#D9E6E2] bg-white overflow-hidden shadow-nivara-xs">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 text-xs font-bold uppercase text-slate-500 border-b border-slate-200">
+          <table className="w-full text-left text-xs">
+            <thead className="bg-[#F7FAF8] text-[11px] font-bold uppercase tracking-wider text-[#7D908C] border-b border-[#D9E6E2]">
               <tr>
                 <th className="py-3 px-4">Rx Number</th>
                 <th className="py-3 px-4">Date</th>
@@ -279,21 +282,21 @@ function PrescriptionsPage() {
                   return (
                     <tr key={rx.id} className="hover:bg-slate-50/70 transition-colors">
                       {/* Rx ID */}
-                      <td className="py-3.5 px-4 font-mono font-semibold text-xs text-blue-700">
+                      <td className="py-3.5 px-4 font-mono font-bold text-xs text-[#123A3A]">
                         {rx.id}
                       </td>
 
                       {/* Date */}
-                      <td className="py-3.5 px-4 text-slate-600 whitespace-nowrap">
+                      <td className="py-3.5 px-4 text-[#4E6460] whitespace-nowrap font-mono text-xs">
                         {formatDisplayDate(rx.date || rx.createdAt)}
                       </td>
 
                       {/* Patient */}
                       <td className="py-3.5 px-4">
-                        <div className="font-semibold text-slate-900">
+                        <div className="font-bold text-[#10201F]">
                           {rx.patientName || 'Walk-in'}
                         </div>
-                        <div className="text-xs text-slate-400">
+                        <div className="text-[11px] text-[#7D908C]">
                           {rx.patientAge ? `${rx.patientAge} Yrs • ` : ''}
                           {rx.patientMobile || 'No contact'}
                         </div>
@@ -301,27 +304,27 @@ function PrescriptionsPage() {
 
                       {/* Diagnosis */}
                       <td className="py-3.5 px-4">
-                        <span className="font-medium text-slate-800 line-clamp-1 max-w-[220px]">
+                        <span className="font-medium text-[#10201F] line-clamp-1 max-w-[220px]">
                           {rx.diagnosis || 'General Consultation'}
                         </span>
                       </td>
 
                       {/* Medicines Count */}
                       <td className="py-3.5 px-4">
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
-                          <Pill size={12} className="text-blue-500" />
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#F7FAF8] text-[#123A3A] border border-[#D9E6E2]">
+                          <Pill size={12} className="text-[#287C75]" />
                           {medCount} {medCount === 1 ? 'med' : 'meds'}
                         </span>
                       </td>
 
                       {/* Follow-up */}
-                      <td className="py-3.5 px-4 whitespace-nowrap text-xs text-slate-600">
+                      <td className="py-3.5 px-4 whitespace-nowrap text-xs text-[#4E6460]">
                         {rx.followUpDate || rx.nextFollowUp ? (
-                          <span className="font-medium text-emerald-700">
+                          <span className="font-semibold text-emerald-700">
                             {formatDisplayDate(rx.followUpDate || rx.nextFollowUp)}
                           </span>
                         ) : (
-                          <span className="text-slate-400">None</span>
+                          <span className="text-[#7D908C]">None</span>
                         )}
                       </td>
 
@@ -331,7 +334,7 @@ function PrescriptionsPage() {
                           <button
                             type="button"
                             onClick={() => handleShareWhatsApp(rx)}
-                            className="p-1.5 rounded-md hover:bg-emerald-50 text-emerald-600 border border-emerald-200 transition-colors"
+                            className="p-1.5 rounded-xl hover:bg-emerald-50 text-emerald-700 border border-emerald-200 transition-colors"
                             title="Share prescription via WhatsApp"
                           >
                             <MessageCircle size={15} />
@@ -339,7 +342,7 @@ function PrescriptionsPage() {
                           <button
                             type="button"
                             onClick={() => handleViewPrescription(rx.id)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs transition-colors"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#287C75] hover:bg-[#123A3A] text-white font-semibold text-xs transition-colors shadow-2xs"
                             title="View or print prescription"
                           >
                             <Printer size={13} />
@@ -352,10 +355,10 @@ function PrescriptionsPage() {
                 })
               ) : (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-400">
-                    <FileText size={36} className="mx-auto mb-2 text-slate-300" />
-                    <p className="font-semibold text-slate-600">No prescriptions found</p>
-                    <p className="text-xs text-slate-400 mt-1">
+                  <td colSpan={7} className="py-12 text-center text-[#7D908C]">
+                    <FileText size={36} className="mx-auto mb-2 text-[#7D908C]/50" />
+                    <p className="font-bold text-[#10201F]">No prescriptions found</p>
+                    <p className="text-xs text-[#7D908C] mt-1">
                       {searchQuery
                         ? 'Try adjusting your search criteria.'
                         : 'Create your first prescription to see it listed here.'}
@@ -363,8 +366,8 @@ function PrescriptionsPage() {
                     {!searchQuery && (
                       <button
                         type="button"
-                        className="btn-primary text-xs mt-3 inline-flex items-center gap-1.5"
-                        onClick={() => navigate('/prescription')}
+                        className="inline-flex items-center gap-1.5 rounded-xl bg-[#123A3A] px-3.5 py-1.5 text-xs font-bold text-white hover:bg-[#287C75] mt-3 transition"
+                        onClick={() => navigate('/prescription/new')}
                       >
                         <Plus size={14} />
                         New Prescription
