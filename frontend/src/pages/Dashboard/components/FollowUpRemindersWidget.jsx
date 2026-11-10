@@ -59,6 +59,17 @@ export default function FollowUpRemindersWidget() {
   useEffect(() => {
     const patients = localPatients.getAll();
     const upcomingVisits = localVisits.getUpcomingFollowUps(2);
+    const allVisits = localVisits.getAll() || [];
+
+    // Pre-index visits by patient ID to avoid N+1 localStorage parsing
+    const visitsByPatient = new Map();
+    allVisits.forEach((v) => {
+      if (!v?.patientId) return;
+      if (!visitsByPatient.has(v.patientId)) {
+        visitsByPatient.set(v.patientId, []);
+      }
+      visitsByPatient.get(v.patientId).push(v);
+    });
 
     // Map by patient ID to merge data
     const patientMap = new Map();
@@ -76,8 +87,8 @@ export default function FollowUpRemindersWidget() {
       const daysDiff = calculateDaysDiff(fDate);
       if (daysDiff === null || daysDiff > 2) return; // Keep overdue, today, tomorrow, in 2 days
 
-      // Find diagnosis from visits
-      const visits = localVisits.getByPatient(patient.id) || [];
+      // Find diagnosis from indexed visits
+      const visits = visitsByPatient.get(patient.id) || [];
       const latestVisit = visits[0] || null;
       const diagnosis =
         latestVisit?.diagnosis ||

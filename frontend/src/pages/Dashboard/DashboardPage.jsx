@@ -4,7 +4,7 @@ import {
   Activity,
   CalendarClock,
   Clock3,
-  DollarSign,
+  ShieldCheck,
   Users,
   Stethoscope,
 } from 'lucide-react';
@@ -59,8 +59,12 @@ function DashboardPage() {
     const queueData = localAppointments.getQueue();
     setQueue(queueData);
 
-    // Calculate visits completed today
-    const todayStr = new Date().toISOString().split('T')[0];
+    // Calculate visits completed today (using local calendar date)
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const todayStr = `${yyyy}-${mm}-${dd}`;
     const allVisits = localVisits.getAll() || [];
     const visitsToday = allVisits.filter((v) => {
       if (!v.date) return false;
@@ -136,7 +140,7 @@ function DashboardPage() {
     {
       label: 'Offline Mode',
       value: 'Active',
-      icon: DollarSign,
+      icon: ShieldCheck,
       tone: 'secondary',
       trend: { label: 'No backend required', positive: true },
     },

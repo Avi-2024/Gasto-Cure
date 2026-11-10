@@ -85,6 +85,7 @@ export default function QuickPatientSearch() {
               if (query.trim()) setIsOpen(true);
             }}
             placeholder="Search patient by name, mobile, or ID (e.g. PT-001)..."
+            aria-label="Search patient by name, mobile, or ID"
             className="w-full h-12 pl-12 pr-10 text-base font-medium rounded-2xl border-2 border-[#D9E6E2] bg-white placeholder:text-[#7D908C] text-[#10201F] focus:border-[#287C75] focus:outline-none focus:ring-4 focus:ring-[#287C75]/10 transition shadow-nivara-xs"
           />
           {query && (
