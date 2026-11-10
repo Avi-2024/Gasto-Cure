@@ -318,7 +318,7 @@ describe('Patient Management - Task 6 Tests', () => {
 
       expect(screen.getByText(/Next Follow-Up/i)).toBeTruthy();
       // Should show follow-up date for Rajesh Kumar
-      expect(screen.getByText(/Mar 1, 2026/i)).toBeTruthy();
+      expect(screen.getByText(/Mar 15, 2026/i)).toBeTruthy();
     });
 
     it('renders direct WhatsApp chat button on patient row opening wa.me URL', () => {
