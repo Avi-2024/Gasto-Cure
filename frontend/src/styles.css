@@ -74,7 +74,7 @@
   input,
   select,
   textarea {
-    @apply w-full rounded-xl border border-nivara-border bg-white px-3.5 py-2.5 text-sm text-[#10201F] outline-none transition focus:border-nivara-secondary focus:ring-2 focus:ring-nivara-secondary/20 placeholder:text-nivara-subtle;
+    @apply w-full rounded-xl border border-nivara-border bg-white px-3.5 py-2.5 text-sm text-nivara-text outline-none transition focus:border-nivara-secondary focus:ring-2 focus:ring-nivara-secondary/20 placeholder:text-nivara-subtle;
   }
 
   textarea {
