@@ -175,13 +175,16 @@ function PrescriptionPage() {
     }
   }, [patientIdParam, visitIdParam]);
 
-  // Calculate follow-up dates
+  // Calculate follow-up dates based on prescription date
   const getFollowUpIsoDate = () => {
+    const baseDate = prescriptionDate ? new Date(prescriptionDate) : new Date();
+    const anchor = isNaN(baseDate.getTime()) ? new Date() : baseDate;
+
     if (followUpOption === 'custom') {
       if (followUpCustomDate) return followUpCustomDate;
       const days = parseInt(followUpCustomDays, 10);
       if (days && !isNaN(days)) {
-        const d = new Date();
+        const d = new Date(anchor);
         d.setDate(d.getDate() + days);
         return d.toISOString().split('T')[0];
       }
@@ -190,7 +193,7 @@ function PrescriptionPage() {
 
     const days = parseInt(followUpOption, 10);
     if (days && !isNaN(days)) {
-      const d = new Date();
+      const d = new Date(anchor);
       d.setDate(d.getDate() + days);
       return d.toISOString().split('T')[0];
     }
@@ -324,7 +327,7 @@ function PrescriptionPage() {
   };
 
   const handleShareWhatsApp = () => {
-    const visit = handleSavePrescription(currentRxId ? 'SAVED' : 'SAVED', false);
+    const visit = handleSavePrescription('SAVED', false);
     if (!visit) return;
     const waUrl = generatePrescriptionWhatsAppLink(patient, visit, clinicSettings);
     window.open(waUrl, '_blank', 'noopener,noreferrer');

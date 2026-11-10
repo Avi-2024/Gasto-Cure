@@ -73,7 +73,13 @@ function PrintPreviewModal({
   );
 
   return (
-    <div className="preview-modal-overlay no-print" onClick={onClose} role="dialog" aria-modal="true">
+    <div
+      className="preview-modal-overlay no-print"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="preview-modal-title"
+    >
       <div className="preview-modal-window" onClick={(e) => e.stopPropagation()}>
         {/* Header Bar */}
         <div className="preview-modal-header">
@@ -82,7 +88,9 @@ function PrintPreviewModal({
               <FileText size={18} />
             </div>
             <div>
-              <h2 className="preview-header-title font-heading">Prescription Print Preview</h2>
+              <h2 id="preview-modal-title" className="preview-header-title font-heading">
+                Prescription Print Preview
+              </h2>
               <p className="preview-header-sub">
                 {padMode
                   ? `Pad Mode (Pre-printed pad offset: ${topOffsetMm}mm)`
