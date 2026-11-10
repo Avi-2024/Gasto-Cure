@@ -1,32 +1,42 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import Sidebar from '../components/layout/Sidebar';
-import Header from '../components/layout/Header';
+import Sidebar from '../components/navigation/Sidebar';
+import AppHeader from '../components/layout/AppHeader';
 
-function DashboardLayout() {
+/**
+ * DashboardLayout Component
+ * Nivara operational shell providing persistent spruce sidebar navigation,
+ * floating frosted header, and animated page canvas.
+ */
+export default function DashboardLayout() {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Close mobile drawer automatically when route changes
   useEffect(() => {
     setSidebarOpen(false);
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen bg-medical-background md:flex">
+    <div className="min-h-screen bg-[#F7FAF8] text-[#10201F] md:flex">
+      {/* Navigation Sidebar */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <main className="min-h-screen flex-1 p-4 sm:p-6 lg:p-8">
+      {/* Main Content Workspace */}
+      <main className="min-h-screen flex-1 p-3 sm:p-5 lg:p-7 overflow-x-hidden">
         <div className="mx-auto w-full max-w-[1600px]">
-          <Header onMenuClick={() => setSidebarOpen(true)} />
+          {/* Floating Frosted Header */}
+          <AppHeader onMenuClick={() => setSidebarOpen(true)} />
 
+          {/* Smooth Route Transition Canvas */}
           <AnimatePresence mode="wait">
             <motion.section
               key={location.pathname}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.24, ease: 'easeOut' }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
             >
               <Outlet />
             </motion.section>
@@ -36,5 +46,3 @@ function DashboardLayout() {
     </div>
   );
 }
-
-export default DashboardLayout;
