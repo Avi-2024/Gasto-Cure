@@ -298,6 +298,16 @@ describe('Print Settings & Alignment Engine', () => {
       expect(document.documentElement.style.getPropertyValue('--print-top-offset')).toBe('85mm');
     });
 
+    it('updates bottom margin when moving slider and updates root CSS variables', () => {
+      render(React.createElement(PrintSettingsTab));
+
+      const bottomMarginSlider = screen.getByLabelText(/Bottom Margin/i);
+      fireEvent.change(bottomMarginSlider, { target: { value: '28' } });
+
+      // CSS variable should have been applied live
+      expect(document.documentElement.style.getPropertyValue('--print-bottom-margin')).toBe('28mm');
+    });
+
     it('resets print margins to default in a single batch when clicking Reset Defaults', () => {
       render(React.createElement(PrintSettingsTab));
 

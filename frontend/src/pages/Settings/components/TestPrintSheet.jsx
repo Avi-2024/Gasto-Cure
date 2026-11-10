@@ -36,11 +36,16 @@ export function TestPrintSheet({ onClose, onPrint }) {
 
   return (
     <div className="test-print-modal-overlay fixed inset-0 z-50 bg-[#123A3A]/75 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
-      <div className="test-print-modal bg-white rounded-2xl shadow-nivara-lg max-w-4xl w-full border border-[#D9E6E2] overflow-hidden flex flex-col my-auto">
+      <div
+        className="test-print-modal bg-white rounded-2xl shadow-nivara-lg max-w-4xl w-full border border-[#D9E6E2] overflow-hidden flex flex-col my-auto"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="calibration-modal-title"
+      >
         {/* Modal Controls (No Print) */}
         <div className="test-print-modal-header no-print flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 sm:p-5 border-b border-[#D9E6E2] bg-white">
           <div>
-            <h2 className="font-heading text-lg font-bold tracking-tight text-[#10201F]">
+            <h2 id="calibration-modal-title" className="font-heading text-lg font-bold tracking-tight text-[#10201F]">
               Print Alignment Calibration Sheet
             </h2>
             <p className="text-xs text-[#4E6460] mt-0.5">

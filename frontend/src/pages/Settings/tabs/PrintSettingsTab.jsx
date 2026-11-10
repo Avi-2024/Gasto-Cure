@@ -37,6 +37,8 @@ export function PrintSettingsTab() {
       const updatedPrint = {
         ...currentPrint,
         [field]: value,
+        ...(field === 'bottomOffsetMm' ? { bottomMarginMm: value } : {}),
+        ...(field === 'bottomMarginMm' ? { bottomOffsetMm: value } : {}),
       };
       // Live apply CSS variables to the document
       applyPrintSettings(updatedPrint);
