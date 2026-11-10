@@ -4,18 +4,14 @@ import { localMedicines } from '../../../services/localStore';
 /**
  * MedicineAutocomplete
  *
- * Fast, keyboard-accessible autocomplete component for medicine selection.
- * Integrates directly with localMedicines catalog.
+ * Fast, keyboard-accessible autocomplete component for Nivara prescription studio.
+ * Integrates directly with master formulary catalog (localMedicines).
  *
- * Props:
- * - value: string (initial/controlled query string)
- * - onChange: function(event) (standard input change handler)
- * - onSelect: function(selectedMedicine) (called with full medicine object)
- * - placeholder: string
- * - debounceMs: number (debounce in milliseconds, default 0 for instant local catalog search)
- * - disabled: boolean
- * - className: string
- * - autoFocus: boolean
+ * Keyboard Accessibility:
+ * - ArrowDown / ArrowUp moves through matching options
+ * - Enter selects highlighted option OR preserves typed query when none highlighted
+ * - Escape closes dropdown
+ * - Click outside closes dropdown
  */
 export default function MedicineAutocomplete({
   value = '',
@@ -169,7 +165,7 @@ export default function MedicineAutocomplete({
         <ul
           id={`med-autocomplete-listbox-${compId}`}
           role="listbox"
-          className="med-autocomplete-dropdown"
+          className="med-autocomplete-dropdown shadow-nivara-lg"
         >
           {results.length > 0 ? (
             results.map((item, index) => {
@@ -188,8 +184,12 @@ export default function MedicineAutocomplete({
                   }}
                 >
                   <div className="med-autocomplete-main">
-                    <span className="med-name">{item.name}</span>
-                    {item.strength && <span className="med-strength">{item.strength}</span>}
+                    <span className="med-name font-semibold text-[#10201F]">{item.name}</span>
+                    {item.strength && (
+                      <span className="med-strength text-xs bg-[#E8F3F1] text-[#287C75] font-medium px-1.5 py-0.5 rounded tabular-nums">
+                        {item.strength}
+                      </span>
+                    )}
                     {item.form && (
                       <span className={`med-badge med-badge-${String(item.form).toLowerCase()}`}>
                         {item.form}
@@ -200,18 +200,20 @@ export default function MedicineAutocomplete({
                     item.defaultTiming ||
                     item.defaultDuration ||
                     item.defaultInstruction) && (
-                    <div className="med-autocomplete-meta">
+                    <div className="med-autocomplete-meta text-xs text-[#4E6460]">
                       {item.defaultDosage && (
-                        <span className="med-meta-dosage">{item.defaultDosage}</span>
+                        <span className="med-meta-dosage font-semibold text-[#287C75]">
+                          {item.defaultDosage}
+                        </span>
                       )}
                       {item.defaultTiming && (
                         <span className="med-meta-timing">• {item.defaultTiming}</span>
                       )}
                       {item.defaultDuration && (
-                        <span className="med-meta-duration">• {item.defaultDuration}</span>
+                        <span className="med-meta-duration tabular-nums">• {item.defaultDuration}</span>
                       )}
                       {item.defaultInstruction && (
-                        <span className="med-meta-instruction">
+                        <span className="med-meta-instruction italic text-[#7D908C]">
                           ({item.defaultInstruction})
                         </span>
                       )}
@@ -222,7 +224,7 @@ export default function MedicineAutocomplete({
             })
           ) : (
             <li className="med-autocomplete-empty" role="option" aria-disabled="true">
-              No matching medicines found
+              No matching medicines found in formulary
             </li>
           )}
         </ul>

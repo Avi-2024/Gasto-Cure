@@ -1,19 +1,19 @@
 /* ═══════════════════════════════════════════════════════════════
-   PRINT PREVIEW MODAL STYLES
-   Realistic A4 Sheet Representation
+   NIVARA PRINT PREVIEW MODAL STYLES
+   Realistic Simulated A4 Sheet & Pad Mode Offset Calibration
    ═══════════════════════════════════════════════════════════════ */
 
 .preview-modal-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(4px);
+  background-color: rgba(18, 58, 58, 0.55);
+  backdrop-filter: blur(6px);
   z-index: 10000;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 16px;
-  animation: fadeIn 0.2s ease-out;
+  animation: modalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @media print {
@@ -22,29 +22,35 @@
   }
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .preview-modal-window {
-  background: #f8fafc;
-  border-radius: 12px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 25px 60px -15px rgba(18, 58, 58, 0.3), 0 0 0 1px rgba(18, 58, 58, 0.08);
   display: flex;
   flex-direction: column;
-  max-width: 900px;
+  max-width: 920px;
   width: 100%;
   max-height: 94vh;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #D9E6E2;
   overflow: hidden;
 }
 
 /* Modal Header */
 .preview-modal-header {
-  padding: 14px 20px;
+  padding: 14px 22px;
   background: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid #D9E6E2;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -54,20 +60,21 @@
 .preview-header-left {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .preview-header-title {
   font-size: 16px;
   font-weight: 700;
-  color: #0f172a;
+  color: #10201F;
   margin: 0;
+  letter-spacing: -0.01em;
 }
 
 .preview-header-sub {
   font-size: 12px;
-  color: #64748b;
-  margin: 0;
+  color: #4E6460;
+  margin: 1px 0 0 0;
 }
 
 .preview-header-actions {
@@ -81,18 +88,20 @@
   align-items: center;
   gap: 6px;
   padding: 7px 14px;
-  background: #16a34a;
+  background: #25D366;
   color: #ffffff;
   font-size: 13px;
   font-weight: 600;
-  border-radius: 6px;
+  border-radius: 10px;
   border: none;
   cursor: pointer;
   transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(37, 211, 102, 0.3);
 }
 
 .btn-preview-wa:hover {
-  background: #15803d;
+  background: #1eb956;
+  transform: translateY(-1px);
 }
 
 .btn-preview-print {
@@ -100,18 +109,20 @@
   align-items: center;
   gap: 6px;
   padding: 7px 14px;
-  background: #2563eb;
+  background: #287C75;
   color: #ffffff;
   font-size: 13px;
   font-weight: 600;
-  border-radius: 6px;
+  border-radius: 10px;
   border: none;
   cursor: pointer;
   transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(40, 124, 117, 0.3);
 }
 
 .btn-preview-print:hover {
-  background: #1d4ed8;
+  background: #1f635d;
+  transform: translateY(-1px);
 }
 
 .btn-preview-close {
@@ -120,17 +131,18 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: 6px;
-  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  border: 1px solid #D9E6E2;
   background: #ffffff;
-  color: #64748b;
+  color: #4E6460;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .btn-preview-close:hover {
-  background: #f1f5f9;
-  color: #0f172a;
+  background: #F7FAF8;
+  color: #10201F;
+  border-color: #7D908C;
 }
 
 /* Scroll Area for Sheet */
@@ -139,7 +151,7 @@
   overflow-y: auto;
   display: flex;
   justify-content: center;
-  background: #e2e8f0;
+  background: #EBF1EE;
   flex: 1;
 }
 
@@ -148,26 +160,28 @@
   background: #ffffff;
   width: 100%;
   max-width: 780px;
-  min-height: 900px;
-  padding: 36px 44px;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.12), 0 2px 6px -1px rgba(0, 0, 0, 0.08);
-  border-radius: 3px;
+  min-height: 940px;
+  padding: 38px 46px;
+  box-shadow: 0 20px 45px -10px rgba(18, 58, 58, 0.16), 0 4px 12px rgba(18, 58, 58, 0.06);
+  border-radius: 4px;
   font-size: 13px;
-  color: #1e293b;
+  color: #10201F;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 /* Pad Spacer in Pad Mode */
 .preview-pad-spacer {
-  border: 2px dashed #93c5fd;
-  background: #f0f7ff;
-  border-radius: 4px;
+  border: 2px dashed #287C75;
+  background: #F2F7F5;
+  border-radius: 8px;
   margin-bottom: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
+  transition: height 0.2s ease;
 }
 
 .preview-pad-indicator {
@@ -175,7 +189,7 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  color: #2563eb;
+  color: #123A3A;
   padding: 8px 16px;
 }
 
@@ -183,13 +197,14 @@
   font-weight: 700;
   font-size: 12px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
+  color: #287C75;
 }
 
 .preview-pad-indicator-desc {
   font-size: 11px;
-  color: #3b82f6;
-  opacity: 0.9;
+  color: #4E6460;
+  margin-top: 2px;
 }
 
 /* Digital Letterhead */
@@ -207,13 +222,13 @@
 .preview-clinic-name {
   font-size: 20px;
   font-weight: 800;
-  color: #1e3a8a;
+  color: #123A3A;
   margin: 0 0 4px 0;
 }
 
 .preview-clinic-sub {
   font-size: 11.5px;
-  color: #475569;
+  color: #4E6460;
   margin: 0;
   line-height: 1.4;
 }
@@ -225,29 +240,29 @@
 .preview-doctor-name {
   font-size: 17px;
   font-weight: 700;
-  color: #0f172a;
+  color: #10201F;
   margin: 0 0 2px 0;
 }
 
 .preview-doctor-sub {
   font-size: 11.5px;
-  color: #475569;
+  color: #4E6460;
   margin: 0;
   line-height: 1.4;
 }
 
 .preview-letterhead-divider {
   border: none;
-  border-top: 2px solid #2563eb;
+  border-top: 2px solid #287C75;
   margin-top: 14px;
   margin-bottom: 0;
 }
 
 /* Patient Card */
 .preview-patient-card {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
+  background: #F7FAF8;
+  border: 1px solid #D9E6E2;
+  border-radius: 8px;
   padding: 12px 16px;
   margin-bottom: 16px;
 }
@@ -260,12 +275,13 @@
 }
 
 .preview-patient-grid .label {
-  color: #64748b;
+  color: #7D908C;
+  font-weight: 500;
   margin-right: 6px;
 }
 
 .preview-patient-grid .value {
-  color: #0f172a;
+  color: #10201F;
 }
 
 /* Sections */
@@ -276,7 +292,7 @@
 .preview-section-title {
   font-size: 11.5px;
   font-weight: 800;
-  color: #334155;
+  color: #123A3A;
   text-transform: uppercase;
   letter-spacing: 0.8px;
   margin: 0 0 6px 0;
@@ -285,7 +301,7 @@
 .preview-section-title.rx-symbol {
   font-size: 15px;
   font-weight: 900;
-  color: #1d4ed8;
+  color: #287C75;
   letter-spacing: normal;
 }
 
@@ -293,7 +309,7 @@
   margin: 0;
   font-size: 12.5px;
   line-height: 1.5;
-  color: #1e293b;
+  color: #10201F;
   white-space: pre-wrap;
 }
 
@@ -303,8 +319,9 @@
   flex-wrap: wrap;
   gap: 12px;
   padding: 8px 12px;
-  background: #f1f5f9;
-  border-radius: 4px;
+  background: #F0F5F3;
+  border: 1px solid #D9E6E2;
+  border-radius: 6px;
 }
 
 .preview-vital-item {
@@ -315,12 +332,12 @@
 
 .preview-vital-item .v-label {
   font-weight: 700;
-  color: #475569;
+  color: #4E6460;
 }
 
 .preview-vital-item .v-value {
   font-weight: 600;
-  color: #0f172a;
+  color: #10201F;
 }
 
 /* Medicine Table */
@@ -332,72 +349,72 @@
 }
 
 .preview-med-table th {
-  background: #f8fafc;
-  color: #334155;
+  background: #F0F5F3;
+  color: #123A3A;
   font-weight: 700;
   text-align: left;
   padding: 7px 8px;
-  border-bottom: 2px solid #cbd5e1;
+  border-bottom: 2px solid #D9E6E2;
   font-size: 11px;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .preview-med-table td {
-  padding: 7px 8px;
-  border-bottom: 1px solid #e2e8f0;
+  padding: 8px 8px;
+  border-bottom: 1px solid #D9E6E2;
   vertical-align: middle;
 }
 
 /* Follow-up */
 .preview-followup {
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  border-radius: 4px;
-  padding: 8px 12px;
+  background: #F7FAF8;
+  border: 1px solid #D9E6E2;
+  border-left: 3px solid #287C75;
+  border-radius: 6px;
+  padding: 9px 14px;
   margin-top: 10px;
 }
 
 /* Doctor Signature */
 .preview-signature-block {
   margin-top: auto;
-  padding-top: 30px;
+  padding-top: 36px;
   display: flex;
   justify-content: flex-end;
 }
 
 .preview-signature-line {
-  border-top: 1.5px solid #0f172a;
+  border-top: 1.5px solid #123A3A;
   padding-top: 6px;
-  min-width: 180px;
+  min-width: 190px;
   text-align: center;
 }
 
 .preview-sign-doctor {
   font-weight: 700;
   font-size: 13px;
-  color: #0f172a;
+  color: #10201F;
   margin: 0;
 }
 
 .preview-sign-clinic {
   font-size: 11px;
-  color: #64748b;
-  margin: 0;
+  color: #4E6460;
+  margin: 1px 0 0 0;
 }
 
 /* Footer Bar */
 .preview-modal-footer {
-  padding: 12px 20px;
+  padding: 12px 22px;
   background: #ffffff;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid #D9E6E2;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
 .preview-footer-info {
-  font-size: 12px;
-  color: #475569;
   display: flex;
   align-items: center;
 }

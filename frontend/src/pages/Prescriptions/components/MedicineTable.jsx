@@ -34,27 +34,18 @@ const TIMING_OPTIONS = [
 /**
  * MedicineTable Component
  *
- * Dynamic medicine table for prescriptions.
+ * Dynamic medicine table for Nivara Prescription Studio.
  * - Fast autocomplete powered by localMedicines
  * - Auto-fills dosage, frequency, timing, duration, and remarks upon selection
  * - All cells remain directly editable
- * - Minimal borders, clean clinic layout
- *
- * Columns:
- * - # (number)
- * - Medicine Name (Autocomplete)
- * - Dosage
- * - Frequency
- * - Timing (Before Food / After Food, etc.)
- * - Duration
- * - Remarks / Instructions
- * - Action (no-print)
+ * - Preserves exact header names for test compatibility:
+ *   /Medicine Name/i, /^Dosage$/i, /^Frequency$/i, /Timing \/ Instructions/i, /^Duration$/i, /^Remarks$/i
  */
 function MedicineTable({ medicines = [], onUpdate, onRemove, onUpdateMedicineFull, debounceMs = 0 }) {
   const handleSelectMedicine = (medicineId, selectedMed) => {
     const fullData = {
       name: selectedMed.name || '',
-      dosage: selectedMed.strength || selectedMed.defaultDosage || '',
+      dosage: selectedMed.strength || selectedMed.dosage || selectedMed.defaultDosage || '',
       frequency: selectedMed.defaultDosage || '',
       timing: selectedMed.defaultTiming || '',
       duration: selectedMed.defaultDuration || '',
@@ -94,7 +85,7 @@ function MedicineTable({ medicines = [], onUpdate, onRemove, onUpdateMedicineFul
         <tbody>
           {medicines.map((medicine, index) => (
             <tr key={medicine.id}>
-              <td className="medicine-number">{index + 1}</td>
+              <td className="medicine-number tabular-nums">{index + 1}</td>
               <td className="col-medicine-cell">
                 <MedicineAutocomplete
                   value={medicine.name || ''}
@@ -107,7 +98,7 @@ function MedicineTable({ medicines = [], onUpdate, onRemove, onUpdateMedicineFul
               <td>
                 <input
                   type="text"
-                  className="medicine-input"
+                  className="medicine-input tabular-nums"
                   placeholder="e.g. 500mg"
                   value={medicine.dosage || ''}
                   onChange={(e) => handleFieldChange(medicine.id, 'dosage', e.target.value)}
@@ -150,7 +141,7 @@ function MedicineTable({ medicines = [], onUpdate, onRemove, onUpdateMedicineFul
               <td>
                 <input
                   type="text"
-                  className="medicine-input"
+                  className="medicine-input tabular-nums"
                   placeholder="e.g. 5 days"
                   value={medicine.duration || ''}
                   onChange={(e) => handleFieldChange(medicine.id, 'duration', e.target.value)}
@@ -174,7 +165,7 @@ function MedicineTable({ medicines = [], onUpdate, onRemove, onUpdateMedicineFul
                     title="Remove medicine"
                     aria-label="Delete this medicine"
                   >
-                    <Trash2 size={14} />
+                    <Trash2 size={15} />
                   </button>
                 )}
               </td>

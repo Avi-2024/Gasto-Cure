@@ -5,10 +5,11 @@ import './PrintPreviewModal.css';
 /**
  * PrintPreviewModal Component
  *
- * Provides a realistic A4 preview of the prescription exactly as it will appear on paper.
+ * Provides a realistic A4 preview of the Nivara prescription pad.
  * - Displays Pad Mode top offset spacer or Digital Header letterhead
- * - Shows Patient Info, Vitals, Symptoms, Diagnosis, Rx Medicine Table, Advice, and Follow-up
- * - Allows 1-click Print and WhatsApp sharing directly from preview
+ * - Shows Patient Demographics, 6-Point Vitals, Symptoms, Diagnosis, Rx Medicine Table, Advice, and Follow-up
+ * - Allows 1-click Direct Print and WhatsApp sharing directly from preview
+ * - Closes on Escape key press or clicking outside sheet
  */
 function PrintPreviewModal({
   isOpen,
@@ -43,7 +44,7 @@ function PrintPreviewModal({
   const padMode = Boolean(printSettings?.padMode);
   const topOffsetMm = Number(printSettings?.topOffsetMm) || 60;
   const doctorName = clinicSettings?.doctorName || 'Dr. Aarav Sharma';
-  const clinicName = clinicSettings?.clinicName || 'ClinicRx Medical Centre';
+  const clinicName = clinicSettings?.clinicName || 'Nivara Clinic & Health Centre';
 
   let formattedDate = '';
   if (prescriptionDate) {
@@ -77,11 +78,15 @@ function PrintPreviewModal({
         {/* Header Bar */}
         <div className="preview-modal-header">
           <div className="preview-header-left">
-            <FileText size={20} className="text-blue-600" />
+            <div className="w-9 h-9 rounded-xl bg-[#E8F3F1] flex items-center justify-center text-[#287C75]">
+              <FileText size={18} />
+            </div>
             <div>
-              <h2 className="preview-header-title">Prescription Print Preview</h2>
+              <h2 className="preview-header-title font-heading">Prescription Print Preview</h2>
               <p className="preview-header-sub">
-                {padMode ? `Pad Mode (Pre-printed pad • ${topOffsetMm}mm margin)` : 'Digital Header Mode (Plain A4 paper)'}
+                {padMode
+                  ? `Pad Mode (Pre-printed pad offset: ${topOffsetMm}mm)`
+                  : 'Digital Header Mode (Plain A4 paper)'}
               </p>
             </div>
           </div>
@@ -94,7 +99,7 @@ function PrintPreviewModal({
                 onClick={onShareWhatsApp}
                 title="Share prescription via WhatsApp"
               >
-                <MessageCircle size={16} />
+                <MessageCircle size={15} />
                 WhatsApp
               </button>
             )}
@@ -105,7 +110,7 @@ function PrintPreviewModal({
                 onClick={onPrint}
                 title="Print prescription now"
               >
-                <Printer size={16} />
+                <Printer size={15} />
                 Print Now
               </button>
             )}
@@ -122,7 +127,7 @@ function PrintPreviewModal({
 
         {/* Preview A4 Sheet Container */}
         <div className="preview-sheet-scroll">
-          <div className="preview-sheet-a4">
+          <div className="preview-sheet-a4 shadow-nivara-lg">
             {/* Top Offset Spacer (Pad Mode) OR Digital Letterhead Header */}
             {padMode ? (
               <div
@@ -130,11 +135,11 @@ function PrintPreviewModal({
                 style={{ height: `${topOffsetMm}mm`, minHeight: '60px' }}
               >
                 <div className="preview-pad-indicator">
-                  <span className="preview-pad-indicator-label">
+                  <span className="preview-pad-indicator-label tabular-nums">
                     Pre-printed Letterhead Pad Area ({topOffsetMm}mm)
                   </span>
                   <span className="preview-pad-indicator-desc">
-                    (Content will start printing below this boundary)
+                    (Content will start printing below this boundary line)
                   </span>
                 </div>
               </div>
@@ -142,12 +147,12 @@ function PrintPreviewModal({
               <div className="preview-letterhead">
                 <div className="preview-letterhead-content">
                   <div className="preview-clinic-info">
-                    <h1 className="preview-clinic-name">{clinicName}</h1>
+                    <h1 className="preview-clinic-name font-heading">{clinicName}</h1>
                     <p className="preview-clinic-sub">{clinicSettings?.address || 'Medical Centre'}</p>
                     <p className="preview-clinic-sub">Phone: {clinicSettings?.phone || 'N/A'}</p>
                   </div>
                   <div className="preview-doctor-info">
-                    <h2 className="preview-doctor-name">{doctorName}</h2>
+                    <h2 className="preview-doctor-name font-heading">{doctorName}</h2>
                     <p className="preview-doctor-sub">{clinicSettings?.qualification || 'MBBS, MD'}</p>
                     <p className="preview-doctor-sub">Reg. No: {clinicSettings?.regNumber || 'MCI-REG'}</p>
                     {clinicSettings?.timing && (
@@ -164,26 +169,32 @@ function PrintPreviewModal({
               <div className="preview-patient-grid">
                 <div>
                   <span className="label">Patient Name:</span>
-                  <span className="value font-semibold">{patient?.name || 'Walk-in Patient'}</span>
+                  <span className="value font-semibold text-[#10201F]">{patient?.name || 'Walk-in Patient'}</span>
                 </div>
                 <div>
                   <span className="label">Age / Gender:</span>
-                  <span className="value">
+                  <span className="value tabular-nums">
                     {patient?.age ? `${patient.age} Yrs` : 'N/A'} / {patient?.gender || 'N/A'}
                   </span>
                 </div>
                 <div>
                   <span className="label">Contact:</span>
-                  <span className="value">{patient?.contact || patient?.mobile || 'N/A'}</span>
+                  <span className="value tabular-nums">{patient?.contact || patient?.mobile || 'N/A'}</span>
                 </div>
                 <div>
                   <span className="label">Date:</span>
-                  <span className="value">{formattedDate}</span>
+                  <span className="value tabular-nums">{formattedDate}</span>
                 </div>
                 {rxId && (
                   <div>
                     <span className="label">Rx No:</span>
-                    <span className="value font-mono text-xs">{rxId}</span>
+                    <span className="value font-mono text-xs tabular-nums font-semibold text-[#287C75]">{rxId}</span>
+                  </div>
+                )}
+                {patient?.id && (
+                  <div>
+                    <span className="label">Patient ID:</span>
+                    <span className="value font-mono text-xs tabular-nums text-[#4E6460]">{patient.id}</span>
                   </div>
                 )}
               </div>
@@ -192,42 +203,42 @@ function PrintPreviewModal({
             {/* Vitals Section */}
             {hasAnyVital && (
               <div className="preview-section preview-vitals">
-                <h3 className="preview-section-title">Vitals</h3>
+                <h3 className="preview-section-title font-heading">Vitals</h3>
                 <div className="preview-vitals-grid">
                   {vitals.bloodPressure && (
                     <div className="preview-vital-item">
                       <span className="v-label">BP:</span>
-                      <span className="v-value">{vitals.bloodPressure}</span>
+                      <span className="v-value tabular-nums">{vitals.bloodPressure} mmHg</span>
                     </div>
                   )}
                   {vitals.weight && (
                     <div className="preview-vital-item">
                       <span className="v-label">Weight:</span>
-                      <span className="v-value">{vitals.weight} kg</span>
+                      <span className="v-value tabular-nums">{vitals.weight} kg</span>
                     </div>
                   )}
                   {vitals.bloodSugar && (
                     <div className="preview-vital-item">
                       <span className="v-label">Sugar:</span>
-                      <span className="v-value">{vitals.bloodSugar}</span>
+                      <span className="v-value tabular-nums">{vitals.bloodSugar} mg/dL</span>
                     </div>
                   )}
                   {vitals.temperature && (
                     <div className="preview-vital-item">
                       <span className="v-label">Temp:</span>
-                      <span className="v-value">{vitals.temperature} °F</span>
+                      <span className="v-value tabular-nums">{vitals.temperature} °F</span>
                     </div>
                   )}
                   {vitals.pulseRate && (
                     <div className="preview-vital-item">
                       <span className="v-label">Pulse:</span>
-                      <span className="v-value">{vitals.pulseRate} bpm</span>
+                      <span className="v-value tabular-nums">{vitals.pulseRate} bpm</span>
                     </div>
                   )}
                   {vitals.spo2 && (
                     <div className="preview-vital-item">
                       <span className="v-label">SpO2:</span>
-                      <span className="v-value">{vitals.spo2} %</span>
+                      <span className="v-value tabular-nums">{vitals.spo2} %</span>
                     </div>
                   )}
                 </div>
@@ -237,7 +248,7 @@ function PrintPreviewModal({
             {/* Symptoms / Complaints */}
             {symptoms && (
               <div className="preview-section">
-                <h3 className="preview-section-title">Chief Complaints / Symptoms</h3>
+                <h3 className="preview-section-title font-heading">Chief Complaints / Symptoms</h3>
                 <p className="preview-text-block">{symptoms}</p>
               </div>
             )}
@@ -245,14 +256,14 @@ function PrintPreviewModal({
             {/* Diagnosis */}
             {diagnosis && (
               <div className="preview-section">
-                <h3 className="preview-section-title">Diagnosis</h3>
-                <p className="preview-text-block font-medium">{diagnosis}</p>
+                <h3 className="preview-section-title font-heading">Diagnosis</h3>
+                <p className="preview-text-block font-semibold text-[#10201F]">{diagnosis}</p>
               </div>
             )}
 
             {/* Rx Medicine Table */}
             <div className="preview-section preview-rx-section">
-              <h3 className="preview-section-title rx-symbol">Rx (Medicines)</h3>
+              <h3 className="preview-section-title rx-symbol font-heading">Rx (Medicines)</h3>
               {validMedicines.length > 0 ? (
                 <table className="preview-med-table">
                   <thead>
@@ -269,26 +280,26 @@ function PrintPreviewModal({
                   <tbody>
                     {validMedicines.map((med, idx) => (
                       <tr key={med.id || idx}>
-                        <td className="text-center">{idx + 1}</td>
-                        <td className="font-semibold text-slate-900">{med.name}</td>
-                        <td>{med.dosage || '-'}</td>
-                        <td className="font-medium text-blue-700">{med.frequency || '-'}</td>
+                        <td className="text-center tabular-nums text-slate-500">{idx + 1}</td>
+                        <td className="font-semibold text-[#10201F]">{med.name}</td>
+                        <td className="tabular-nums">{med.dosage || '-'}</td>
+                        <td className="font-medium text-[#287C75]">{med.frequency || '-'}</td>
                         <td>{med.timing || '-'}</td>
-                        <td>{med.duration || '-'}</td>
-                        <td className="text-slate-600">{med.remarks || '-'}</td>
+                        <td className="tabular-nums">{med.duration || '-'}</td>
+                        <td className="text-[#4E6460]">{med.remarks || '-'}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               ) : (
-                <p className="text-sm italic text-slate-400 py-2">No medicines listed in this prescription.</p>
+                <p className="text-sm italic text-[#7D908C] py-2">No medicines listed in this prescription.</p>
               )}
             </div>
 
             {/* Advice / Instructions */}
             {advice && (
               <div className="preview-section">
-                <h3 className="preview-section-title">Advice & Instructions</h3>
+                <h3 className="preview-section-title font-heading">Advice & Instructions</h3>
                 <p className="preview-text-block">{advice}</p>
               </div>
             )}
@@ -296,15 +307,15 @@ function PrintPreviewModal({
             {/* Next Follow-Up */}
             {followUpDate && (
               <div className="preview-section preview-followup">
-                <span className="font-bold text-slate-800 text-sm">Next Follow-Up: </span>
-                <span className="font-semibold text-blue-700 text-sm ml-1">{followUpDate}</span>
+                <span className="font-bold text-[#10201F] text-sm">Next Follow-Up: </span>
+                <span className="font-semibold text-[#287C75] text-sm ml-1 tabular-nums">{followUpDate}</span>
               </div>
             )}
 
             {/* Doctor Signature Block */}
             <div className="preview-signature-block">
               <div className="preview-signature-line">
-                <p className="preview-sign-doctor">{doctorName}</p>
+                <p className="preview-sign-doctor font-heading">{doctorName}</p>
                 <p className="preview-sign-clinic">{clinicName}</p>
               </div>
             </div>
@@ -314,8 +325,8 @@ function PrintPreviewModal({
         {/* Footer Bar */}
         <div className="preview-modal-footer">
           <div className="preview-footer-info">
-            <CheckCircle2 size={15} className="text-emerald-600 inline mr-1" />
-            <span>Ready for printing or sending via WhatsApp</span>
+            <CheckCircle2 size={16} className="text-[#2E7D5B] inline mr-1.5" />
+            <span className="text-xs text-[#4E6460]">Ready for precision printing or patient WhatsApp sharing</span>
           </div>
           <div className="preview-footer-buttons">
             <button type="button" className="btn-secondary" onClick={onClose}>
@@ -323,13 +334,13 @@ function PrintPreviewModal({
             </button>
             {onShareWhatsApp && (
               <button type="button" className="btn-preview-wa" onClick={onShareWhatsApp}>
-                <MessageCircle size={16} />
+                <MessageCircle size={15} />
                 Send via WhatsApp
               </button>
             )}
             {onPrint && (
               <button type="button" className="btn-primary" onClick={onPrint}>
-                <Printer size={16} />
+                <Printer size={15} />
                 Print Prescription
               </button>
             )}
