@@ -157,51 +157,51 @@ export default function FollowUpRemindersWidget() {
     if (daysLeft < 0) {
       return {
         label: 'Overdue',
-        className: 'bg-red-50 text-red-700 border-red-200',
+        className: 'bg-rose-50 text-[#B94A48] border-rose-200',
       };
     }
     if (daysLeft === 0) {
       return {
         label: 'Today',
-        className: 'bg-rose-50 text-rose-700 border-rose-200',
+        className: 'bg-amber-50 text-[#B7791F] border-amber-200',
       };
     }
     if (daysLeft === 1) {
       return {
         label: 'Tomorrow',
-        className: 'bg-amber-50 text-amber-700 border-amber-200',
+        className: 'bg-teal-50 text-[#287C75] border-teal-200',
       };
     }
     if (daysLeft === 2) {
       return {
         label: 'In 2 Days',
-        className: 'bg-sky-50 text-sky-700 border-sky-200',
+        className: 'bg-teal-50 text-[#287C75] border-teal-200',
       };
     }
     return {
       label: `In ${daysLeft} Days`,
-      className: 'bg-slate-50 text-slate-700 border-slate-200',
+      className: 'bg-[#F7FAF8] text-[#4E6460] border-[#D9E6E2]',
     };
   };
 
   return (
-    <article className="app-card p-6 flex flex-col justify-between">
+    <article className="app-card p-6 flex flex-col justify-between border border-[#D9E6E2] bg-white rounded-2xl shadow-nivara-xs">
       <div>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600 border border-amber-200">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-[#B7791F] border border-amber-200">
               <CalendarClock size={20} />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-slate-900">Follow-Up Reminders</h2>
-              <p className="text-xs text-slate-500">Upcoming consultations within 48 hours & overdue</p>
+              <h2 className="text-lg font-heading font-bold text-[#10201F]">Follow-Up Reminders</h2>
+              <p className="text-xs text-[#4E6460]">Upcoming consultations within 48 hours & overdue</p>
             </div>
           </div>
           <span
             className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
               followUps.length > 0
                 ? 'bg-amber-100 text-amber-800'
-                : 'bg-slate-100 text-slate-600'
+                : 'bg-[#F7FAF8] text-[#4E6460] border border-[#D9E6E2]'
             }`}
           >
             {followUps.length} Due
@@ -209,10 +209,10 @@ export default function FollowUpRemindersWidget() {
         </div>
 
         {followUps.length === 0 ? (
-          <div className="mt-5 rounded-2xl border border-dashed border-medical-border bg-slate-50 p-8 text-center">
-            <CheckCircle2 size={36} className="mx-auto text-emerald-500" />
-            <p className="mt-2 text-sm font-semibold text-slate-700">No Follow-up Reminders Due</p>
-            <p className="mt-1 text-xs text-slate-500">
+          <div className="mt-5 rounded-2xl border border-dashed border-[#D9E6E2] bg-[#F7FAF8] p-8 text-center">
+            <CheckCircle2 size={36} className="mx-auto text-[#2E7D5B]" />
+            <p className="mt-2 text-sm font-semibold text-[#10201F]">No Follow-up Reminders Due</p>
+            <p className="mt-1 text-xs text-[#4E6460]">
               No upcoming follow-ups scheduled for the next 2 days. All patients are up to date!
             </p>
           </div>
@@ -228,41 +228,41 @@ export default function FollowUpRemindersWidget() {
                   className={`rounded-2xl border p-4 transition ${
                     isReminded
                       ? 'border-emerald-200 bg-emerald-50/40'
-                      : 'border-medical-border bg-slate-50/60 hover:bg-white hover:border-slate-300'
+                      : 'border-[#D9E6E2] bg-[#F7FAF8]/70 hover:bg-white hover:border-[#287C75]/40 hover:shadow-nivara-xs'
                   }`}
                 >
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     {/* Patient Info */}
                     <div className="space-y-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm font-bold text-slate-900">{item.name}</span>
+                        <span className="text-sm font-heading font-bold text-[#10201F]">{item.name}</span>
                         {(item.age || item.gender) && (
-                          <span className="text-xs text-slate-500 font-medium">
+                          <span className="text-xs text-[#4E6460] font-medium">
                             ({item.age ? `${item.age} Y` : ''}
                             {item.age && item.gender ? ' / ' : ''}
                             {item.gender})
                           </span>
                         )}
                         <span
-                          className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-semibold ${badge.className}`}
+                          className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${badge.className}`}
                         >
                           {badge.label}
                         </span>
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600">
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[#4E6460]">
                         {item.contact && (
                           <span className="inline-flex items-center gap-1 font-mono">
-                            <Phone size={12} className="text-slate-400" />
+                            <Phone size={12} className="text-[#7D908C]" />
                             {item.contact}
                           </span>
                         )}
-                        <span className="inline-flex items-center gap-1 text-slate-500">
-                          <Clock size={12} className="text-slate-400" />
+                        <span className="inline-flex items-center gap-1 text-[#4E6460]">
+                          <Clock size={12} className="text-[#7D908C]" />
                           {formatDisplayDate(item.followUpDate)}
                         </span>
                         {item.diagnosis && (
-                          <span className="inline-flex items-center gap-1 text-medical-primary font-medium">
+                          <span className="inline-flex items-center gap-1 text-[#287C75] font-medium">
                             <Stethoscope size={12} />
                             {item.diagnosis}
                           </span>
@@ -271,12 +271,13 @@ export default function FollowUpRemindersWidget() {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center gap-2 pt-2 sm:pt-0">
+                    <div className="flex items-center gap-2 pt-2 sm:pt-0 shrink-0">
                       {/* WhatsApp Reminder Button */}
                       <button
                         type="button"
                         onClick={() => handleSendWhatsApp(item)}
-                        className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-emerald-700 transition active:scale-95"
+                        aria-label="WhatsApp Reminder"
+                        className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-[#2E7D5B] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-[#25664a] transition active:scale-95"
                         title="Send WhatsApp Reminder"
                       >
                         <MessageCircle size={14} />
@@ -290,7 +291,7 @@ export default function FollowUpRemindersWidget() {
                         className={`inline-flex items-center gap-1 rounded-xl px-2.5 py-1.5 text-xs font-semibold border transition ${
                           isReminded
                             ? 'border-emerald-300 bg-emerald-100 text-emerald-800'
-                            : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                            : 'border-[#D9E6E2] bg-white text-[#4E6460] hover:bg-[#F7FAF8] hover:text-[#10201F]'
                         }`}
                         title={isReminded ? 'Mark as Not Reminded' : 'Mark as Reminded'}
                       >
