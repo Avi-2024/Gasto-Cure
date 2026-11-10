@@ -139,11 +139,11 @@ function PrescriptionPage() {
 
         if (visit.vitals) {
           setVitals({
-            bloodPressure: visit.vitals.bloodPressure || '',
+            bloodPressure: visit.vitals.bloodPressure || visit.vitals.bp || '',
             weight: visit.vitals.weight || '',
-            bloodSugar: visit.vitals.bloodSugar || '',
-            temperature: visit.vitals.temperature || '',
-            pulseRate: visit.vitals.pulseRate || '',
+            bloodSugar: visit.vitals.bloodSugar || visit.vitals.sugar || '',
+            temperature: visit.vitals.temperature || visit.vitals.temp || '',
+            pulseRate: visit.vitals.pulseRate || visit.vitals.pulse || '',
             spo2: visit.vitals.spo2 || '',
           });
         }
@@ -293,7 +293,13 @@ function PrescriptionPage() {
       patientAge: patient.age,
       patientGender: patient.gender,
       date: prescriptionDate || new Date().toISOString(),
-      vitals,
+      vitals: {
+        ...vitals,
+        bp: vitals.bloodPressure,
+        pulse: vitals.pulseRate,
+        sugar: vitals.bloodSugar,
+        temp: vitals.temperature,
+      },
       symptoms,
       diagnosis,
       advice,

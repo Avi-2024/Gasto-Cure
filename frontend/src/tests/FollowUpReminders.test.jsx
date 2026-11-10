@@ -5,7 +5,7 @@ import { MemoryRouter } from 'react-router-dom';
 import FollowUpRemindersWidget from '../pages/Dashboard/components/FollowUpRemindersWidget';
 import QuickPatientSearch from '../pages/Dashboard/components/QuickPatientSearch';
 import DashboardPage from '../pages/Dashboard/DashboardPage';
-import { localPatients, localVisits, localSettings } from '../services/localStore';
+import { localPatients, localVisits, localSettings, localAppointments } from '../services/localStore';
 
 // Helper to create YYYY-MM-DD strings relative to today
 const getRelativeDateStr = (dayOffset) => {
@@ -387,6 +387,19 @@ describe('Follow-Up Reminders & Quick Patient Search - Task 7 Tests', () => {
 
       // Follow-up Reminders Widget header
       expect(screen.getByText(/Follow-Up Reminders/i)).toBeTruthy();
+    });
+
+    it('links queue items to /prescription/new?patientId=... and performs safe local calendar date check', () => {
+      localAppointments.addToQueue('PT-101', 'Rohan Verma', 42, 'Fever and cold');
+      render(
+        <MemoryRouter>
+          <DashboardPage />
+        </MemoryRouter>
+      );
+
+      const consultButtons = screen.getAllByRole('link', { name: /Start Consultation/i });
+      expect(consultButtons.length).toBeGreaterThan(0);
+      expect(consultButtons[0].getAttribute('href')).toMatch(/^\/prescription\/new\?patientId=/);
     });
   });
 });

@@ -269,6 +269,23 @@ describe('Task 2: Global Navigation Shell & Brand Identity', () => {
       fireEvent.click(menuBtn);
       expect(onMenuClick).toHaveBeenCalledTimes(1);
     });
+
+    it('navigates to /patients?search=... on Enter keypress when query is non-empty', () => {
+      const mockNav = vi.fn();
+      render(<AppHeader onMenuClick={vi.fn()} navigate={mockNav} />);
+
+      const searchInput = screen.getByPlaceholderText(/Search patients, prescriptions/i);
+
+      // Whitespace only - should not navigate
+      fireEvent.change(searchInput, { target: { value: '   ' } });
+      fireEvent.keyDown(searchInput, { key: 'Enter' });
+      expect(mockNav).not.toHaveBeenCalled();
+
+      // Non-empty query - should navigate to /patients?search=...
+      fireEvent.change(searchInput, { target: { value: 'Anita' } });
+      fireEvent.keyDown(searchInput, { key: 'Enter' });
+      expect(mockNav).toHaveBeenCalledWith('/patients?search=Anita');
+    });
   });
 
   describe('DashboardLayout Component', () => {

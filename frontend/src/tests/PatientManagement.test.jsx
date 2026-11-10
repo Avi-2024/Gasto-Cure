@@ -251,6 +251,53 @@ describe('Patient Management - Task 6 Tests', () => {
       expect(shareWaBtns.length).toBeGreaterThanOrEqual(2);
     });
 
+    it('harmonizes vitals schema displaying both alias formats (bloodPressure, pulseRate, sugar, etc.)', () => {
+      const patientWithAltVitals = {
+        id: 'PT-999',
+        name: 'Suman Sen',
+        contact: '9876543219',
+        age: 39,
+        gender: 'Female',
+      };
+      localVisits.save({
+        patientId: 'PT-999',
+        patientName: 'Suman Sen',
+        patientMobile: '9876543219',
+        patientAge: 39,
+        patientGender: 'Female',
+        date: '2026-11-10',
+        vitals: {
+          bloodPressure: '122/78',
+          pulseRate: '74',
+          bloodSugar: '95',
+          temperature: '98.4',
+          spo2: '99',
+          weight: '62',
+        },
+        diagnosis: 'Dyspepsia Review',
+        medicines: [],
+        advice: 'Normal vitals',
+        status: 'COMPLETED',
+      });
+
+      render(
+        <MemoryRouter>
+          <PatientProfileDrawer
+            isOpen={true}
+            patient={patientWithAltVitals}
+            onClose={vi.fn()}
+            onEdit={vi.fn()}
+          />
+        </MemoryRouter>
+      );
+
+      expect(screen.getByText(/122\/78/)).toBeTruthy();
+      expect(screen.getByText(/74 bpm/)).toBeTruthy();
+      expect(screen.getByText(/95 mg\/dL/)).toBeTruthy();
+      expect(screen.getByText(/98\.4 °F/)).toBeTruthy();
+      expect(screen.getByText(/99%/)).toBeTruthy();
+    });
+
     it('clicking WhatsApp share on a past visit opens wa.me URL with clean phone', () => {
       render(
         <MemoryRouter>

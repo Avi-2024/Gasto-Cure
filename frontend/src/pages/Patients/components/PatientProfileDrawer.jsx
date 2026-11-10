@@ -284,9 +284,23 @@ function PatientProfileDrawer({ isOpen, patient, onClose, onEdit, clinicSettings
             ) : (
               <div className="space-y-4">
                 {visits.map((visit) => {
+                  const bp = visit.vitals ? (visit.vitals.bp || visit.vitals.bloodPressure) : null;
+                  const pulse = visit.vitals ? (visit.vitals.pulse || visit.vitals.pulseRate) : null;
+                  const sugar = visit.vitals ? (visit.vitals.sugar || visit.vitals.bloodSugar) : null;
+                  const temp = visit.vitals ? (visit.vitals.temp || visit.vitals.temperature) : null;
+                  const weight = visit.vitals?.weight;
+                  const spo2 = visit.vitals?.spo2;
                   const hasVitals =
                     visit.vitals &&
-                    Object.values(visit.vitals).some((val) => val !== null && val !== undefined && val !== '');
+                    Boolean(
+                      bp ||
+                      pulse ||
+                      sugar ||
+                      temp ||
+                      weight ||
+                      spo2 ||
+                      Object.values(visit.vitals).some((val) => val !== null && val !== undefined && val !== '')
+                    );
                   const medicines = Array.isArray(visit.medicines) ? visit.medicines : [];
                   const followUp = visit.followUpDate || visit.nextFollowUp;
 
@@ -335,29 +349,34 @@ function PatientProfileDrawer({ isOpen, patient, onClose, onEdit, clinicSettings
                       {/* Vitals Strip */}
                       {hasVitals && (
                         <div className="flex flex-wrap gap-2 text-xs bg-[#F7FAF8] p-3 rounded-xl border border-[#D9E6E2]">
-                          {visit.vitals.bp && (
+                          {bp && (
                             <span className="font-semibold text-[#10201F]">
-                              <span className="text-[#7D908C]">BP:</span> {visit.vitals.bp}
+                              <span className="text-[#7D908C]">BP:</span> {bp}
                             </span>
                           )}
-                          {visit.vitals.pulse && (
+                          {pulse && (
                             <span className="font-medium text-[#4E6460]">
-                              <span className="text-[#7D908C]">• Pulse:</span> {visit.vitals.pulse} bpm
+                              <span className="text-[#7D908C]">• Pulse:</span> {pulse} bpm
                             </span>
                           )}
-                          {(visit.vitals.sugar || visit.vitals.bloodSugar) && (
+                          {sugar && (
                             <span className="font-medium text-[#4E6460]">
-                              <span className="text-[#7D908C]">• Sugar:</span> {visit.vitals.sugar || visit.vitals.bloodSugar} mg/dL
+                              <span className="text-[#7D908C]">• Sugar:</span> {sugar} mg/dL
                             </span>
                           )}
-                          {visit.vitals.weight && (
+                          {weight && (
                             <span className="font-medium text-[#4E6460]">
-                              <span className="text-[#7D908C]">• Wt:</span> {visit.vitals.weight} kg
+                              <span className="text-[#7D908C]">• Wt:</span> {weight} kg
                             </span>
                           )}
-                          {(visit.vitals.temp || visit.vitals.temperature) && (
+                          {temp && (
                             <span className="font-medium text-[#4E6460]">
-                              <span className="text-[#7D908C]">• Temp:</span> {visit.vitals.temp || visit.vitals.temperature} °F
+                              <span className="text-[#7D908C]">• Temp:</span> {temp} °F
+                            </span>
+                          )}
+                          {spo2 && (
+                            <span className="font-medium text-[#4E6460]">
+                              <span className="text-[#7D908C]">• SpO2:</span> {spo2}%
                             </span>
                           )}
                         </div>

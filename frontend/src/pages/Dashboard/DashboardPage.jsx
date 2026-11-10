@@ -61,14 +61,11 @@ function DashboardPage() {
 
     // Calculate visits completed today (using local calendar date)
     const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    const todayStr = `${yyyy}-${mm}-${dd}`;
     const allVisits = localVisits.getAll() || [];
     const visitsToday = allVisits.filter((v) => {
       if (!v.date) return false;
-      return v.date.startsWith(todayStr);
+      const vDate = new Date(v.date);
+      return !isNaN(vDate.getTime()) && vDate.toDateString() === today.toDateString();
     });
 
     // Calculate active follow-ups due within 2 days or overdue
@@ -250,7 +247,10 @@ function DashboardPage() {
                         </div>
                       </div>
 
-                      <Link to="/doctor/consultation" className="btn-primary">
+                      <Link
+                        to={`/prescription/new?patientId=${encodeURIComponent(patient.patientId || patient.id)}`}
+                        className="btn-primary inline-flex items-center gap-1.5"
+                      >
                         Start Consultation
                       </Link>
                     </div>

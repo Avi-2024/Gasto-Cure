@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Bell, Menu, Search } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -7,9 +8,31 @@ import { useAuth } from '../../contexts/AuthContext';
  * Floating frosted card with global search, keyboard shortcut cue (⌘K / Ctrl+K),
  * contextual clinic selector pill with active status dot, and doctor profile badge.
  */
-export default function AppHeader({ onMenuClick }) {
+export default function AppHeader({ onMenuClick, navigate: customNavigate }) {
   const { activeClinicId, user, switchClinic } = useAuth();
   const searchInputRef = useRef(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  let routerNavigate = null;
+  try {
+    routerNavigate = useNavigate();
+  } catch (err) {
+    // Graceful fallback when rendered in isolated test harnesses without a Router
+  }
+  const navigate = customNavigate || routerNavigate || ((path) => {
+    if (typeof window !== 'undefined') {
+      window.location.href = path;
+    }
+  });
+
+  const handleSearchKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      const trimmed = searchQuery.trim();
+      if (trimmed) {
+        navigate(`/patients?search=${encodeURIComponent(trimmed)}`);
+      }
+    }
+  };
 
   const clinicIds = user?.clinicIds || [];
   const role = user?.role || 'DOCTOR';
@@ -64,6 +87,9 @@ export default function AppHeader({ onMenuClick }) {
               id="global-search"
               type="search"
               placeholder="Search patients, prescriptions, master drugs..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleSearchKeyDown}
               className="w-full border-0 bg-transparent p-0 text-xs font-medium text-[#10201F] placeholder-[#7D908C] focus:outline-none focus:ring-0 sm:text-sm"
             />
             <span className="hidden sm:inline-flex items-center rounded border border-[#D9E6E2] bg-white px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-[#4E6460] shadow-2xs">
