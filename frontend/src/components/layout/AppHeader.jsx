@@ -12,19 +12,23 @@ export default function AppHeader({ onMenuClick }) {
   const searchInputRef = useRef(null);
 
   const clinicIds = user?.clinicIds || [];
+  const role = user?.role || 'DOCTOR';
   const rawName = user?.name || (user?.email ? user.email.split('@')[0].replace(/[._-]/g, ' ') : 'Doctor');
-  const doctorName = rawName
+  const cleanName = rawName.replace(/^dr\.?\s+/i, '');
+  const formattedName = cleanName
     .split(' ')
+    .filter(Boolean)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ');
-  const doctorInitial = doctorName.charAt(0).toUpperCase() || 'D';
+  const displayName = role === 'DOCTOR' ? `Dr. ${formattedName}` : formattedName;
+  const doctorInitial = formattedName.charAt(0).toUpperCase() || (role === 'DOCTOR' ? 'D' : 'U');
   const roleLabel = user?.role ? user.role.replace(/_/g, ' ') : 'Doctor';
   const clinicValue = activeClinicId && clinicIds.includes(activeClinicId) ? activeClinicId : clinicIds[0] || '';
 
   // Keyboard shortcut (⌘K / Ctrl+K) to focus search
   useEffect(() => {
     function handleKeyDown(event) {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+      if ((event.metaKey || event.ctrlKey) && event.key?.toLowerCase() === 'k') {
         event.preventDefault();
         searchInputRef.current?.focus();
       }
@@ -115,7 +119,7 @@ export default function AppHeader({ onMenuClick }) {
             </span>
             <div className="hidden pr-1 sm:block text-left">
               <p className="text-xs font-bold capitalize text-[#10201F]">
-                Dr. {doctorName}
+                {displayName}
               </p>
               <p className="text-[10px] font-semibold uppercase tracking-wider text-[#4E6460]">
                 {roleLabel}

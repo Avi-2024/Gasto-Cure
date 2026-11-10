@@ -1,6 +1,5 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import {
   CalendarDays,
   ClipboardList,
@@ -107,19 +106,22 @@ export default function Sidebar({ isOpen, onClose }) {
   const { user, logout } = useAuth();
   const role = user?.role || 'DOCTOR';
 
-  // Compute doctor name and initials
+  // Compute user name and initials without redundant "Dr." prefixes
   const rawName = user?.name || (user?.email ? user.email.split('@')[0].replace(/[._-]/g, ' ') : 'Doctor');
-  const doctorName = rawName
+  const cleanName = rawName.replace(/^dr\.?\s+/i, '');
+  const formattedName = cleanName
     .split(' ')
+    .filter(Boolean)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ');
-  const initials = doctorName
+  const displayName = role === 'DOCTOR' ? `Dr. ${formattedName}` : formattedName;
+  const initials = formattedName
     .split(' ')
     .filter(Boolean)
     .map((w) => w[0])
     .join('')
     .slice(0, 2)
-    .toUpperCase() || 'DR';
+    .toUpperCase() || (role === 'DOCTOR' ? 'DR' : 'U');
   const roleLabel = role.replace(/_/g, ' ');
 
   // Filter groups according to user role
@@ -218,7 +220,7 @@ export default function Sidebar({ isOpen, onClose }) {
               </span>
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold text-white">
-                  Dr. {doctorName}
+                  {displayName}
                 </p>
                 <span className="inline-block text-[10px] uppercase tracking-wider text-teal-200/80 font-medium">
                   {roleLabel}

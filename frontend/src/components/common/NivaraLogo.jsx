@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 
 /**
  * Nivara Brand Identity Logo Component
@@ -21,6 +21,7 @@ export default function NivaraLogo({
   const isCompact = variant === 'compact';
   const isMonochrome = variant === 'monochrome';
   const isDark = theme === 'dark';
+  const uniqueId = useId();
 
   // Dimension scaling
   const iconSizes = {
@@ -31,18 +32,15 @@ export default function NivaraLogo({
 
   const currentSize = iconSizes[size] || iconSizes.md;
 
-  // Color mappings
-  const hexStroke = isMonochrome
-    ? 'currentColor'
-    : isDark
-    ? '#C9A45C'
-    : '#287C75';
+  const hexGradId = `nivara-hex-gradient-${uniqueId}`;
+  const flowGradId = `nivara-flow-${uniqueId}`;
+  const darkFlowGradId = `nivara-dark-flow-${uniqueId}`;
 
   const flowStroke = isMonochrome
     ? 'currentColor'
     : isDark
-    ? 'url(#nivara-dark-flow)'
-    : 'url(#nivara-flow)';
+    ? `url(#${darkFlowGradId})`
+    : `url(#${flowGradId})`;
 
   const entryColor = isMonochrome ? 'currentColor' : '#287C75';
   const consultColor = isMonochrome ? 'currentColor' : isDark ? '#E2EFEA' : '#123A3A';
@@ -79,21 +77,21 @@ export default function NivaraLogo({
         >
           <defs>
             {/* Flow path gradient for light surfaces */}
-            <linearGradient id="nivara-flow" x1="14" y1="16" x2="30" y2="28" gradientUnits="userSpaceOnUse">
+            <linearGradient id={flowGradId} x1="14" y1="16" x2="30" y2="28" gradientUnits="userSpaceOnUse">
               <stop offset="0%" stopColor="#287C75" />
               <stop offset="50%" stopColor="#123A3A" />
               <stop offset="100%" stopColor="#C9A45C" />
             </linearGradient>
 
             {/* Flow path gradient for dark surfaces */}
-            <linearGradient id="nivara-dark-flow" x1="14" y1="16" x2="30" y2="28" gradientUnits="userSpaceOnUse">
+            <linearGradient id={darkFlowGradId} x1="14" y1="16" x2="30" y2="28" gradientUnits="userSpaceOnUse">
               <stop offset="0%" stopColor="#52B2A7" />
               <stop offset="50%" stopColor="#E2EFEA" />
               <stop offset="100%" stopColor="#E5C77A" />
             </linearGradient>
 
             {/* Subtle hexagon stroke gradient */}
-            <linearGradient id="nivara-hex-gradient" x1="5.5" y1="3.5" x2="38.5" y2="40.5" gradientUnits="userSpaceOnUse">
+            <linearGradient id={hexGradId} x1="5.5" y1="3.5" x2="38.5" y2="40.5" gradientUnits="userSpaceOnUse">
               <stop offset="0%" stopColor="#287C75" />
               <stop offset="100%" stopColor="#C9A45C" />
             </linearGradient>
@@ -102,7 +100,7 @@ export default function NivaraLogo({
           {/* Hexagonal boundary representing clinical integrity */}
           <polygon
             points="22,4 38.5,13.2 38.5,30.8 22,40 5.5,30.8 5.5,13.2"
-            stroke={isMonochrome ? 'currentColor' : 'url(#nivara-hex-gradient)'}
+            stroke={isMonochrome ? 'currentColor' : `url(#${hexGradId})`}
             strokeWidth="2.2"
             strokeLinejoin="round"
             strokeLinecap="round"

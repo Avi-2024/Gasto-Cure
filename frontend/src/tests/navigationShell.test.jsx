@@ -164,6 +164,68 @@ describe('Task 2: Global Navigation Shell & Brand Identity', () => {
       fireEvent.click(logoutBtn);
       expect(mockLogout).toHaveBeenCalledTimes(1);
     });
+
+    it('filters navigation items for RECEPTIONIST role and does not prepend Dr. to non-doctors', () => {
+      vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
+        user: {
+          id: 'rec-1',
+          name: 'Pooja Sharma',
+          email: 'pooja.sharma@nivara.health',
+          role: 'RECEPTIONIST',
+          clinicIds: ['clinic-1'],
+        },
+        activeClinicId: 'clinic-1',
+        switchClinic: mockSwitchClinic,
+        logout: mockLogout,
+      });
+
+      render(
+        <MemoryRouter initialEntries={['/dashboard']}>
+          <Sidebar isOpen={true} onClose={vi.fn()} />
+        </MemoryRouter>
+      );
+
+      // Permitted items for receptionist
+      expect(screen.getByText('Dashboard')).toBeDefined();
+      expect(screen.getByText('Patients')).toBeDefined();
+      expect(screen.getByText('Appointments')).toBeDefined();
+      expect(screen.getByText('Billing & Invoices')).toBeDefined();
+      expect(screen.getByText('Reception Desk')).toBeDefined();
+
+      // Clinical items must be hidden
+      expect(screen.queryByText('Prescriptions')).toBeNull();
+      expect(screen.queryByText('New Prescription')).toBeNull();
+      expect(screen.queryByText('Master Formulary')).toBeNull();
+      expect(screen.queryByText('Settings & Calibration')).toBeNull();
+
+      // Non-doctor profile displays without "Dr."
+      expect(screen.getByText('Pooja Sharma')).toBeDefined();
+      expect(screen.queryByText(/Dr\. Pooja Sharma/i)).toBeNull();
+    });
+
+    it('safely handles doctor emails starting with dr. without repeating Dr. title', () => {
+      vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
+        user: {
+          id: 'doc-2',
+          email: 'dr.aarav.sharma@nivara.health',
+          role: 'DOCTOR',
+          clinicIds: ['clinic-1'],
+        },
+        activeClinicId: 'clinic-1',
+        switchClinic: mockSwitchClinic,
+        logout: mockLogout,
+      });
+
+      render(
+        <MemoryRouter initialEntries={['/dashboard']}>
+          <Sidebar isOpen={true} onClose={vi.fn()} />
+        </MemoryRouter>
+      );
+
+      // Must be "Dr. Aarav Sharma", never "Dr. Dr Aarav Sharma"
+      expect(screen.getByText('Dr. Aarav Sharma')).toBeDefined();
+      expect(screen.queryByText(/Dr\. Dr/i)).toBeNull();
+    });
   });
 
   describe('AppHeader Component', () => {
