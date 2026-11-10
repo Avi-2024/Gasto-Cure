@@ -171,42 +171,34 @@ export const generatePrescriptionWhatsAppLink = (patient = {}, prescription = {}
  * @returns {string} wa.me URL
  */
 export const generateFollowUpReminderWhatsAppLink = (patient = {}, clinic = {}, daysLeft = null) => {
-  const rawPhone = patient?.contact || patient?.mobile || patient?.phone || '';
+  const rawPhone = patient?.contact || patient?.mobile || patient?.phone || patient?.patientMobile || '';
   const cleanPhone = cleanPhoneNumber(rawPhone);
   const waPhone = cleanPhone
     ? (cleanPhone.length === 10 ? `91${cleanPhone}` : (cleanPhone.startsWith('91') ? cleanPhone : `91${cleanPhone}`))
     : '';
 
-  const patientName = patient?.name || 'Patient';
+  const patientName = patient?.name || patient?.patientName || 'Patient';
   const clinicName = clinic?.clinicName || 'ClinicRx Medical Centre';
   const doctorName = clinic?.doctorName || 'Dr. Aarav Sharma';
-  const followUpDate = patient?.nextFollowUp || '';
+  const followUpDate = patient?.nextFollowUp || patient?.followUpDate || '';
 
-  let timingDescription = 'soon';
+  let timingText = followUpDate ? `for ${followUpDate}` : 'soon';
   if (daysLeft === 0) {
-    timingDescription = 'today';
+    timingText = followUpDate ? `for today (${followUpDate})` : 'for today';
   } else if (daysLeft === 1) {
-    timingDescription = 'tomorrow';
+    timingText = followUpDate ? `for tomorrow (${followUpDate})` : 'for tomorrow';
   } else if (typeof daysLeft === 'number' && daysLeft > 1) {
-    timingDescription = `in ${daysLeft} days (${followUpDate || 'scheduled'})`;
+    timingText = `for in ${daysLeft} days (${followUpDate || 'scheduled'})`;
+  } else if (typeof daysLeft === 'number' && daysLeft < 0) {
+    timingText = `for ${followUpDate || 'previously'} (Overdue)`;
   } else if (followUpDate) {
-    timingDescription = `on ${followUpDate}`;
+    timingText = `for ${followUpDate}`;
   }
 
   const docPrefix = doctorName.startsWith('Dr.') || doctorName.startsWith('Dr ') ? '' : 'Dr. ';
+  const clinicPhone = clinic?.phone || clinic?.contact || '9876543210';
 
-  const lines = [
-    `*ClinicRx - Follow-Up Appointment Reminder*`,
-    `Dear ${patientName},`,
-    ``,
-    `This is a friendly reminder from *${clinicName}* that your follow-up consultation with *${docPrefix}${doctorName}* is scheduled ${timingDescription}.`,
-    ``,
-    clinic?.phone ? `Please contact us at ${clinic.phone} if you need to reschedule.` : `Please reach out to the clinic if you need to reschedule.`,
-    ``,
-    `Wishing you good health!`,
-    `${clinicName}`,
-  ];
+  const message = `Namaste ${patientName} ji, this is a reminder from ${docPrefix}${doctorName} / ${clinicName}. Your follow-up consultation is scheduled ${timingText}. Please visit the clinic on time. Contact: ${clinicPhone}`;
 
-  const message = lines.join('\n');
   return `https://wa.me/${waPhone}?text=${encodeURIComponent(message)}`;
 };

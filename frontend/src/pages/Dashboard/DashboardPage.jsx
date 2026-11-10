@@ -5,6 +5,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import StatCard from '../../components/ui/StatCard';
 import StatusBadge from '../../components/ui/StatusBadge';
 import { localAppointments, localPatients, localVisits } from '../../services/localStore';
+import QuickPatientSearch from './components/QuickPatientSearch';
+import FollowUpRemindersWidget from './components/FollowUpRemindersWidget';
 
 const statusToVariant = {
   waiting: 'warning',
@@ -32,13 +34,11 @@ function DashboardPage() {
 
     // Calculate stats
     const allPatients = localPatients.getAll();
-    const allAppointments = localAppointments.getQueue();
-    const allVisits = localVisits.getByPatient('all'); // This won't work, but we'll count all
 
     setStats({
       totalPatients: allPatients.length,
       pendingConsultations: queueData.length,
-      completedToday: 0, // Can be enhanced later
+      completedToday: 0,
     });
   }, []);
 
@@ -51,12 +51,23 @@ function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      {/* Top Header & Prominent Patient Search */}
       <section className="app-card p-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-medical-primary">Doctor Dashboard</p>
-        <h1 className="mt-3 text-2xl font-semibold text-slate-900">Welcome back, Dr. {doctorName}</h1>
-        <p className="mt-2 text-sm text-slate-500">Offline mode active - All data stored locally in browser.</p>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-medical-primary">Doctor Dashboard</p>
+            <h1 className="mt-1 text-2xl font-semibold text-slate-900">Welcome back, Dr. {doctorName}</h1>
+            <p className="mt-1 text-sm text-slate-500">Offline mode active - All clinical data stored locally in browser.</p>
+          </div>
+        </div>
+
+        {/* Prominent Quick Search Input Bar */}
+        <div className="mt-6 pt-5 border-t border-slate-100">
+          <QuickPatientSearch />
+        </div>
       </section>
 
+      {/* Quick Metrics */}
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {statCards.map((stat) => (
           <StatCard
@@ -70,15 +81,23 @@ function DashboardPage() {
         ))}
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-2">
+      {/* Main Operations: Follow-up Reminders & Waiting Queue */}
+      <section className="grid gap-6 xl:grid-cols-2 items-start">
+        {/* Follow-Up Reminders (1-2 Days Ahead & Overdue) */}
+        <FollowUpRemindersWidget />
+
+        {/* Patient Waiting Queue */}
         <article className="app-card p-6">
           <div className="flex items-center justify-between gap-4">
-            <h2 className="text-lg font-semibold text-slate-900">Patient Waiting Queue</h2>
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900">Patient Waiting Queue</h2>
+              <p className="text-xs text-slate-500">Patients checked-in for consultation</p>
+            </div>
             <StatusBadge label={`${queue.length} Patients`} variant="info" />
           </div>
 
           {queue.length === 0 ? (
-            <div className="mt-4 rounded-2xl border border-dashed border-medical-border bg-slate-50 p-8 text-center">
+            <div className="mt-5 rounded-2xl border border-dashed border-medical-border bg-slate-50 p-8 text-center">
               <p className="text-sm font-semibold text-slate-700">No patients in queue</p>
               <p className="mt-1 text-sm text-slate-500">Add patients from the Patients page to start consultations.</p>
               <Link to="/patients" className="btn-primary mt-4 inline-flex">
@@ -110,33 +129,29 @@ function DashboardPage() {
             </ul>
           )}
         </article>
+      </section>
 
-        <article className="app-card p-6">
-          <h2 className="text-lg font-semibold text-slate-900">Quick Actions</h2>
-          <p className="mt-1 text-sm text-slate-500">Navigate to key workflows</p>
+      {/* Quick Actions Footer Strip */}
+      <section className="app-card p-6">
+        <h2 className="text-lg font-semibold text-slate-900">Quick Clinical Shortcuts</h2>
+        <p className="mt-1 text-sm text-slate-500">Direct navigation to key clinic workflows</p>
 
-          <div className="mt-5 space-y-3">
-            <Link to="/patients" className="block rounded-2xl border border-medical-border bg-slate-50 p-4 transition hover:-translate-y-0.5 hover:bg-white">
-              <p className="text-sm font-semibold text-slate-900">Add New Patient</p>
-              <p className="mt-1 text-sm text-slate-500">Register patient and add to queue</p>
-            </Link>
+        <div className="mt-4 grid gap-4 sm:grid-cols-3">
+          <Link to="/patients?action=new" className="block rounded-2xl border border-medical-border bg-slate-50 p-4 transition hover:-translate-y-0.5 hover:bg-white hover:border-slate-300">
+            <p className="text-sm font-semibold text-slate-900">+ Add New Patient</p>
+            <p className="mt-1 text-xs text-slate-500">Register demographic info & allergies</p>
+          </Link>
 
-            <Link to="/doctor/consultation" className="block rounded-2xl border border-medical-border bg-slate-50 p-4 transition hover:-translate-y-0.5 hover:bg-white">
-              <p className="text-sm font-semibold text-slate-900">Start Consultation</p>
-              <p className="mt-1 text-sm text-slate-500">View queue and write prescriptions</p>
-            </Link>
+          <Link to="/prescription/new" className="block rounded-2xl border border-medical-border bg-slate-50 p-4 transition hover:-translate-y-0.5 hover:bg-white hover:border-slate-300">
+            <p className="text-sm font-semibold text-slate-900">Write Prescription</p>
+            <p className="mt-1 text-xs text-slate-500">Fast medicine autocomplete & Rx print</p>
+          </Link>
 
-            <Link to="/appointments" className="block rounded-2xl border border-medical-border bg-slate-50 p-4 transition hover:-translate-y-0.5 hover:bg-white">
-              <p className="text-sm font-semibold text-slate-900">View Appointments</p>
-              <p className="mt-1 text-sm text-slate-500">Check scheduled visits</p>
-            </Link>
-          </div>
-
-          <div className="mt-5 rounded-2xl border border-blue-200 bg-blue-50 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-blue-700">Offline Mode</p>
-            <p className="mt-1 text-sm text-slate-700">All data is stored locally in your browser. No backend connection required.</p>
-          </div>
-        </article>
+          <Link to="/medicines" className="block rounded-2xl border border-medical-border bg-slate-50 p-4 transition hover:-translate-y-0.5 hover:bg-white hover:border-slate-300">
+            <p className="text-sm font-semibold text-slate-900">Medicine Master Catalog</p>
+            <p className="mt-1 text-xs text-slate-500">Manage standard dosages & formulations</p>
+          </Link>
+        </div>
       </section>
     </div>
   );

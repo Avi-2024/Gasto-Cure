@@ -810,13 +810,22 @@ export const localVisits = {
 
     // Side effect: update patient record
     if (data.patientId) {
-      const patch = {
-        lastVisit: todayDate,
-      };
-      if (followUpDate) {
+      const existingPatient = localPatients.getById(data.patientId);
+      const visitDate = data.date ? (data.date.includes('T') ? data.date.split('T')[0] : data.date) : todayDate;
+      const isNewer = !existingPatient?.lastVisit || visitDate >= existingPatient.lastVisit;
+
+      const patch = {};
+      if (isNewer) {
+        patch.lastVisit = visitDate;
+        if (followUpDate) {
+          patch.nextFollowUp = followUpDate;
+        }
+      } else if (followUpDate && (!existingPatient?.nextFollowUp || followUpDate >= existingPatient.nextFollowUp)) {
         patch.nextFollowUp = followUpDate;
       }
-      localPatients.update(data.patientId, patch);
+      if (Object.keys(patch).length > 0) {
+        localPatients.update(data.patientId, patch);
+      }
     }
 
     return visit;
