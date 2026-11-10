@@ -117,9 +117,9 @@ function PatientsPage() {
     () =>
       patients.filter((patient) => {
         const matchesSearch =
-          (patient.name || '').toLowerCase().includes(search.toLowerCase()) ||
-          (patient.id || '').toLowerCase().includes(search.toLowerCase()) ||
-          (patient.contact || patient.mobile || '').toLowerCase().includes(search.toLowerCase());
+          String(patient.name || '').toLowerCase().includes(search.toLowerCase()) ||
+          String(patient.id || '').toLowerCase().includes(search.toLowerCase()) ||
+          String(patient.contact || patient.mobile || '').toLowerCase().includes(search.toLowerCase());
 
         const age = Number(patient.age);
         const matchesAge =

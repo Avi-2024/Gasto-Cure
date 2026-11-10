@@ -47,6 +47,7 @@ function EditPatientModal({ isOpen, patient, onClose, onSave }) {
 
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
+        e.stopImmediatePropagation?.();
         onClose?.();
       }
     };
@@ -135,7 +136,7 @@ function EditPatientModal({ isOpen, patient, onClose, onSave }) {
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[calc(85vh-130px)] overflow-y-auto">
+        <form onSubmit={handleSubmit} noValidate className="p-6 space-y-4 max-h-[calc(85vh-130px)] overflow-y-auto">
           {error && (
             <div className="flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs font-semibold text-[#B94A48] shadow-xs">
               <AlertCircle size={15} className="shrink-0" />
