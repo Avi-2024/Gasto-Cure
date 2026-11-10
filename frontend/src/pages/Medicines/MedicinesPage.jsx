@@ -1,10 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   AlertCircle,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
-  Filter,
   Layers,
   Pencil,
   Pill,
@@ -71,19 +70,28 @@ function MedicinesPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingMedicine, setEditingMedicine] = useState(null);
   const [notification, setNotification] = useState('');
+  const notificationTimerRef = useRef(null);
 
   const refreshList = () => {
-    localMedicines.seed();
     setMedicines(localMedicines.getAll());
   };
 
   useEffect(() => {
-    refreshList();
+    localMedicines.seed();
+    setMedicines(localMedicines.getAll());
+    return () => {
+      if (notificationTimerRef.current) {
+        clearTimeout(notificationTimerRef.current);
+      }
+    };
   }, []);
 
   const showNotification = (msg) => {
+    if (notificationTimerRef.current) {
+      clearTimeout(notificationTimerRef.current);
+    }
     setNotification(msg);
-    setTimeout(() => {
+    notificationTimerRef.current = setTimeout(() => {
       setNotification('');
     }, 3500);
   };
@@ -219,7 +227,7 @@ function MedicinesPage() {
 
       {/* Notification Toast */}
       {notification ? (
-        <div className="flex items-center justify-between rounded-xl border border-teal-200 bg-teal-50/80 px-4 py-3 text-sm font-medium text-[#123A3A] shadow-nivara-xs transition animate-in fade-in">
+        <div role="status" aria-live="polite" className="flex items-center justify-between rounded-xl border border-teal-200 bg-teal-50/80 px-4 py-3 text-sm font-medium text-[#123A3A] shadow-nivara-xs transition animate-in fade-in">
           <div className="flex items-center gap-2.5">
             <CheckCircle2 size={18} className="text-[#2E7D5B]" />
             <span>{notification}</span>
@@ -278,6 +286,7 @@ function MedicinesPage() {
             <input
               type="text"
               placeholder="Search medicine by name, strength, category..."
+              aria-label="Search medicines"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full rounded-xl border border-[#D9E6E2] bg-white pl-10 pr-10 py-2.5 text-sm text-[#10201F] placeholder-[#7D908C] focus:border-[#287C75] focus:ring-2 focus:ring-[#287C75]/20 focus:outline-none transition"

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Pill, X, Clock, Calendar, Sparkles, Check, FileText } from 'lucide-react';
+import { Pill, X } from 'lucide-react';
 
 const formOptions = [
   'Tablet',
@@ -92,21 +92,23 @@ function AddEditMedicineModal({ isOpen, onClose, onSave, initialData }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!form.name.trim()) {
+    const nameStr = String(form.name || '').trim();
+    if (!nameStr) {
       setError('Medicine name is required.');
       return;
     }
 
+    const defaultInst = String(form.defaultInstruction || '').trim();
     onSave({
       ...form,
-      name: form.name.trim(),
-      strength: form.strength.trim(),
-      category: form.category.trim() || 'General',
-      defaultDosage: form.defaultDosage.trim(),
+      name: nameStr,
+      strength: String(form.strength || '').trim(),
+      category: String(form.category || '').trim() || 'General',
+      defaultDosage: String(form.defaultDosage || '').trim(),
       defaultTiming: form.defaultTiming,
-      defaultDuration: form.defaultDuration.trim(),
-      defaultInstruction: form.defaultInstruction.trim(),
-      instructions: form.defaultInstruction.trim(),
+      defaultDuration: String(form.defaultDuration || '').trim(),
+      defaultInstruction: defaultInst,
+      instructions: defaultInst,
     });
   };
 
