@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import {
   ChevronLeft,
   ChevronRight,
@@ -73,12 +73,65 @@ function PatientsPage() {
   const [profilePatient, setProfilePatient] = useState(null);
   const [editingPatient, setEditingPatient] = useState(null);
   const [openActionMenuId, setOpenActionMenuId] = useState(null);
+  const [lockedActionMenuId, setLockedActionMenuId] = useState(null);
+  const closeTimerRef = useRef(null);
+
+  const handleMenuMouseEnter = (patientId) => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    setOpenActionMenuId(patientId);
+  };
+
+  const handleMenuMouseLeave = (patientId) => {
+    // If the menu was locked open by clicking the 3-dots button, do not close on mouse leave
+    if (lockedActionMenuId === patientId) return;
+
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+    }
+    closeTimerRef.current = setTimeout(() => {
+      setOpenActionMenuId((prev) => (prev === patientId ? null : prev));
+    }, 200);
+  };
+
+  const handleMenuTriggerClick = (e, patientId) => {
+    e.stopPropagation();
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+
+    if (openActionMenuId === patientId && lockedActionMenuId === patientId) {
+      // Toggle closed if already locked open
+      setOpenActionMenuId(null);
+      setLockedActionMenuId(null);
+    } else {
+      // Open and lock firmly open
+      setOpenActionMenuId(patientId);
+      setLockedActionMenuId(patientId);
+    }
+  };
+
+  const handleMenuActionClick = (callback) => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    setOpenActionMenuId(null);
+    setLockedActionMenuId(null);
+    if (typeof callback === 'function') {
+      callback();
+    }
+  };
 
   // Close action menus when clicking outside
   useEffect(() => {
     const handleDocumentClick = (e) => {
       if (!e.target.closest?.('.action-menu-container')) {
         setOpenActionMenuId(null);
+        setLockedActionMenuId(null);
       }
     };
     document.addEventListener('click', handleDocumentClick);
@@ -451,18 +504,19 @@ function PatientsPage() {
 
                     <td className="px-4 py-3.5 text-right whitespace-nowrap">
                       <div
-                        className="relative inline-block text-left action-menu-container group/actions"
-                        onMouseEnter={() => setOpenActionMenuId(patient.id)}
-                        onMouseLeave={() => setOpenActionMenuId(null)}
+                        className="relative inline-block text-left action-menu-container"
+                        onMouseEnter={() => handleMenuMouseEnter(patient.id)}
+                        onMouseLeave={() => handleMenuMouseLeave(patient.id)}
                       >
                         {/* 3-Dot Action Trigger Button */}
                         <button
                           type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setOpenActionMenuId(openActionMenuId === patient.id ? null : patient.id);
-                          }}
-                          className="h-8 w-8 rounded-xl text-[#4E6460] hover:text-[#10201F] hover:bg-teal-50 hover:border-teal-200 border border-[#D9E6E2] transition shadow-2xs inline-flex items-center justify-center cursor-pointer"
+                          onClick={(e) => handleMenuTriggerClick(e, patient.id)}
+                          className={`h-8 w-8 rounded-xl border transition shadow-2xs inline-flex items-center justify-center cursor-pointer ${
+                            openActionMenuId === patient.id
+                              ? 'bg-teal-50 border-teal-300 text-[#287C75] ring-2 ring-teal-100/70'
+                              : 'text-[#4E6460] hover:text-[#10201F] hover:bg-teal-50 hover:border-teal-200 border-[#D9E6E2]'
+                          }`}
                           title="Actions"
                           aria-label="Actions"
                           aria-expanded={openActionMenuId === patient.id}
@@ -470,100 +524,93 @@ function PatientsPage() {
                           <MoreVertical size={16} />
                         </button>
 
-                        {/* Floating Action Menu on Hover / Click */}
+                        {/* Floating Action Menu with Invisible Hover Bridge */}
                         <div
-                          className={`absolute right-0 top-full mt-1.5 w-56 rounded-2xl bg-white border border-[#D9E6E2] shadow-nivara-lg p-2 z-50 transition-all duration-150 origin-top-right text-left ${
+                          className={`absolute right-0 top-full pt-1.5 w-56 z-50 origin-top-right transition-all duration-150 ${
                             openActionMenuId === patient.id
                               ? 'opacity-100 pointer-events-auto scale-100 translate-y-0'
-                              : 'opacity-0 pointer-events-none scale-95 -translate-y-1 group-hover/actions:opacity-100 group-hover/actions:pointer-events-auto group-hover/actions:scale-100 group-hover/actions:translate-y-0'
+                              : 'opacity-0 pointer-events-none scale-95 -translate-y-1'
                           }`}
                         >
-                          <div className="px-2.5 py-1.5 border-b border-[#EBF1EE] mb-1 flex items-center justify-between">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#7D908C]">
-                              Actions • {patient.name.split(' ')[0]}
-                            </span>
-                            <span className="text-[10px] font-mono font-semibold text-[#287C75]">
-                              {patient.id}
-                            </span>
-                          </div>
+                          <div className="rounded-2xl bg-white border border-[#D9E6E2] shadow-nivara-lg p-2 text-left relative before:content-[''] before:absolute before:-top-3 before:left-0 before:right-0 before:h-3">
+                            <div className="px-2.5 py-1.5 border-b border-[#EBF1EE] mb-1 flex items-center justify-between">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-[#7D908C]">
+                                Actions • {patient.name.split(' ')[0]}
+                              </span>
+                              <span className="text-[10px] font-mono font-semibold text-[#287C75]">
+                                {patient.id}
+                              </span>
+                            </div>
 
-                          {/* 1. Start Prescription */}
-                          <button
-                            type="button"
-                            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#10201F] hover:text-[#287C75] hover:bg-teal-50/80 transition text-left cursor-pointer group"
-                            onClick={() => {
-                              setOpenActionMenuId(null);
-                              navigate(`/prescription/new?patientId=${patient.id}`);
-                            }}
-                            title="Start Prescription"
-                          >
-                            <FileText size={15} className="text-[#287C75] shrink-0" />
-                            <span className="flex-1 font-heading">Prescription</span>
-                            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-teal-50 text-[#287C75] border border-teal-200">
-                              Start Rx
-                            </span>
-                          </button>
-
-                          {/* 2. Patient Profile */}
-                          <button
-                            type="button"
-                            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#10201F] hover:text-[#287C75] hover:bg-[#F7FAF8] transition text-left cursor-pointer"
-                            onClick={() => {
-                              setOpenActionMenuId(null);
-                              setProfilePatient(patient);
-                            }}
-                            title="View Profile"
-                          >
-                            <User size={15} className="text-[#4E6460] shrink-0" />
-                            <span className="flex-1">Profile</span>
-                          </button>
-
-                          {/* 3. Edit Details */}
-                          <button
-                            type="button"
-                            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#10201F] hover:text-[#287C75] hover:bg-[#F7FAF8] transition text-left cursor-pointer"
-                            onClick={() => {
-                              setOpenActionMenuId(null);
-                              setEditingPatient(patient);
-                            }}
-                            title="Edit Details"
-                          >
-                            <Edit3 size={15} className="text-[#4E6460] shrink-0" />
-                            <span className="flex-1">Edit</span>
-                          </button>
-
-                          {/* 4. Add to Reception Queue */}
-                          <button
-                            type="button"
-                            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#10201F] hover:text-[#287C75] hover:bg-[#F7FAF8] transition text-left cursor-pointer"
-                            onClick={() => {
-                              setOpenActionMenuId(null);
-                              localAppointments.addToQueue(patient.id, patient.name, patient.age, 'Follow-up visit');
-                              setQueueMsg(`${patient.name} added to waiting queue.`);
-                              setTimeout(() => setQueueMsg(''), 4000);
-                            }}
-                            title="Add to Reception Queue"
-                          >
-                            <Clock3 size={15} className="text-[#B7791F] shrink-0" />
-                            <span className="flex-1">+ Queue</span>
-                          </button>
-
-                          {/* 5. WhatsApp Chat */}
-                          {cleanPhone && (
+                            {/* 1. Start Prescription */}
                             <button
                               type="button"
-                              onClick={() => {
-                                setOpenActionMenuId(null);
-                                handleOpenWhatsApp(patient);
-                              }}
-                              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#25D366] hover:bg-emerald-50 transition text-left cursor-pointer border-t border-[#EBF1EE] mt-1 pt-2"
-                              title="Chat on WhatsApp"
+                              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#10201F] hover:text-[#287C75] hover:bg-teal-50/80 transition text-left cursor-pointer group"
+                              onClick={() =>
+                                handleMenuActionClick(() => navigate(`/prescription/new?patientId=${patient.id}`))
+                              }
+                              title="Start Prescription"
                             >
-                              <MessageCircle size={15} className="text-[#25D366] shrink-0" />
-                              <span className="flex-1 text-[#10201F]">WhatsApp</span>
-                              <span className="text-[10px] text-[#25D366] font-mono">Chat</span>
+                              <FileText size={15} className="text-[#287C75] shrink-0" />
+                              <span className="flex-1 font-heading">Prescription</span>
+                              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-teal-50 text-[#287C75] border border-teal-200">
+                                Start Rx
+                              </span>
                             </button>
-                          )}
+
+                            {/* 2. Patient Profile */}
+                            <button
+                              type="button"
+                              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#10201F] hover:text-[#287C75] hover:bg-[#F7FAF8] transition text-left cursor-pointer"
+                              onClick={() => handleMenuActionClick(() => setProfilePatient(patient))}
+                              title="View Profile"
+                            >
+                              <User size={15} className="text-[#4E6460] shrink-0" />
+                              <span className="flex-1">Profile</span>
+                            </button>
+
+                            {/* 3. Edit Details */}
+                            <button
+                              type="button"
+                              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#10201F] hover:text-[#287C75] hover:bg-[#F7FAF8] transition text-left cursor-pointer"
+                              onClick={() => handleMenuActionClick(() => setEditingPatient(patient))}
+                              title="Edit Details"
+                            >
+                              <Edit3 size={15} className="text-[#4E6460] shrink-0" />
+                              <span className="flex-1">Edit</span>
+                            </button>
+
+                            {/* 4. Add to Reception Queue */}
+                            <button
+                              type="button"
+                              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#10201F] hover:text-[#287C75] hover:bg-[#F7FAF8] transition text-left cursor-pointer"
+                              onClick={() =>
+                                handleMenuActionClick(() => {
+                                  localAppointments.addToQueue(patient.id, patient.name, patient.age, 'Follow-up visit');
+                                  setQueueMsg(`${patient.name} added to waiting queue.`);
+                                  setTimeout(() => setQueueMsg(''), 4000);
+                                })
+                              }
+                              title="Add to Reception Queue"
+                            >
+                              <Clock3 size={15} className="text-[#B7791F] shrink-0" />
+                              <span className="flex-1">+ Queue</span>
+                            </button>
+
+                            {/* 5. WhatsApp Chat */}
+                            {cleanPhone && (
+                              <button
+                                type="button"
+                                onClick={() => handleMenuActionClick(() => handleOpenWhatsApp(patient))}
+                                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#25D366] hover:bg-emerald-50 transition text-left cursor-pointer border-t border-[#EBF1EE] mt-1 pt-2"
+                                title="Chat on WhatsApp"
+                              >
+                                <MessageCircle size={15} className="text-[#25D366] shrink-0" />
+                                <span className="flex-1 text-[#10201F]">WhatsApp</span>
+                                <span className="text-[10px] text-[#25D366] font-mono">Chat</span>
+                              </button>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </td>
