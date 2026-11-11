@@ -149,6 +149,7 @@ export default function MedicineAutocomplete({
         }
         className="medicine-input med-autocomplete-input"
         placeholder={placeholder}
+        title={query || placeholder}
         value={query}
         disabled={disabled}
         autoFocus={autoFocus}

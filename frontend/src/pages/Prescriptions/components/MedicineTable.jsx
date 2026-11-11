@@ -95,18 +95,20 @@ function MedicineTable({ medicines = [], onUpdate, onRemove, onUpdateMedicineFul
                   onSelect={(selectedMed) => handleSelectMedicine(medicine.id, selectedMed)}
                 />
               </td>
-              <td>
+              <td className="col-dosage-cell">
                 <input
                   type="text"
                   className="medicine-input tabular-nums"
                   placeholder="e.g. 500mg"
+                  title={medicine.dosage || 'Dosage'}
                   value={medicine.dosage || ''}
                   onChange={(e) => handleFieldChange(medicine.id, 'dosage', e.target.value)}
                 />
               </td>
-              <td>
+              <td className="col-frequency-cell">
                 <select
                   className="medicine-select"
+                  title={medicine.frequency || 'Select frequency'}
                   value={medicine.frequency || ''}
                   onChange={(e) => handleFieldChange(medicine.id, 'frequency', e.target.value)}
                 >
@@ -121,9 +123,10 @@ function MedicineTable({ medicines = [], onUpdate, onRemove, onUpdateMedicineFul
                     )}
                 </select>
               </td>
-              <td>
+              <td className="col-timing-cell">
                 <select
                   className="medicine-select"
+                  title={medicine.timing || 'Select timing'}
                   value={medicine.timing || ''}
                   onChange={(e) => handleFieldChange(medicine.id, 'timing', e.target.value)}
                 >
@@ -138,20 +141,22 @@ function MedicineTable({ medicines = [], onUpdate, onRemove, onUpdateMedicineFul
                     )}
                 </select>
               </td>
-              <td>
+              <td className="col-duration-cell">
                 <input
                   type="text"
                   className="medicine-input tabular-nums"
                   placeholder="e.g. 5 days"
+                  title={medicine.duration || 'Duration'}
                   value={medicine.duration || ''}
                   onChange={(e) => handleFieldChange(medicine.id, 'duration', e.target.value)}
                 />
               </td>
-              <td>
+              <td className="col-remarks-cell">
                 <input
                   type="text"
                   className="medicine-input"
                   placeholder="e.g. After food"
+                  title={medicine.remarks || 'Remarks'}
                   value={medicine.remarks || ''}
                   onChange={(e) => handleFieldChange(medicine.id, 'remarks', e.target.value)}
                 />

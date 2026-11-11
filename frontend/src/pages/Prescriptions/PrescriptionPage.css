@@ -54,12 +54,13 @@
    ═════════════════════════════════════════════════════════════ */
 
 .prescription-controls {
-  max-width: 1000px;
-  margin: 0 auto 20px;
+  max-width: 1560px;
+  width: 100%;
+  margin: 0 auto 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 20px;
+  padding: 12px 18px;
   background: #ffffff;
   border-radius: 14px;
   border: 1px solid #D9E6E2;
@@ -162,14 +163,73 @@
    ═════════════════════════════════════════════════════════════ */
 
 .prescription-content {
-  max-width: 1000px;
+  max-width: 1560px;
+  width: 100%;
   margin: 0 auto;
   background: #ffffff;
-  padding: 40px 60px;
+  padding: 28px 32px 96px 32px;
   border-radius: 16px;
   border: 1px solid #D9E6E2;
   box-shadow: var(--shadow-nivara-sm, 0 2px 8px rgba(18, 58, 58, 0.05));
   position: relative;
+}
+
+/* ═════════════════════════════════════════════════════════════
+   CLINICAL STUDIO DUAL-COLUMN GRID (Full-View Ergonomics)
+   ═════════════════════════════════════════════════════════════ */
+
+.prescription-studio-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+@media (min-width: 1120px) {
+  .prescription-studio-grid.is-split {
+    grid-template-columns: 390px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .prescription-studio-grid.is-split .studio-col-left {
+    position: sticky;
+    top: 16px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .prescription-studio-grid.is-split {
+    grid-template-columns: 440px 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+}
+
+.prescription-studio-grid.is-stacked {
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+/* Studio Left Column Adjustments in Split Mode */
+.prescription-studio-grid.is-split .studio-col-left .vitals-grid {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.prescription-studio-grid.is-split .studio-col-left .patient-banner-container {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.prescription-studio-grid.is-split .studio-col-left .patient-banner-left {
+  width: 100%;
+}
+
+.prescription-studio-grid.is-split .studio-col-left .patient-banner-right {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
 }
 
 /* Sections */
@@ -437,14 +497,18 @@
 
 .medicine-table-wrapper {
   overflow-x: auto;
+  overflow-y: visible;
+  min-height: 240px;
   border: 1px solid #D9E6E2;
   border-radius: 12px;
   background: #ffffff;
   margin-top: 8px;
+  position: relative;
 }
 
 .medicine-table {
   width: 100%;
+  min-width: 980px;
   border-collapse: collapse;
   font-size: 13px;
 }
@@ -462,39 +526,55 @@
   font-size: 11.5px;
   text-transform: uppercase;
   letter-spacing: 0.6px;
+  white-space: nowrap;
 }
 
-.medicine-table th.col-number {
-  width: 4%;
+.medicine-table th.col-number,
+.medicine-table td.medicine-number {
+  width: 40px;
+  min-width: 36px;
+  max-width: 44px;
   text-align: center;
 }
 
-.medicine-table th.col-medicine {
-  width: 28%;
+.medicine-table th.col-medicine,
+.medicine-table td.col-medicine-cell {
+  min-width: 260px;
 }
 
-.medicine-table th.col-dosage {
-  width: 12%;
+.medicine-table th.col-dosage,
+.medicine-table td.col-dosage-cell {
+  width: 125px;
+  min-width: 110px;
 }
 
-.medicine-table th.col-frequency {
-  width: 14%;
+.medicine-table th.col-frequency,
+.medicine-table td.col-frequency-cell {
+  width: 200px;
+  min-width: 185px;
 }
 
-.medicine-table th.col-timing {
-  width: 14%;
+.medicine-table th.col-timing,
+.medicine-table td.col-timing-cell {
+  width: 165px;
+  min-width: 150px;
 }
 
-.medicine-table th.col-duration {
-  width: 10%;
+.medicine-table th.col-duration,
+.medicine-table td.col-duration-cell {
+  width: 120px;
+  min-width: 105px;
 }
 
-.medicine-table th.col-remarks {
-  width: 14%;
+.medicine-table th.col-remarks,
+.medicine-table td.col-remarks-cell {
+  min-width: 180px;
 }
 
-.medicine-table th.col-action {
-  width: 4%;
+.medicine-table th.col-action,
+.medicine-table td.action-cell {
+  width: 48px;
+  min-width: 44px;
   text-align: center;
 }
 
@@ -504,8 +584,19 @@
   vertical-align: middle;
 }
 
+.medicine-table tbody tr {
+  position: relative;
+  transition: background 0.12s ease;
+}
+
 .medicine-table tbody tr:hover {
   background: #F7FAF8;
+}
+
+.medicine-table tbody tr:focus-within {
+  position: relative;
+  z-index: 50;
+  background: #F2F7F5;
 }
 
 .medicine-number {
@@ -525,6 +616,7 @@
   border: 1px solid #D9E6E2;
   border-radius: 8px;
   font-size: 13px;
+  font-weight: 500;
   color: #10201F;
   background: #ffffff;
   transition: all 0.15s ease;
@@ -546,7 +638,8 @@
   padding: 8px 10px;
   border: 1px solid #D9E6E2;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 12.5px;
+  font-weight: 500;
   color: #10201F;
   background: #ffffff;
   cursor: pointer;
@@ -848,10 +941,11 @@
 .prescription-action-dock {
   position: sticky;
   bottom: 16px;
-  max-width: 1000px;
-  margin: 28px auto 0;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
+  max-width: 1560px;
+  width: 100%;
+  margin: 24px auto 0;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
   border: 1px solid #D9E6E2;
   border-radius: 16px;
   padding: 12px 20px;
@@ -1077,6 +1171,17 @@
     box-shadow: none;
     border-radius: 0;
     border: none;
+  }
+
+  .prescription-studio-grid {
+    display: block !important;
+  }
+
+  .studio-col-left,
+  .studio-col-right {
+    display: block !important;
+    width: 100% !important;
+    position: static !important;
   }
 
   /* Pad Mode vs Digital Mode in print */
