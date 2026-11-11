@@ -12,7 +12,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import StatCard from '../../components/ui/StatCard';
 import StatusBadge from '../../components/ui/StatusBadge';
 import { localAppointments, localPatients, localVisits } from '../../services/localStore';
-import QuickPatientSearch from './components/QuickPatientSearch';
 import FollowUpRemindersWidget from './components/FollowUpRemindersWidget';
 
 const statusToVariant = {
@@ -182,11 +181,6 @@ function DashboardPage() {
             <span className="h-2 w-2 rounded-full bg-[#2E7D5B] animate-pulse" />
             <span>Local Clinical Engine Online</span>
           </div>
-        </div>
-
-        {/* Prominent Quick Search Spotlight */}
-        <div className="relative mt-6 pt-5 border-t border-[#D9E6E2]/70">
-          <QuickPatientSearch />
         </div>
       </section>
 

@@ -375,17 +375,16 @@ describe('Follow-Up Reminders & Quick Patient Search - Task 7 Tests', () => {
   });
 
   describe('DashboardPage Integration', () => {
-    it('mounts QuickPatientSearch and FollowUpRemindersWidget on the Dashboard', () => {
+    it('mounts welcome header, lifecycle metrics, and FollowUpRemindersWidget on the Dashboard', () => {
       render(
         <MemoryRouter>
           <DashboardPage />
         </MemoryRouter>
       );
 
-      // Search bar
-      expect(
-        screen.getByPlaceholderText(/Search patient by name, mobile, or ID/i)
-      ).toBeTruthy();
+      // Doctor Welcome Banner
+      expect(screen.getByText(/Doctor Dashboard/i)).toBeTruthy();
+      expect(screen.getByText(/Welcome back/i)).toBeTruthy();
 
       // Follow-up Reminders Widget header
       expect(screen.getByText(/Follow-Up Reminders/i)).toBeTruthy();
