@@ -18,11 +18,15 @@ import {
   RefreshCw,
   Search,
   X,
+  UserPlus,
+  ArrowRight,
+  Clock3,
+  ChevronRight,
 } from 'lucide-react';
 import MedicineTable from './components/MedicineTable';
 import AutoResizeTextarea from './components/AutoResizeTextarea';
 import PrintPreviewModal from './components/PrintPreviewModal';
-import { localPatients, localVisits, localSettings } from '../../services/localStore';
+import { localPatients, localVisits, localSettings, localAppointments } from '../../services/localStore';
 import { applyPrintSettings } from '../../utils/printStyles';
 import { generatePrescriptionWhatsAppLink } from '../../utils/whatsappHelper';
 import './PrescriptionPage.css';
@@ -97,6 +101,18 @@ function PrescriptionPage() {
 
   // Preview Modal
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
+  // Clinical Intake & Quick Registration Modal State
+  const [showIntakeAddModal, setShowIntakeAddModal] = useState(false);
+  const [intakeForm, setIntakeForm] = useState({
+    name: '',
+    age: '',
+    gender: 'Male',
+    contact: '',
+    address: '',
+    allergies: '',
+  });
+  const [intakeFormError, setIntakeFormError] = useState('');
 
   // Apply print settings on mount and when changed
   useEffect(() => {
@@ -339,101 +355,508 @@ function PrescriptionPage() {
     window.open(waUrl, '_blank', 'noopener,noreferrer');
   };
 
+  const handleIntakeAddPatient = () => {
+    if (!intakeForm.name.trim() || !intakeForm.age || !intakeForm.contact.trim()) {
+      setIntakeFormError('Patient Name, Age, and Contact are required.');
+      return;
+    }
+    const newPt = localPatients.add({
+      ...intakeForm,
+      age: Number(intakeForm.age),
+    });
+    localAppointments.addToQueue(newPt.id, newPt.name, newPt.age, 'Prescription consultation');
+    setAllPatients(localPatients.getAll());
+    setShowIntakeAddModal(false);
+    setIntakeForm({ name: '', age: '', gender: 'Male', contact: '', address: '', allergies: '' });
+    setIntakeFormError('');
+    setPatient(newPt);
+  };
+
   const handleSelectPatientFromList = (selectedPt) => {
     setPatient(selectedPt);
     setPatientSearchQuery('');
     setShowPatientSwitcher(false);
   };
 
-  const filteredPatients = patientSearchQuery
+  const waitingQueue = localAppointments.getQueue() || [];
+  const recentVisits = (localVisits.getAll() || []).slice(0, 4);
+
+  const filteredPatients = patientSearchQuery.trim()
     ? allPatients.filter(
         (p) =>
           (p.name && p.name.toLowerCase().includes(patientSearchQuery.toLowerCase())) ||
           (p.contact && p.contact.includes(patientSearchQuery)) ||
           (p.id && p.id.toLowerCase().includes(patientSearchQuery.toLowerCase()))
       )
-    : allPatients.slice(0, 5);
+    : allPatients;
 
-  // If no patient selected yet, show quick selection screen
+  // If no patient selected yet, show clinical intake suite
   if (!patient) {
     return (
-      <div className="prescription-page bg-[#F7FAF8] min-h-screen">
-        <div className="prescription-error app-card max-w-lg mx-auto my-16 p-8 text-center shadow-nivara-md border border-[#D9E6E2]">
-          <div className="flex items-center justify-center w-14 h-14 mx-auto mb-4 bg-[#E8F3F1] text-[#287C75] rounded-2xl">
-            <User size={28} />
-          </div>
-          <h2 className="text-xl font-heading font-bold text-[#10201F] mb-1.5">
-            Select Patient for Prescription Studio
-          </h2>
-          <p className="text-sm text-[#4E6460] mb-6">
-            Choose an existing patient or search by name / mobile to begin.
-          </p>
-
-          <div className="mb-5 text-left">
-            <div className="relative mb-3">
-              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#7D908C]" />
-              <input
-                type="text"
-                placeholder="Search patient name, phone, or ID..."
-                value={patientSearchQuery}
-                onChange={(e) => setPatientSearchQuery(e.target.value)}
-                className="vital-input pl-10 w-full rounded-xl border border-[#D9E6E2]"
-                autoFocus
-              />
+      <div className="prescription-page bg-[#F7FAF8] min-h-screen pb-20">
+        <div className="max-w-6xl mx-auto space-y-6">
+          {/* Top Header & Quick Actions Bar */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white p-6 rounded-2xl border border-[#D9E6E2] shadow-nivara-xs">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#287C75] bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200">
+                  Prescription Studio • Clinical Intake
+                </span>
+                <span className="text-xs font-mono text-[#7D908C]">
+                  {allPatients.length} Registered Patients
+                </span>
+              </div>
+              <h1 className="text-2xl font-heading font-bold text-[#10201F]">
+                Select Patient for Consultation
+              </h1>
+              <p className="text-sm text-[#4E6460]">
+                Choose from today's waiting queue, search directory, or register a walk-in patient.
+              </p>
             </div>
 
-            <div className="border border-[#D9E6E2] rounded-xl divide-y divide-[#EBF1EE] max-h-60 overflow-y-auto bg-white shadow-inner">
-              {filteredPatients.length > 0 ? (
-                filteredPatients.map((p) => (
-                  <div
-                    key={p.id}
-                    onClick={() => handleSelectPatientFromList(p)}
-                    className="p-3.5 hover:bg-[#F2F7F5] cursor-pointer flex justify-between items-center transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-[#123A3A] text-white flex items-center justify-center text-xs font-bold font-heading">
-                        {getInitials(p.name)}
-                      </div>
-                      <div>
-                        <p className="font-semibold text-[#10201F] text-sm">{p.name}</p>
-                        <p className="text-xs text-[#4E6460]">
-                          {p.age ? `${p.age} Yrs` : ''} • {p.gender || 'N/A'} • {p.contact || p.mobile}
-                        </p>
-                      </div>
+            <div className="flex items-center gap-3 shrink-0 flex-wrap">
+              <button
+                type="button"
+                onClick={() => {
+                  setIntakeForm((prev) => ({
+                    ...prev,
+                    name: patientSearchQuery.trim() || '',
+                  }));
+                  setShowIntakeAddModal(true);
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#287C75] text-white text-xs font-semibold hover:bg-[#1f635d] shadow-nivara-xs transition cursor-pointer"
+              >
+                <UserPlus size={15} />
+                <span>+ Register New Patient</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const walkIn = {
+                    id: `PT-${Date.now().toString().slice(-6)}`,
+                    name: 'Walk-in Patient',
+                    age: 30,
+                    gender: 'Male',
+                    contact: '',
+                  };
+                  setPatient(walkIn);
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#D9E6E2] bg-white text-[#10201F] text-xs font-semibold hover:bg-[#F7FAF8] transition cursor-pointer"
+                title="Instant consultation for unregistered walk-in"
+              >
+                <Sparkles size={14} className="text-[#C9A45C]" />
+                <span>Instant Walk-in</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Main 2-Column Split: Queue & Directory */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* Left Column (5/12 cols): Waiting Queue & Recent Prescriptions */}
+            <div className="lg:col-span-5 space-y-6">
+              {/* Card 1: Today's Waiting Queue */}
+              <div className="bg-white p-5 rounded-2xl border border-[#D9E6E2] shadow-nivara-xs">
+                <div className="flex items-center justify-between pb-3 border-b border-[#D9E6E2]">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#2E7D5B] animate-pulse" />
+                    <h2 className="text-sm font-heading font-bold text-[#10201F]">
+                      Today's Waiting Queue
+                    </h2>
+                  </div>
+                  <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-[#2E7D5B] border border-emerald-200">
+                    {waitingQueue.length} Waiting
+                  </span>
+                </div>
+
+                {waitingQueue.length > 0 ? (
+                  <div className="mt-3 divide-y divide-[#EBF1EE] max-h-72 overflow-y-auto pr-1">
+                    {waitingQueue.map((item) => {
+                      const matched = localPatients.getById(item.patientId);
+                      const displayPt = matched || {
+                        id: item.patientId || `PT-${item.id}`,
+                        name: item.patientName,
+                        age: item.patientAge,
+                        gender: 'Patient',
+                        contact: '',
+                      };
+
+                      return (
+                        <div
+                          key={item.id}
+                          className="py-3 flex items-center justify-between gap-3 hover:bg-[#F7FAF8] rounded-xl px-2 transition group cursor-pointer"
+                          onClick={() => handleSelectPatientFromList(displayPt)}
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="w-9 h-9 rounded-xl bg-teal-50 border border-teal-200 text-[#287C75] flex items-center justify-center font-heading font-bold text-xs shrink-0">
+                              {getInitials(displayPt.name)}
+                            </span>
+                            <div>
+                              <p className="text-xs font-bold text-[#10201F] group-hover:text-[#287C75] transition">
+                                {displayPt.name}
+                              </p>
+                              <div className="flex items-center gap-2 text-[11px] text-[#4E6460]">
+                                <span>{displayPt.age ? `${displayPt.age} Y` : ''}</span>
+                                {item.startTime && (
+                                  <span className="font-mono text-[#7D908C]">
+                                    • in queue {item.startTime}
+                                  </span>
+                                )}
+                              </div>
+                              {item.reason && (
+                                <p className="text-[11px] text-[#7D908C] italic truncate max-w-[180px]">
+                                  {item.reason}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSelectPatientFromList(displayPt);
+                            }}
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#287C75] text-white text-xs font-semibold hover:bg-[#1f635d] transition shrink-0"
+                          >
+                            <span>Start Rx</span>
+                            <ArrowRight size={12} />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="py-8 text-center text-[#7D908C] text-xs">
+                    <p className="font-semibold text-[#10201F]">Waiting Queue Empty</p>
+                    <p className="mt-1">No checked-in patients currently waiting.</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Card 2: Recent Consultations */}
+              {recentVisits.length > 0 && (
+                <div className="bg-white p-5 rounded-2xl border border-[#D9E6E2] shadow-nivara-xs">
+                  <div className="flex items-center justify-between pb-3 border-b border-[#D9E6E2]">
+                    <div className="flex items-center gap-2">
+                      <Clock3 size={15} className="text-[#C9A45C]" />
+                      <h2 className="text-sm font-heading font-bold text-[#10201F]">
+                        Recent Consultations
+                      </h2>
                     </div>
-                    <span className="text-xs font-semibold px-2.5 py-1 bg-white border border-[#D9E6E2] rounded-lg text-[#287C75] shadow-sm">
-                      Select
+                    <span className="text-xs font-mono text-[#7D908C]">
+                      Quick Follow-up
                     </span>
                   </div>
-                ))
-              ) : (
-                <div className="p-5 text-center text-sm text-[#7D908C]">No matching patients found.</div>
+
+                  <div className="mt-3 divide-y divide-[#EBF1EE]">
+                    {recentVisits.map((v) => {
+                      const matched = v.patientId ? localPatients.getById(v.patientId) : null;
+                      const displayPt = matched || {
+                        id: v.patientId || 'PT-PREV',
+                        name: v.patientName,
+                        age: v.patientAge,
+                        gender: v.patientGender,
+                        contact: v.patientMobile,
+                      };
+
+                      return (
+                        <div
+                          key={v.id}
+                          className="py-2.5 flex items-center justify-between gap-3 hover:bg-[#F7FAF8] rounded-xl px-2 transition group cursor-pointer"
+                          onClick={() => handleSelectPatientFromList(displayPt)}
+                        >
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-semibold text-[#10201F] group-hover:text-[#287C75] transition">
+                                {v.patientName}
+                              </span>
+                              <span className="text-[10px] font-mono text-[#7D908C]">
+                                {v.date ? (v.date.includes('T') ? v.date.split('T')[0] : v.date) : ''}
+                              </span>
+                            </div>
+                            {v.diagnosis && (
+                              <p className="text-[11px] text-[#4E6460] truncate max-w-[200px] italic">
+                                {v.diagnosis}
+                              </p>
+                            )}
+                          </div>
+                          <span className="text-[11px] font-semibold text-[#287C75] hover:underline">
+                            Select →
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               )}
             </div>
-          </div>
 
-          <div className="flex justify-center gap-3 mt-5">
-            <button type="button" className="btn-secondary" onClick={() => navigate('/patients')}>
-              Go to Patients Directory
-            </button>
-            <button
-              type="button"
-              className="btn-primary"
-              onClick={() => {
-                const walkIn = {
-                  id: `PT-${Date.now().toString().slice(-6)}`,
-                  name: 'Walk-in Patient',
-                  age: 30,
-                  gender: 'Male',
-                  contact: '',
-                };
-                setPatient(walkIn);
-              }}
-            >
-              Start as Walk-in
-            </button>
+            {/* Right Column (7/12 cols): Patient Directory & Search */}
+            <div className="lg:col-span-7 bg-white p-6 rounded-2xl border border-[#D9E6E2] shadow-nivara-xs space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <h2 className="text-sm font-heading font-bold text-[#10201F]">
+                  Patient Directory Lookup
+                </h2>
+                <span className="text-xs font-mono text-[#7D908C]">
+                  Showing {filteredPatients.length} of {allPatients.length} patients
+                </span>
+              </div>
+
+              {/* Search Bar */}
+              <div className="relative">
+                <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#7D908C]" />
+                <input
+                  type="text"
+                  placeholder="Search by patient name, phone number, or PT-ID..."
+                  value={patientSearchQuery}
+                  onChange={(e) => setPatientSearchQuery(e.target.value)}
+                  className="w-full h-11 pl-10 pr-10 text-sm rounded-xl border border-[#D9E6E2] bg-[#F7FAF8] focus:bg-white focus:border-[#287C75] focus:outline-none focus:ring-2 focus:ring-[#287C75]/15 transition"
+                  autoFocus
+                />
+                {patientSearchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setPatientSearchQuery('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#7D908C] hover:text-[#10201F] rounded-full hover:bg-slate-100 transition"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+
+              {/* Patients List */}
+              <div className="divide-y divide-[#EBF1EE] max-h-[500px] overflow-y-auto pr-1">
+                {filteredPatients.length > 0 ? (
+                  filteredPatients.map((p) => (
+                    <div
+                      key={p.id}
+                      onClick={() => handleSelectPatientFromList(p)}
+                      className="py-3.5 px-3 hover:bg-[#F7FAF8] rounded-xl cursor-pointer flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 transition border border-transparent hover:border-[#D9E6E2]"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-[#123A3A] text-white flex items-center justify-center text-xs font-bold font-heading shrink-0 shadow-xs">
+                          {getInitials(p.name)}
+                        </div>
+                        <div className="space-y-0.5">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-sm font-bold text-[#10201F]">
+                              {p.name}
+                            </span>
+                            <span className="text-[11px] font-mono text-[#7D908C] bg-[#F7FAF8] border border-[#D9E6E2] px-1.5 py-0.2 rounded">
+                              {p.id}
+                            </span>
+                            {p.status && (
+                              <span className="text-[10px] font-bold text-[#2E7D5B] bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded-full">
+                                {p.status}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#4E6460]">
+                            <span>
+                              {p.age ? `${p.age} Yrs` : ''} {p.gender ? `• ${p.gender}` : ''}
+                            </span>
+                            {(p.contact || p.mobile) && (
+                              <span className="inline-flex items-center gap-1 font-mono">
+                                <Phone size={11} className="text-[#7D908C]" />
+                                {p.contact || p.mobile}
+                              </span>
+                            )}
+                            {p.bloodGroup && (
+                              <span className="font-semibold text-rose-600">
+                                {p.bloodGroup}
+                              </span>
+                            )}
+                          </div>
+                          {p.allergies && p.allergies !== 'None' && (
+                            <p className="text-[11px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 inline-block mt-1">
+                              ⚠️ Allergy: {p.allergies}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSelectPatientFromList(p);
+                        }}
+                        className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl border border-[#287C75] bg-teal-50 text-[#287C75] text-xs font-semibold hover:bg-[#287C75] hover:text-white transition shrink-0 self-end sm:self-auto cursor-pointer"
+                      >
+                        <span>Select Patient</span>
+                        <ChevronRight size={14} />
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-8 text-center space-y-3">
+                    <p className="text-sm font-semibold text-[#10201F]">
+                      No patients found matching "{patientSearchQuery}"
+                    </p>
+                    <p className="text-xs text-[#7D908C]">
+                      You can register this patient right now to start the prescription.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIntakeForm((prev) => ({
+                          ...prev,
+                          name: patientSearchQuery.trim(),
+                        }));
+                        setShowIntakeAddModal(true);
+                      }}
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#287C75] text-white text-xs font-semibold hover:bg-[#1f635d] transition shadow-xs cursor-pointer"
+                    >
+                      <UserPlus size={14} />
+                      <span>+ Register "{patientSearchQuery.trim()}" as Patient</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* Modal: Quick Register New Patient */}
+        {showIntakeAddModal && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 transition-opacity"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setShowIntakeAddModal(false);
+                setIntakeFormError('');
+              }
+            }}
+            role="dialog"
+            aria-modal="true"
+          >
+            <div
+              className="w-full max-w-md rounded-2xl bg-white border border-[#D9E6E2] shadow-nivara-lg p-6 animate-in fade-in zoom-in-95 duration-150"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between border-b border-[#D9E6E2] pb-3.5">
+                <div className="flex items-center gap-2">
+                  <UserPlus size={18} className="text-[#287C75]" />
+                  <h2 className="font-heading text-lg font-bold text-[#10201F]">
+                    Register Patient & Begin Rx
+                  </h2>
+                </div>
+                <button
+                  type="button"
+                  className="rounded-xl p-1.5 text-[#7D908C] hover:bg-slate-100 hover:text-[#10201F] transition"
+                  onClick={() => {
+                    setShowIntakeAddModal(false);
+                    setIntakeFormError('');
+                  }}
+                  aria-label="Close modal"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="mt-4 space-y-3.5">
+                <div>
+                  <label className="block text-xs font-semibold text-[#10201F] mb-1">
+                    Patient Name *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Full name"
+                    value={intakeForm.name}
+                    onChange={(e) => setIntakeForm((p) => ({ ...p, name: e.target.value }))}
+                    className="w-full h-10 px-3 text-sm rounded-xl border border-[#D9E6E2] bg-white focus:border-[#287C75] focus:outline-none"
+                    autoFocus
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-[#10201F] mb-1">
+                      Age *
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="130"
+                      placeholder="Age"
+                      value={intakeForm.age}
+                      onChange={(e) => setIntakeForm((p) => ({ ...p, age: e.target.value }))}
+                      className="w-full h-10 px-3 text-sm rounded-xl border border-[#D9E6E2] bg-white focus:border-[#287C75] focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-[#10201F] mb-1">
+                      Gender *
+                    </label>
+                    <select
+                      value={intakeForm.gender}
+                      onChange={(e) => setIntakeForm((p) => ({ ...p, gender: e.target.value }))}
+                      className="w-full h-10 px-3 text-sm rounded-xl border border-[#D9E6E2] bg-white focus:border-[#287C75] focus:outline-none"
+                    >
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#10201F] mb-1">
+                    Mobile Number *
+                  </label>
+                  <input
+                    type="tel"
+                    placeholder="10 digit phone number"
+                    value={intakeForm.contact}
+                    onChange={(e) => setIntakeForm((p) => ({ ...p, contact: e.target.value }))}
+                    className="w-full h-10 px-3 text-sm rounded-xl border border-[#D9E6E2] bg-white focus:border-[#287C75] focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#10201F] mb-1">
+                    Known Allergies (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Sulfa, Penicillin, None"
+                    value={intakeForm.allergies}
+                    onChange={(e) => setIntakeForm((p) => ({ ...p, allergies: e.target.value }))}
+                    className="w-full h-10 px-3 text-sm rounded-xl border border-[#D9E6E2] bg-white focus:border-[#287C75] focus:outline-none"
+                  />
+                </div>
+
+                {intakeFormError && (
+                  <p className="text-xs font-semibold text-[#B94A48] bg-rose-50 border border-rose-200 px-3 py-2 rounded-xl">
+                    {intakeFormError}
+                  </p>
+                )}
+              </div>
+
+              <div className="mt-6 flex gap-3 pt-3 border-t border-[#D9E6E2]">
+                <button
+                  type="button"
+                  onClick={handleIntakeAddPatient}
+                  className="flex-1 py-2.5 rounded-xl bg-[#287C75] text-white text-xs font-semibold hover:bg-[#1f635d] transition cursor-pointer"
+                >
+                  Save & Open Studio
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowIntakeAddModal(false);
+                    setIntakeFormError('');
+                  }}
+                  className="px-4 py-2.5 rounded-xl border border-[#D9E6E2] text-xs font-semibold text-[#4E6460] hover:bg-slate-50 transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -953,8 +1376,8 @@ function PrescriptionPage() {
         </div>
       </div>
 
-      {/* 8. Bottom Action Dock (Sticky / Floating) */}
-      <div className="prescription-action-dock no-print shadow-nivara-lg">
+      {/* 8. Bottom Action Completion Dock */}
+      <div className="prescription-action-dock no-print shadow-nivara-sm">
         <div className="dock-inner">
           <div className="dock-left">
             <div className="flex items-center gap-2">
@@ -965,6 +1388,10 @@ function PrescriptionPage() {
               {currentRxId && (
                 <span className="text-xs font-mono text-[#7D908C]">({currentRxId})</span>
               )}
+              <span className="text-xs text-[#7D908C] hidden sm:inline">•</span>
+              <span className="text-xs text-[#4E6460] hidden sm:inline">
+                {medicines.filter((m) => m.name).length} {medicines.filter((m) => m.name).length === 1 ? 'medicine' : 'medicines'} prescribed
+              </span>
             </div>
           </div>
 

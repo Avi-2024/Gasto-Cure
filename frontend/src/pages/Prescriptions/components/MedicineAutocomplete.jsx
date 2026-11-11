@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef, useId } from 'react';
+import React, { useState, useEffect, useRef, useId, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { localMedicines } from '../../../services/localStore';
 
 /**
@@ -31,7 +32,45 @@ export default function MedicineAutocomplete({
 
   const containerRef = useRef(null);
   const inputRef = useRef(null);
+  const dropdownRef = useRef(null);
   const compId = useId();
+  const [dropdownCoords, setDropdownCoords] = useState({ top: 0, left: 0, width: 380 });
+
+  const updateCoords = useCallback(() => {
+    if (inputRef.current) {
+      const rect = inputRef.current.getBoundingClientRect();
+      const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 800;
+      const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
+      const spaceBelow = viewportHeight - rect.bottom;
+      const dropdownHeight = 280;
+      const showAbove = spaceBelow < dropdownHeight && rect.top > dropdownHeight;
+      const targetWidth = Math.max(rect.width, 380);
+      const targetLeft = Math.max(10, Math.min(rect.left, viewportWidth - targetWidth - 10));
+
+      setDropdownCoords({
+        top: showAbove ? Math.max(10, rect.top - dropdownHeight - 4) : rect.bottom + 4,
+        left: targetLeft,
+        width: targetWidth,
+      });
+    }
+  }, []);
+
+  // Update coordinates when opened or when window resizes/scrolls
+  useEffect(() => {
+    if (!isOpen) return;
+    updateCoords();
+
+    const handleScrollOrResize = () => {
+      updateCoords();
+    };
+
+    window.addEventListener('resize', handleScrollOrResize);
+    window.addEventListener('scroll', handleScrollOrResize, true);
+    return () => {
+      window.removeEventListener('resize', handleScrollOrResize);
+      window.removeEventListener('scroll', handleScrollOrResize, true);
+    };
+  }, [isOpen, updateCoords]);
 
   // Sync internal query when controlled value changes from outside
   useEffect(() => {
@@ -67,10 +106,12 @@ export default function MedicineAutocomplete({
     return () => clearTimeout(timer);
   }, [query, isOpen, debounceMs]);
 
-  // Click outside to dismiss dropdown
+  // Click outside to dismiss dropdown (checks container and portal dropdown)
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (containerRef.current && !containerRef.current.contains(event.target)) {
+      const clickedInsideContainer = containerRef.current && containerRef.current.contains(event.target);
+      const clickedInsideDropdown = dropdownRef.current && dropdownRef.current.contains(event.target);
+      if (!clickedInsideContainer && !clickedInsideDropdown) {
         setIsOpen(false);
       }
     };
@@ -161,74 +202,84 @@ export default function MedicineAutocomplete({
         onKeyDown={handleKeyDown}
       />
 
-      {isOpen && query.trim().length >= 2 && !isSearching && (
-        <ul
-          id={`med-autocomplete-listbox-${compId}`}
-          role="listbox"
-          className="med-autocomplete-dropdown shadow-nivara-lg"
-        >
-          {results.length > 0 ? (
-            results.map((item, index) => {
-              const isSelected = index === highlightedIndex;
-              return (
-                <li
-                  key={item.id || `${item.name}-${index}`}
-                  id={`med-option-${compId}-${index}`}
-                  role="option"
-                  aria-selected={isSelected}
-                  className={`med-autocomplete-item ${isSelected ? 'highlighted' : ''}`}
-                  onMouseEnter={() => setHighlightedIndex(index)}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    handleSelect(item);
-                  }}
-                >
-                  <div className="med-autocomplete-main">
-                    <span className="med-name font-semibold text-[#10201F]">{item.name}</span>
-                    {item.strength && (
-                      <span className="med-strength text-xs bg-[#E8F3F1] text-[#287C75] font-medium px-1.5 py-0.5 rounded tabular-nums">
-                        {item.strength}
-                      </span>
-                    )}
-                    {item.form && (
-                      <span className={`med-badge med-badge-${String(item.form).toLowerCase()}`}>
-                        {item.form}
-                      </span>
-                    )}
-                  </div>
-                  {(item.defaultDosage ||
-                    item.defaultTiming ||
-                    item.defaultDuration ||
-                    item.defaultInstruction) && (
-                    <div className="med-autocomplete-meta text-xs text-[#4E6460]">
-                      {item.defaultDosage && (
-                        <span className="med-meta-dosage font-semibold text-[#287C75]">
-                          {item.defaultDosage}
+      {isOpen && query.trim().length >= 2 && !isSearching && typeof document !== 'undefined' &&
+        createPortal(
+          <ul
+            ref={dropdownRef}
+            id={`med-autocomplete-listbox-${compId}`}
+            role="listbox"
+            className="med-autocomplete-dropdown shadow-nivara-lg"
+            style={{
+              position: 'fixed',
+              top: `${dropdownCoords.top}px`,
+              left: `${dropdownCoords.left}px`,
+              width: `${dropdownCoords.width}px`,
+              zIndex: 99999,
+            }}
+          >
+            {results.length > 0 ? (
+              results.map((item, index) => {
+                const isSelected = index === highlightedIndex;
+                return (
+                  <li
+                    key={item.id || `${item.name}-${index}`}
+                    id={`med-option-${compId}-${index}`}
+                    role="option"
+                    aria-selected={isSelected}
+                    className={`med-autocomplete-item ${isSelected ? 'highlighted' : ''}`}
+                    onMouseEnter={() => setHighlightedIndex(index)}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleSelect(item);
+                    }}
+                  >
+                    <div className="med-autocomplete-main">
+                      <span className="med-name font-semibold text-[#10201F]">{item.name}</span>
+                      {item.strength && (
+                        <span className="med-strength text-xs bg-[#E8F3F1] text-[#287C75] font-medium px-1.5 py-0.5 rounded tabular-nums">
+                          {item.strength}
                         </span>
                       )}
-                      {item.defaultTiming && (
-                        <span className="med-meta-timing">• {item.defaultTiming}</span>
-                      )}
-                      {item.defaultDuration && (
-                        <span className="med-meta-duration tabular-nums">• {item.defaultDuration}</span>
-                      )}
-                      {item.defaultInstruction && (
-                        <span className="med-meta-instruction italic text-[#7D908C]">
-                          ({item.defaultInstruction})
+                      {item.form && (
+                        <span className={`med-badge med-badge-${String(item.form).toLowerCase()}`}>
+                          {item.form}
                         </span>
                       )}
                     </div>
-                  )}
-                </li>
-              );
-            })
-          ) : (
-            <li className="med-autocomplete-empty" role="option" aria-disabled="true">
-              No matching medicines found in formulary
-            </li>
-          )}
-        </ul>
-      )}
+                    {(item.defaultDosage ||
+                      item.defaultTiming ||
+                      item.defaultDuration ||
+                      item.defaultInstruction) && (
+                      <div className="med-autocomplete-meta text-xs text-[#4E6460]">
+                        {item.defaultDosage && (
+                          <span className="med-meta-dosage font-semibold text-[#287C75]">
+                            {item.defaultDosage}
+                          </span>
+                        )}
+                        {item.defaultTiming && (
+                          <span className="med-meta-timing">• {item.defaultTiming}</span>
+                        )}
+                        {item.defaultDuration && (
+                          <span className="med-meta-duration tabular-nums">• {item.defaultDuration}</span>
+                        )}
+                        {item.defaultInstruction && (
+                          <span className="med-meta-instruction italic text-[#7D908C]">
+                            ({item.defaultInstruction})
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </li>
+                );
+              })
+            ) : (
+              <li className="med-autocomplete-empty" role="option" aria-disabled="true">
+                No matching medicines found in formulary
+              </li>
+            )}
+          </ul>,
+          document.body
+        )}
     </div>
   );
 }
