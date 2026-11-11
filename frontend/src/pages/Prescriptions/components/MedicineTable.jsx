@@ -31,6 +31,18 @@ const TIMING_OPTIONS = [
   { value: 'As Directed', label: 'As Directed' },
 ];
 
+const getFrequencyLabel = (val) => {
+  if (!val) return '';
+  const opt = FREQUENCY_OPTIONS.find((o) => o.value === val);
+  return opt ? opt.label : val;
+};
+
+const getTimingLabel = (val) => {
+  if (!val) return '';
+  const opt = TIMING_OPTIONS.find((o) => o.value === val);
+  return opt ? opt.label : val;
+};
+
 /**
  * MedicineTable Component
  *
@@ -83,99 +95,120 @@ function MedicineTable({ medicines = [], onUpdate, onRemove, onUpdateMedicineFul
           </tr>
         </thead>
         <tbody>
-          {medicines.map((medicine, index) => (
-            <tr key={medicine.id}>
-              <td className="medicine-number tabular-nums">{index + 1}</td>
-              <td className="col-medicine-cell">
-                <MedicineAutocomplete
-                  value={medicine.name || ''}
-                  placeholder="Medicine name"
-                  debounceMs={debounceMs}
-                  onChange={(e) => handleFieldChange(medicine.id, 'name', e.target.value)}
-                  onSelect={(selectedMed) => handleSelectMedicine(medicine.id, selectedMed)}
-                />
-              </td>
-              <td className="col-dosage-cell">
-                <input
-                  type="text"
-                  className="medicine-input tabular-nums"
-                  placeholder="e.g. 500mg"
-                  title={medicine.dosage || 'Dosage'}
-                  value={medicine.dosage || ''}
-                  onChange={(e) => handleFieldChange(medicine.id, 'dosage', e.target.value)}
-                />
-              </td>
-              <td className="col-frequency-cell">
-                <select
-                  className="medicine-select"
-                  title={medicine.frequency || 'Select frequency'}
-                  value={medicine.frequency || ''}
-                  onChange={(e) => handleFieldChange(medicine.id, 'frequency', e.target.value)}
-                >
-                  {FREQUENCY_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                  {medicine.frequency &&
-                    !FREQUENCY_OPTIONS.some((o) => o.value === medicine.frequency) && (
-                      <option value={medicine.frequency}>{medicine.frequency}</option>
-                    )}
-                </select>
-              </td>
-              <td className="col-timing-cell">
-                <select
-                  className="medicine-select"
-                  title={medicine.timing || 'Select timing'}
-                  value={medicine.timing || ''}
-                  onChange={(e) => handleFieldChange(medicine.id, 'timing', e.target.value)}
-                >
-                  {TIMING_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                  {medicine.timing &&
-                    !TIMING_OPTIONS.some((o) => o.value === medicine.timing) && (
-                      <option value={medicine.timing}>{medicine.timing}</option>
-                    )}
-                </select>
-              </td>
-              <td className="col-duration-cell">
-                <input
-                  type="text"
-                  className="medicine-input tabular-nums"
-                  placeholder="e.g. 5 days"
-                  title={medicine.duration || 'Duration'}
-                  value={medicine.duration || ''}
-                  onChange={(e) => handleFieldChange(medicine.id, 'duration', e.target.value)}
-                />
-              </td>
-              <td className="col-remarks-cell">
-                <input
-                  type="text"
-                  className="medicine-input"
-                  placeholder="e.g. After food"
-                  title={medicine.remarks || 'Remarks'}
-                  value={medicine.remarks || ''}
-                  onChange={(e) => handleFieldChange(medicine.id, 'remarks', e.target.value)}
-                />
-              </td>
-              <td className="no-print action-cell">
-                {medicines.length > 1 && (
-                  <button
-                    type="button"
-                    className="btn-remove-medicine"
-                    onClick={() => onRemove && onRemove(medicine.id)}
-                    title="Remove medicine"
-                    aria-label="Delete this medicine"
+          {medicines.map((medicine, index) => {
+            const freqLabel = getFrequencyLabel(medicine.frequency);
+            const timingLabel = getTimingLabel(medicine.timing);
+
+            return (
+              <tr key={medicine.id} className={medicine.name ? 'has-medicine-data' : ''}>
+                <td className="medicine-number tabular-nums">{index + 1}</td>
+                <td className="col-medicine-cell">
+                  <MedicineAutocomplete
+                    value={medicine.name || ''}
+                    placeholder="Medicine name"
+                    debounceMs={debounceMs}
+                    onChange={(e) => handleFieldChange(medicine.id, 'name', e.target.value)}
+                    onSelect={(selectedMed) => handleSelectMedicine(medicine.id, selectedMed)}
+                  />
+                  {medicine.name && (medicine.dosage || medicine.frequency || medicine.timing || medicine.duration) && (
+                    <div
+                      className="medicine-row-summary no-print"
+                      title="Quick summary of filled prescription details"
+                    >
+                      <span className="summary-pill">
+                        {medicine.dosage && <strong>{medicine.dosage}</strong>}
+                        {freqLabel && <span> • {freqLabel}</span>}
+                        {timingLabel && <span> • {timingLabel}</span>}
+                        {medicine.duration && <span> • for {medicine.duration}</span>}
+                      </span>
+                      {medicine.remarks && (
+                        <span className="summary-remarks">({medicine.remarks})</span>
+                      )}
+                    </div>
+                  )}
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    className="medicine-input tabular-nums font-semibold"
+                    placeholder="e.g. 500mg"
+                    title={medicine.dosage || 'Dosage'}
+                    value={medicine.dosage || ''}
+                    onChange={(e) => handleFieldChange(medicine.id, 'dosage', e.target.value)}
+                  />
+                </td>
+                <td>
+                  <select
+                    className="medicine-select font-semibold"
+                    title={freqLabel || 'Frequency'}
+                    value={medicine.frequency || ''}
+                    onChange={(e) => handleFieldChange(medicine.id, 'frequency', e.target.value)}
                   >
-                    <Trash2 size={15} />
-                  </button>
-                )}
-              </td>
-            </tr>
-          ))}
+                    {FREQUENCY_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                    {medicine.frequency &&
+                      !FREQUENCY_OPTIONS.some((o) => o.value === medicine.frequency) && (
+                        <option value={medicine.frequency}>{medicine.frequency}</option>
+                      )}
+                  </select>
+                </td>
+                <td>
+                  <select
+                    className="medicine-select font-semibold"
+                    title={timingLabel || 'Timing / Instructions'}
+                    value={medicine.timing || ''}
+                    onChange={(e) => handleFieldChange(medicine.id, 'timing', e.target.value)}
+                  >
+                    {TIMING_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                    {medicine.timing &&
+                      !TIMING_OPTIONS.some((o) => o.value === medicine.timing) && (
+                        <option value={medicine.timing}>{medicine.timing}</option>
+                      )}
+                  </select>
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    className="medicine-input tabular-nums font-semibold"
+                    placeholder="e.g. 5 days"
+                    title={medicine.duration || 'Duration'}
+                    value={medicine.duration || ''}
+                    onChange={(e) => handleFieldChange(medicine.id, 'duration', e.target.value)}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    className="medicine-input font-medium"
+                    placeholder="e.g. After food"
+                    title={medicine.remarks || 'Remarks'}
+                    value={medicine.remarks || ''}
+                    onChange={(e) => handleFieldChange(medicine.id, 'remarks', e.target.value)}
+                  />
+                </td>
+                <td className="no-print action-cell">
+                  {medicines.length > 1 && (
+                    <button
+                      type="button"
+                      className="btn-remove-medicine"
+                      onClick={() => onRemove && onRemove(medicine.id)}
+                      title="Remove medicine"
+                      aria-label="Delete this medicine"
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  )}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

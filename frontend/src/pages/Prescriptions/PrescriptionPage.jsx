@@ -98,25 +98,6 @@ function PrescriptionPage() {
   // Preview Modal
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
-  // Layout View Mode (Studio 2-Column vs Stacked Document View)
-  const [isSplitView, setIsSplitView] = useState(() => {
-    try {
-      const saved = localStorage.getItem('nivara_rx_layout');
-      return saved !== 'stacked';
-    } catch (e) {
-      return true;
-    }
-  });
-
-  const toggleSplitView = (val) => {
-    setIsSplitView(val);
-    try {
-      localStorage.setItem('nivara_rx_layout', val ? 'studio' : 'stacked');
-    } catch (e) {
-      // ignore
-    }
-  };
-
   // Apply print settings on mount and when changed
   useEffect(() => {
     applyPrintSettings(printSettings);
@@ -525,26 +506,6 @@ function PrescriptionPage() {
               </span>
             </div>
           )}
-
-          {/* Studio View vs Stacked Document View Toggle */}
-          <div className="prescription-layout-toggle flex items-center gap-1.5 pl-3 border-l border-[#D9E6E2]">
-            <button
-              type="button"
-              className={`prescription-mode-toggle-btn ${isSplitView ? 'is-active' : ''}`}
-              onClick={() => toggleSplitView(true)}
-              title="Studio View: Side-by-side view of clinical findings and formulary without scrolling"
-            >
-              Studio View
-            </button>
-            <button
-              type="button"
-              className={`prescription-mode-toggle-btn ${!isSplitView ? 'is-active' : ''}`}
-              onClick={() => toggleSplitView(false)}
-              title="Stacked View: Full-width continuous document layout"
-            >
-              Stacked View
-            </button>
-          </div>
         </div>
 
         {/* Top Action Buttons */}
@@ -616,12 +577,8 @@ function PrescriptionPage() {
           </div>
         </div>
 
-        {/* Clinical Studio Grid (Side-by-Side Ergonomic Layout on Desktop) */}
-        <div className={`prescription-studio-grid ${isSplitView ? 'is-split' : 'is-stacked'}`}>
-          {/* Left Column: Patient Identity, Vitals, Symptoms, Diagnosis, Internal Notes */}
-          <div className="studio-col-left">
-            {/* 1. Patient Identity Banner */}
-            <section className="prescription-section patient-info-section">
+        {/* 1. Patient Identity Banner */}
+        <section className="prescription-section patient-info-section">
           <div className="patient-banner-container">
             <div className="patient-banner-left">
               <div className="patient-avatar-badge no-print">
@@ -864,23 +821,7 @@ function PrescriptionPage() {
           />
         </section>
 
-        {/* 5. Internal Notes (Screen only) */}
-        <section className="prescription-section no-print">
-          <h3 className="section-title text-[#7D908C]">Internal Doctor Notes (Not Printed)</h3>
-          <AutoResizeTextarea
-            id="notes"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Doctor's private observations or review notes..."
-            minRows={1}
-            className="prescription-textarea text-[#4E6460] bg-[#F7FAF8]"
-          />
-        </section>
-      </div>
-
-      {/* Right Column: Rx Formulary Table, Dietary Advice, Follow-up, Signature */}
-      <div className="studio-col-right">
-        {/* 6. Prescription / Medicines - Dynamic Table with Fast Autocomplete */}
+        {/* 5. Prescription / Medicines - Dynamic Table with Fast Autocomplete */}
         <section className="prescription-section medicines-section">
           <div className="section-header">
             <h3 className="section-title font-heading flex items-center gap-1.5">
@@ -893,7 +834,7 @@ function PrescriptionPage() {
               onClick={addMedicineRow}
             >
               <Plus size={14} />
-              <span>+ Add Another Medicine</span>
+              <span>Add Another Medicine</span>
             </button>
           </div>
 
@@ -905,7 +846,7 @@ function PrescriptionPage() {
           />
         </section>
 
-        {/* 7. Advice / Dietary Instructions */}
+        {/* 6. Advice / Dietary Instructions */}
         <section className="prescription-section">
           <h3 className="section-title font-heading">Advice & Dietary Instructions</h3>
           <AutoResizeTextarea
@@ -918,7 +859,20 @@ function PrescriptionPage() {
           />
         </section>
 
-        {/* 8. Follow-up / Next Visit */}
+        {/* 6.5. Internal Notes (Screen only) */}
+        <section className="prescription-section no-print">
+          <h3 className="section-title text-[#7D908C]">Internal Doctor Notes (Not Printed)</h3>
+          <AutoResizeTextarea
+            id="notes"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Doctor's private observations or review notes..."
+            minRows={1}
+            className="prescription-textarea text-[#4E6460] bg-[#F7FAF8]"
+          />
+        </section>
+
+        {/* 7. Follow-up / Next Visit */}
         <section className="prescription-section followup-section">
           <h3 className="section-title font-heading">Next Follow-Up</h3>
 
@@ -997,8 +951,6 @@ function PrescriptionPage() {
             <p className="signature-clinic">{clinicSettings.clinicName || 'Nivara Clinic & Health Centre'}</p>
           </div>
         </div>
-      </div>
-    </div>
       </div>
 
       {/* 8. Bottom Action Dock (Sticky / Floating) */}

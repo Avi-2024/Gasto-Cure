@@ -35,7 +35,7 @@ export default function DashboardLayout() {
 
         {/* Dedicated Scrollable Content Container */}
         <main className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-3 sm:px-5 sm:py-4 lg:px-7 lg:py-5">
-          <div className="mx-auto w-full max-w-[1600px] pb-12">
+          <div className="mx-auto w-full max-w-[1600px] pb-36">
             <AnimatePresence mode="wait">
               <motion.section
                 key={location.pathname}

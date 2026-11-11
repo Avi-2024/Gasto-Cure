@@ -24,24 +24,24 @@ describe('Prescription Studio Full-View Ergonomics & Zero-Clipping Tests', () =>
     );
   };
 
-  it('renders dual-column studio view toggle with active studio view by default', () => {
+  it('renders print alignment controls with Pad Mode and Digital Header toggle', () => {
     renderStudioWithPatient();
 
-    const studioToggle = screen.getByRole('button', { name: /Studio View/i });
-    const stackedToggle = screen.getByRole('button', { name: /Stacked View/i });
+    const padModeToggle = screen.getByRole('button', { name: /Pad Mode/i });
+    const digitalToggle = screen.getByRole('button', { name: /Digital Header/i });
 
-    expect(studioToggle).toBeTruthy();
-    expect(stackedToggle).toBeTruthy();
-    expect(studioToggle.classList.contains('is-active')).toBe(true);
+    expect(padModeToggle).toBeTruthy();
+    expect(digitalToggle).toBeTruthy();
+    expect(padModeToggle.classList.contains('is-active')).toBe(true);
 
-    // Can toggle to Stacked View
-    fireEvent.click(stackedToggle);
-    expect(stackedToggle.classList.contains('is-active')).toBe(true);
-    expect(studioToggle.classList.contains('is-active')).toBe(false);
+    // Can toggle to Digital Header
+    fireEvent.click(digitalToggle);
+    expect(digitalToggle.classList.contains('is-active')).toBe(true);
+    expect(padModeToggle.classList.contains('is-active')).toBe(false);
 
-    // Can toggle back to Studio View
-    fireEvent.click(studioToggle);
-    expect(studioToggle.classList.contains('is-active')).toBe(true);
+    // Can toggle back to Pad Mode
+    fireEvent.click(padModeToggle);
+    expect(padModeToggle.classList.contains('is-active')).toBe(true);
   });
 
   it('renders all 6 vital points with clear tabular inputs and labels in full view', () => {
@@ -107,7 +107,7 @@ describe('Prescription Studio Full-View Ergonomics & Zero-Clipping Tests', () =>
     const freqSelect = frequencySelects.find((s) => s.classList.contains('medicine-select'));
     if (freqSelect) {
       fireEvent.change(freqSelect, { target: { value: '1-0-1' } });
-      expect(freqSelect.getAttribute('title')).toBe('1-0-1');
+      expect(freqSelect.getAttribute('title')).toBe('1-0-1 (Morning & Evening)');
     }
   });
 
