@@ -146,22 +146,24 @@ function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* Top Header & Prominent Patient Search */}
-      <section className="relative overflow-hidden rounded-2xl border border-[#D9E6E2] bg-white p-6 shadow-nivara-xs">
+      <section className="relative rounded-2xl border border-[#D9E6E2] bg-white p-6 shadow-nivara-xs">
         {/* Subtle decorative background glow / flow curve */}
-        <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-gradient-to-br from-teal-50/80 to-[#287C75]/5 blur-2xl" />
-        <svg
-          className="pointer-events-none absolute right-0 top-0 h-full w-1/3 opacity-[0.03] text-[#123A3A]"
-          viewBox="0 0 400 200"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M0 100 C 150 20, 250 180, 400 100"
-            stroke="currentColor"
-            strokeWidth="3"
-            strokeDasharray="6 6"
-          />
-        </svg>
+        <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl">
+          <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-gradient-to-br from-teal-50/80 to-[#287C75]/5 blur-2xl" />
+          <svg
+            className="absolute right-0 top-0 h-full w-1/3 opacity-[0.03] text-[#123A3A]"
+            viewBox="0 0 400 200"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M0 100 C 150 20, 250 180, 400 100"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeDasharray="6 6"
+            />
+          </svg>
+        </div>
 
         <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>

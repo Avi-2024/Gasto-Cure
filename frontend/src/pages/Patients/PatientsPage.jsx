@@ -54,8 +54,8 @@ const getInitials = (name) => {
 
 function PatientsPage() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const [search, setSearch] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [search, setSearch] = useState(() => searchParams.get('search') || '');
   const [ageFilter, setAgeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [patients, setPatients] = useState([]);
@@ -68,17 +68,40 @@ function PatientsPage() {
   const [profilePatient, setProfilePatient] = useState(null);
   const [editingPatient, setEditingPatient] = useState(null);
 
+  const closeModal = () => {
+    setShowModal(false);
+    setFormError('');
+    setForm(emptyForm);
+    if (searchParams.get('action') || searchParams.get('name')) {
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.delete('action');
+        next.delete('name');
+        return next;
+      }, { replace: true });
+    }
+  };
+
   // Initialize and handle query parameters
   useEffect(() => {
     localPatients.seed();
     const all = localPatients.getAll();
     setPatients(all);
 
+    const searchQuery = searchParams.get('search');
+    if (searchQuery !== null) {
+      setSearch(searchQuery);
+    }
+
     const action = searchParams.get('action');
     const patientId = searchParams.get('patientId');
+    const initialName = searchParams.get('name');
 
     if (action === 'new') {
       setShowModal(true);
+      if (initialName) {
+        setForm((prev) => ({ ...prev, name: initialName }));
+      }
     }
 
     if (patientId) {
@@ -94,9 +117,7 @@ function PatientsPage() {
     if (!showModal) return;
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
-        setShowModal(false);
-        setFormError('');
-        setForm(emptyForm);
+        closeModal();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -148,9 +169,7 @@ function PatientsPage() {
     }
     const patient = localPatients.add({ ...form, age: Number(form.age) });
     setPatients(localPatients.getAll());
-    setShowModal(false);
-    setForm(emptyForm);
-    setFormError('');
+    closeModal();
     // Automatically add to waiting queue
     localAppointments.addToQueue(patient.id, patient.name, patient.age, 'New patient visit');
     setQueueMsg(`${patient.name} added to waiting queue successfully.`);
@@ -454,9 +473,7 @@ function PatientsPage() {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 transition-opacity"
           onClick={(e) => {
             if (e.target === e.currentTarget) {
-              setShowModal(false);
-              setFormError('');
-              setForm(emptyForm);
+              closeModal();
             }
           }}
           role="dialog"
@@ -474,11 +491,7 @@ function PatientsPage() {
               <button
                 type="button"
                 className="rounded-xl p-1.5 text-[#7D908C] hover:bg-slate-100 hover:text-[#10201F] transition"
-                onClick={() => {
-                  setShowModal(false);
-                  setFormError('');
-                  setForm(emptyForm);
-                }}
+                onClick={closeModal}
                 aria-label="Close add patient modal"
               >
                 <X size={18} />
@@ -568,11 +581,7 @@ function PatientsPage() {
               <button
                 type="button"
                 className="btn-secondary"
-                onClick={() => {
-                  setShowModal(false);
-                  setFormError('');
-                  setForm(emptyForm);
-                }}
+                onClick={closeModal}
               >
                 Cancel
               </button>

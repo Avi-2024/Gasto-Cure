@@ -84,6 +84,15 @@ export default function QuickPatientSearch() {
             onFocus={() => {
               if (query.trim()) setIsOpen(true);
             }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                const trimmed = query.trim();
+                if (trimmed) {
+                  navigate(`/patients?search=${encodeURIComponent(trimmed)}`);
+                  setIsOpen(false);
+                }
+              }
+            }}
             placeholder="Search patient by name, mobile, or ID (e.g. PT-001)..."
             aria-label="Search patient by name, mobile, or ID"
             className="w-full h-12 pl-12 pr-10 text-base font-medium rounded-2xl border-2 border-[#D9E6E2] bg-white placeholder:text-[#7D908C] text-[#10201F] focus:border-[#287C75] focus:outline-none focus:ring-4 focus:ring-[#287C75]/10 transition shadow-nivara-xs"
@@ -143,7 +152,8 @@ export default function QuickPatientSearch() {
                 return (
                   <li
                     key={patient.id}
-                    className="p-3 transition rounded-xl hover:bg-[#F7FAF8] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+                    onClick={() => handleViewProfile(patient.id)}
+                    className="p-3 transition rounded-xl hover:bg-[#F7FAF8] cursor-pointer flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
                   >
                     {/* Patient Info */}
                     <div className="flex items-center gap-3">
@@ -186,7 +196,7 @@ export default function QuickPatientSearch() {
                     </div>
 
                     {/* Quick Actions */}
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
                       <button
                         type="button"
                         onClick={() => handleNewPrescription(patient.id)}
