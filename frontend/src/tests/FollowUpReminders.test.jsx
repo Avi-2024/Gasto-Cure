@@ -258,7 +258,7 @@ describe('Follow-Up Reminders & Quick Patient Search - Task 7 Tests', () => {
   });
 
   describe('QuickPatientSearch Component', () => {
-    it('renders prominent search input and "+ New Patient" button', () => {
+    it('renders prominent full-width spotlight search input', () => {
       render(
         <MemoryRouter>
           <QuickPatientSearch />
@@ -268,7 +268,6 @@ describe('Follow-Up Reminders & Quick Patient Search - Task 7 Tests', () => {
       expect(
         screen.getByPlaceholderText(/Search patient by name, mobile, or ID/i)
       ).toBeTruthy();
-      expect(screen.getByRole('button', { name: /\+ New Patient|\+ Add Patient/i })).toBeTruthy();
     });
 
     it('filters dropdown instantly when typing patient name', () => {
@@ -345,15 +344,18 @@ describe('Follow-Up Reminders & Quick Patient Search - Task 7 Tests', () => {
       expect(mockedNavigate).toHaveBeenCalledWith('/patients?patientId=PT-101');
     });
 
-    it('navigates to /patients?action=new when "+ New Patient" button is clicked', () => {
+    it('navigates to /patients?action=new when "+ Register New Patient" button is clicked in empty state', () => {
       render(
         <MemoryRouter>
           <QuickPatientSearch />
         </MemoryRouter>
       );
 
-      const newPatientBtn = screen.getByRole('button', { name: /\+ New Patient|\+ Add Patient/i });
-      fireEvent.click(newPatientBtn);
+      const input = screen.getByPlaceholderText(/Search patient by name, mobile, or ID/i);
+      fireEvent.change(input, { target: { value: 'NonexistentPatient' } });
+
+      const registerBtn = screen.getByRole('button', { name: /\+ Register New Patient/i });
+      fireEvent.click(registerBtn);
 
       expect(mockedNavigate).toHaveBeenCalledWith('/patients?action=new');
     });

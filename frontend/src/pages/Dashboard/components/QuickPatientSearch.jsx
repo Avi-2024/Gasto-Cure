@@ -70,54 +70,42 @@ export default function QuickPatientSearch() {
 
   return (
     <div ref={containerRef} className="relative w-full">
-      <div className="flex flex-col sm:flex-row gap-3 items-stretch">
-        {/* Prominent Spotlight Search Input Box */}
-        <div className="relative flex-1">
-          <Search
-            className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#7D908C]"
-            size={20}
-          />
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => {
-              if (query.trim()) setIsOpen(true);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                const trimmed = query.trim();
-                if (trimmed) {
-                  navigate(`/patients?search=${encodeURIComponent(trimmed)}`);
-                  setIsOpen(false);
-                }
+      {/* Prominent Full-Width Spotlight Search Input Box */}
+      <div className="relative w-full">
+        <Search
+          className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#7D908C]"
+          size={20}
+        />
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onFocus={() => {
+            if (query.trim()) setIsOpen(true);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              const trimmed = query.trim();
+              if (trimmed) {
+                navigate(`/patients?search=${encodeURIComponent(trimmed)}`);
+                setIsOpen(false);
               }
-            }}
-            placeholder="Search patient by name, mobile, or ID (e.g. PT-001)..."
-            aria-label="Search patient by name, mobile, or ID"
-            className="w-full h-12 pl-12 pr-10 text-base font-medium rounded-2xl border-2 border-[#D9E6E2] bg-white placeholder:text-[#7D908C] text-[#10201F] focus:border-[#287C75] focus:outline-none focus:ring-4 focus:ring-[#287C75]/10 transition shadow-nivara-xs"
-          />
-          {query && (
-            <button
-              type="button"
-              onClick={handleClear}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-[#7D908C] hover:text-[#10201F] rounded-full hover:bg-slate-100 transition"
-              aria-label="Clear search"
-            >
-              <X size={16} />
-            </button>
-          )}
-        </div>
-
-        {/* Quick Add Patient Button */}
-        <button
-          type="button"
-          onClick={handleNewPatient}
-          className="h-12 px-5 inline-flex items-center justify-center gap-2 rounded-2xl bg-[#287C75] text-white font-semibold shadow-nivara-xs hover:bg-[#1f635d] active:scale-[0.98] transition whitespace-nowrap"
-        >
-          <UserPlus size={18} />
-          + New Patient
-        </button>
+            }
+          }}
+          placeholder="Search patient by name, mobile, or ID (e.g. PT-001)..."
+          aria-label="Search patient by name, mobile, or ID"
+          className="w-full h-12 pl-12 pr-10 text-base font-medium rounded-2xl border-2 border-[#D9E6E2] bg-white placeholder:text-[#7D908C] text-[#10201F] focus:border-[#287C75] focus:outline-none focus:ring-4 focus:ring-[#287C75]/10 transition shadow-nivara-xs"
+        />
+        {query && (
+          <button
+            type="button"
+            onClick={handleClear}
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-[#7D908C] hover:text-[#10201F] rounded-full hover:bg-slate-100 transition"
+            aria-label="Clear search"
+          >
+            <X size={16} />
+          </button>
+        )}
       </div>
 
       {/* Instant Dropdown Results */}
