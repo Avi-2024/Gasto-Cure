@@ -11,6 +11,8 @@ import {
   MessageCircle,
   X,
   CheckCircle2,
+  Clock3,
+  RotateCcw,
 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import StatCard from '../../components/ui/StatCard';
@@ -191,10 +193,28 @@ function PatientsPage() {
     window.open(waUrl, '_blank', 'noopener,noreferrer');
   };
 
+  const queueLength = localAppointments.getQueue()?.length || 0;
+
   return (
-    <div className="space-y-6">
-      {/* Quick Stats Strip */}
-      <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div className="space-y-4">
+      {/* Toast Notification (Floating, zero layout shift) */}
+      {queueMsg ? (
+        <div className="fixed top-20 right-6 z-50 flex items-center gap-2.5 bg-white border border-[#D9E6E2] border-l-4 border-l-[#2E7D5B] rounded-xl px-4 py-3 shadow-nivara-lg animate-in slide-in-from-top-2 duration-200">
+          <CheckCircle2 size={16} className="text-[#2E7D5B] shrink-0" />
+          <span className="text-xs font-semibold text-[#10201F]">{queueMsg}</span>
+          <button
+            type="button"
+            onClick={() => setQueueMsg('')}
+            className="text-[#7D908C] hover:text-[#10201F] p-0.5 ml-2 cursor-pointer"
+            aria-label="Dismiss notification"
+          >
+            <X size={14} />
+          </button>
+        </div>
+      ) : null}
+
+      {/* Quick Stats Strip (Compact 4-column layout) */}
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
         <StatCard
           icon={Users}
           label="Total Patients"
@@ -219,30 +239,50 @@ function PatientsPage() {
           tone="warning"
           trend={{ label: 'Upcoming', positive: true }}
         />
+        <div className="app-card rounded-2xl p-5 border border-[#D9E6E2] bg-white shadow-nivara-xs hover:shadow-nivara-sm transition duration-200 flex flex-col justify-between">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm font-medium text-[#4E6460]">Waiting in Queue</p>
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-[#B7791F] border border-amber-100">
+              <Clock3 size={18} />
+            </span>
+          </div>
+          <div className="mt-4 flex items-baseline justify-between">
+            <p className="font-heading font-bold text-3xl text-[#10201F] tracking-tight tabular-nums">
+              {queueLength}
+            </p>
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#2E7D5B]">
+              <span className="w-2 h-2 rounded-full bg-[#2E7D5B] animate-pulse"></span>
+              Live Queue
+            </span>
+          </div>
+          <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-[#D9E6E2] bg-[#F7FAF8] px-2.5 py-1 text-xs font-semibold text-[#4E6460]">
+            <span>Checked-in today</span>
+          </div>
+        </div>
       </section>
 
       {/* Header and Filters Section */}
-      <section className="app-card p-6 border border-[#D9E6E2]">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+      <section className="app-card p-5 border border-[#D9E6E2]">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h1 className="page-title">Patients</h1>
-            <p className="page-subtitle">Search records, filter cohorts, and review patient status at a glance.</p>
+            <div className="flex items-center gap-2.5">
+              <h1 className="page-title text-xl font-heading font-bold text-[#10201F]">Patients</h1>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-50 text-[#287C75] border border-teal-200 tabular-nums">
+                {filteredPatients.length} {filteredPatients.length === 1 ? 'Patient' : 'Patients'}
+              </span>
+            </div>
+            <p className="page-subtitle text-xs text-[#4E6460] mt-0.5">
+              Search records, filter cohorts, and review patient status at a glance.
+            </p>
           </div>
-          <button type="button" className="btn-primary" onClick={() => setShowModal(true)}>
+          <button type="button" className="btn-primary shrink-0" onClick={() => setShowModal(true)}>
             <Plus size={16} />
-            Add Patient
+            <span>Add Patient</span>
           </button>
         </div>
 
-        {queueMsg ? (
-          <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-medium text-[#2E7D5B] flex items-center gap-2 shadow-xs">
-            <CheckCircle2 size={16} className="shrink-0 text-[#2E7D5B]" />
-            <span>{queueMsg}</span>
-          </div>
-        ) : null}
-
-        <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_220px_220px]">
-          <label htmlFor="patient-search" className="relative">
+        <div className="mt-4 grid gap-3 lg:grid-cols-[1fr_200px_200px]">
+          <div className="relative">
             <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#7D908C]" size={16} />
             <input
               id="patient-search"
@@ -250,14 +290,26 @@ function PatientsPage() {
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search name, ID, or contact"
-              className="pl-10"
+              className="pl-10 pr-9 w-full h-10 text-sm rounded-xl border border-[#D9E6E2] bg-white focus:border-[#287C75] focus:outline-none transition"
             />
-          </label>
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#7D908C] hover:text-[#10201F] p-0.5 cursor-pointer"
+                title="Clear search"
+                aria-label="Clear search"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
 
           <select
             value={ageFilter}
             onChange={(event) => setAgeFilter(event.target.value)}
             aria-label="Filter patients by age group"
+            className="h-10 px-3 text-sm rounded-xl border border-[#D9E6E2] bg-white focus:border-[#287C75] focus:outline-none transition cursor-pointer text-[#10201F]"
           >
             <option value="all">All age groups</option>
             <option value="child">Children (&lt;18)</option>
@@ -269,6 +321,7 @@ function PatientsPage() {
             value={statusFilter}
             onChange={(event) => setStatusFilter(event.target.value)}
             aria-label="Filter patients by status"
+            className="h-10 px-3 text-sm rounded-xl border border-[#D9E6E2] bg-white focus:border-[#287C75] focus:outline-none transition cursor-pointer text-[#10201F]"
           >
             <option value="all">All statuses</option>
             <option value="Active">Active</option>
@@ -280,30 +333,30 @@ function PatientsPage() {
       </section>
 
       {/* Patients Table */}
-      <section className="app-card overflow-hidden border border-[#D9E6E2]">
+      <section className="app-card overflow-hidden border border-[#D9E6E2] shadow-nivara-xs">
         <div className="overflow-x-auto">
           <table className="min-w-full border-collapse">
             <thead className="sticky top-0 z-10 bg-[#F7FAF8] border-b border-[#D9E6E2]">
               <tr>
-                <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-[0.08em] text-[#4E6460]">
+                <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-[0.08em] text-[#4E6460] min-w-[240px] whitespace-nowrap">
                   Patient Details
                 </th>
-                <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-[0.08em] text-[#4E6460]">
+                <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-[0.08em] text-[#4E6460] min-w-[170px] whitespace-nowrap">
                   Contact
                 </th>
-                <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-[0.08em] text-[#4E6460]">
+                <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-[0.08em] text-[#4E6460] min-w-[110px] whitespace-nowrap">
                   Blood Group
                 </th>
-                <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-[0.08em] text-[#4E6460]">
+                <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-[0.08em] text-[#4E6460] min-w-[120px] whitespace-nowrap">
                   Last Visit
                 </th>
-                <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-[0.08em] text-[#4E6460]">
+                <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-[0.08em] text-[#4E6460] min-w-[150px] whitespace-nowrap">
                   Next Follow-Up
                 </th>
-                <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-[0.08em] text-[#4E6460]">
+                <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-[0.08em] text-[#4E6460] min-w-[110px] whitespace-nowrap">
                   Status
                 </th>
-                <th className="px-4 py-3.5 text-right text-xs font-semibold uppercase tracking-[0.08em] text-[#4E6460]">
+                <th className="px-4 py-3.5 text-right text-xs font-semibold uppercase tracking-[0.08em] text-[#4E6460] min-w-[340px] whitespace-nowrap">
                   Actions
                 </th>
               </tr>
@@ -316,69 +369,78 @@ function PatientsPage() {
                     key={patient.id}
                     className="bg-white hover:bg-[#F7FAF8]/80 transition duration-150"
                   >
-                    <td className="px-4 py-4">
+                    <td className="px-4 py-3.5 whitespace-nowrap">
                       <div className="flex items-center gap-3">
                         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-[#287C75] font-heading font-semibold text-xs border border-teal-100 shadow-nivara-xs">
                           {getInitials(patient.name)}
                         </span>
                         <div>
                           <div className="flex items-center gap-2">
-                            <p className="font-heading font-bold text-sm text-[#10201F]">{patient.name}</p>
-                            <span className="font-mono text-xs text-[#287C75] bg-teal-50 px-2 py-0.5 rounded-md border border-teal-100">
+                            <p
+                              onClick={() => setProfilePatient(patient)}
+                              className="font-heading font-bold text-sm text-[#10201F] hover:text-[#287C75] cursor-pointer transition whitespace-nowrap"
+                              title="View patient profile"
+                            >
+                              {patient.name}
+                            </p>
+                            <span className="font-mono text-xs text-[#287C75] bg-teal-50 px-2 py-0.5 rounded-md border border-teal-100 shrink-0 whitespace-nowrap tabular-nums font-semibold">
                               {patient.id}
                             </span>
                           </div>
-                          <p className="text-xs text-[#4E6460] mt-0.5">
+                          <p className="text-xs text-[#4E6460] mt-0.5 whitespace-nowrap">
                             {patient.age} Yrs • {patient.gender}
                           </p>
                         </div>
                       </div>
                     </td>
 
-                    <td className="px-4 py-4 text-sm text-[#10201F] tabular-nums">
+                    <td className="px-4 py-3.5 text-sm text-[#10201F] tabular-nums whitespace-nowrap">
                       <div>
-                        <span>{patient.contact || patient.mobile || '-'}</span>
+                        <span className="font-semibold text-xs">{patient.contact || patient.mobile || '-'}</span>
                         {patient.address && (
-                          <p className="text-xs text-[#7D908C] truncate max-w-[160px]">{patient.address}</p>
+                          <p className="text-xs text-[#7D908C] truncate max-w-[170px]" title={patient.address}>
+                            {patient.address}
+                          </p>
                         )}
                       </div>
                     </td>
 
-                    <td className="px-4 py-4 text-sm">
+                    <td className="px-4 py-3.5 text-sm whitespace-nowrap">
                       {patient.bloodGroup ? (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold text-[#B94A48] bg-rose-50 border border-rose-100">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold text-[#B94A48] bg-rose-50 border border-rose-100 tabular-nums">
                           {patient.bloodGroup}
                         </span>
                       ) : (
-                        <span className="text-[#7D908C] text-xs">-</span>
+                        <span className="text-[#7D908C] text-xs font-mono">-</span>
                       )}
                     </td>
 
-                    <td className="px-4 py-4 text-sm text-[#4E6460]">
+                    <td className="px-4 py-3.5 text-sm text-[#4E6460] whitespace-nowrap">
                       {formatDisplayDate(patient.lastVisit) || '-'}
                     </td>
 
-                    <td className="px-4 py-4 text-sm">
+                    <td className="px-4 py-3.5 text-sm whitespace-nowrap">
                       {patient.nextFollowUp ? (
-                        <span className="font-semibold text-[#2E7D5B] tabular-nums">
+                        <span className="inline-flex items-center gap-1.5 font-semibold text-xs text-[#2E7D5B] bg-emerald-50/80 px-2.5 py-1 rounded-lg border border-emerald-100 tabular-nums">
+                          <CalendarClock size={13} className="text-[#2E7D5B]" />
                           {formatDisplayDate(patient.nextFollowUp)}
                         </span>
                       ) : (
-                        <span className="text-[#7D908C]">None</span>
+                        <span className="text-[#7D908C] text-xs">None</span>
                       )}
                     </td>
 
-                    <td className="px-4 py-4">
+                    <td className="px-4 py-3.5 whitespace-nowrap">
                       <StatusBadge label={patient.status} variant={statusVariantMap[patient.status] || 'info'} />
                     </td>
 
-                    <td className="px-4 py-4 text-right">
-                      <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                    <td className="px-4 py-3.5 text-right whitespace-nowrap">
+                      <div className="inline-flex items-center justify-end gap-1.5 whitespace-nowrap">
                         {cleanPhone ? (
                           <button
                             type="button"
                             onClick={() => handleOpenWhatsApp(patient)}
-                            className="p-1.5 rounded-xl border border-emerald-200 bg-emerald-50 text-[#2E7D5B] hover:bg-emerald-100 transition shadow-xs"
+                            className="p-1.5 rounded-lg border border-emerald-200 bg-emerald-50 text-[#25D366] hover:bg-emerald-100 transition shadow-xs cursor-pointer"
                             title="Chat on WhatsApp"
                           >
                             <MessageCircle size={15} />
@@ -387,7 +449,7 @@ function PatientsPage() {
 
                         <button
                           type="button"
-                          className="btn-secondary text-xs py-1.5 px-3"
+                          className="btn-secondary text-xs py-1.5 px-3 cursor-pointer"
                           onClick={() => setProfilePatient(patient)}
                         >
                           Profile
@@ -395,7 +457,7 @@ function PatientsPage() {
 
                         <button
                           type="button"
-                          className="btn-secondary text-xs py-1.5 px-3"
+                          className="btn-secondary text-xs py-1.5 px-3 cursor-pointer"
                           onClick={() => setEditingPatient(patient)}
                         >
                           Edit
@@ -403,17 +465,17 @@ function PatientsPage() {
 
                         <button
                           type="button"
-                          className="btn-primary text-xs py-1.5 px-3"
+                          className="btn-primary text-xs py-1.5 px-3 inline-flex items-center gap-1 cursor-pointer"
                           onClick={() => navigate(`/prescription/new?patientId=${patient.id}`)}
                           title="Start Prescription"
                         >
-                          <FileText size={14} />
-                          Prescription
+                          <FileText size={13} />
+                          <span>Prescription</span>
                         </button>
 
                         <button
                           type="button"
-                          className="btn-secondary text-xs py-1.5 px-2.5"
+                          className="btn-secondary text-xs py-1.5 px-2.5 text-[#287C75] hover:bg-teal-50 border-teal-200 cursor-pointer"
                           onClick={() => {
                             localAppointments.addToQueue(patient.id, patient.name, patient.age, 'Follow-up visit');
                             setQueueMsg(`${patient.name} added to waiting queue.`);
@@ -421,7 +483,7 @@ function PatientsPage() {
                           }}
                           title="Add to Reception Queue"
                         >
-                          Queue
+                          + Queue
                         </button>
                       </div>
                     </td>
@@ -430,8 +492,26 @@ function PatientsPage() {
               })}
               {paginated.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-sm text-[#7D908C]">
-                    No patients found for the selected filters.
+                  <td colSpan={7} className="px-4 py-12 text-center text-sm text-[#7D908C]">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <Users size={28} className="text-[#A2B3B0]" />
+                      <p className="font-semibold text-[#10201F]">No patients found</p>
+                      <p className="text-xs">No records matched your search or filters.</p>
+                      {(search || ageFilter !== 'all' || statusFilter !== 'all') && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSearch('');
+                            setAgeFilter('all');
+                            setStatusFilter('all');
+                          }}
+                          className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#D9E6E2] text-xs font-semibold text-[#287C75] hover:bg-[#F2F7F5] transition cursor-pointer"
+                        >
+                          <RotateCcw size={13} />
+                          <span>Reset Filters</span>
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ) : null}
