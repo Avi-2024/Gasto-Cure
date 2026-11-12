@@ -12,6 +12,7 @@ import PrescriptionPage from '../pages/Prescriptions/PrescriptionPage';
 import MedicinesPage from '../pages/Medicines/MedicinesPage';
 import SettingsPage from '../pages/Settings/SettingsPage';
 import DoctorProfilePage from '../pages/Doctor/DoctorProfilePage';
+import NotificationsPage from '../pages/Notifications/NotificationsPage';
 import DoctorDashboardPage from '../pages/Doctor/DoctorDashboardPage';
 import ConsultationPage from '../pages/Doctor/ConsultationPage';
 import ReceptionistDashboardPage from '../pages/Receptionist/ReceptionistDashboardPage';
@@ -42,6 +43,7 @@ function AppRouter() {
           <Route path="/appointments" element={<AppointmentsPage />} />
           <Route path="/patients" element={<PatientsPage />} />
           <Route path="/profile" element={<DoctorProfilePage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
         </Route>
       </Route>
 

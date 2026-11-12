@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Menu, Search, UserPlus, FileText, Pill, User, X, Plus, ChevronRight, Stethoscope } from 'lucide-react';
+import { Bell, Menu, Search, UserPlus, FileText, Pill, User, X, Plus, ChevronRight, Stethoscope, CheckCheck } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { localPatients, localVisits, localMedicines } from '../../services/localStore';
+import { notificationsService } from '../../services/notificationsService';
 
 /**
  * AppHeader Component
@@ -13,8 +14,25 @@ export default function AppHeader({ onMenuClick, navigate: customNavigate }) {
   const { activeClinicId, user, switchClinic } = useAuth();
   const searchInputRef = useRef(null);
   const searchContainerRef = useRef(null);
+  const notifContainerRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [notifList, setNotifList] = useState([]);
+
+  const refreshNotifications = () => {
+    try {
+      setNotifList(notificationsService.getAll());
+    } catch {
+      setNotifList([]);
+    }
+  };
+
+  useEffect(() => {
+    refreshNotifications();
+  }, []);
+
+  const unreadNotifsCount = notifList.filter((n) => !n.read).length;
 
   let routerNavigate = null;
   try {
@@ -40,11 +58,14 @@ export default function AppHeader({ onMenuClick, navigate: customNavigate }) {
     }
   };
 
-  // Close omni-search dropdown on click outside
+  // Close omni-search & notifications dropdown on click outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (searchContainerRef.current && !searchContainerRef.current.contains(e.target)) {
         setIsSearchOpen(false);
+      }
+      if (notifContainerRef.current && !notifContainerRef.current.contains(e.target)) {
+        setIsNotifOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -370,18 +391,111 @@ export default function AppHeader({ onMenuClick, navigate: customNavigate }) {
             </select>
           </div>
 
-          {/* Notifications Button */}
-          <button
-            type="button"
-            className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-[#D9E6E2] bg-white text-[#4E6460] transition hover:bg-[#F7FAF8] hover:text-[#10201F] shadow-nivara-xs"
-            aria-label="Notifications"
-          >
-            <Bell size={16} />
-            <span
-              className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-[#C9A45C]"
-              aria-hidden="true"
-            />
-          </button>
+          {/* Notifications Dropdown Container */}
+          <div className="relative" ref={notifContainerRef}>
+            <button
+              type="button"
+              onClick={() => {
+                refreshNotifications();
+                setIsNotifOpen((prev) => !prev);
+              }}
+              className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-[#D9E6E2] bg-white text-[#4E6460] transition hover:bg-[#F7FAF8] hover:text-[#10201F] shadow-nivara-xs cursor-pointer"
+              aria-label="Notifications"
+              title="Clinical Notifications & Alerts"
+            >
+              <Bell size={16} />
+              {unreadNotifsCount > 0 ? (
+                <span
+                  className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white px-1 shadow-xs"
+                  aria-hidden="true"
+                >
+                  {unreadNotifsCount > 9 ? '9+' : unreadNotifsCount}
+                </span>
+              ) : (
+                <span
+                  className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-[#C9A45C]"
+                  aria-hidden="true"
+                />
+              )}
+            </button>
+
+            {/* Notifications Popover Dropdown */}
+            {isNotifOpen && (
+              <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl border border-[#D9E6E2] bg-white shadow-xl z-50 overflow-hidden animate-in fade-in duration-150">
+                <div className="flex items-center justify-between border-b border-[#D9E6E2] px-4 py-3 bg-[#F7FAF8]">
+                  <div className="flex items-center gap-2">
+                    <span className="font-heading text-xs font-bold text-[#10201F]">
+                      Notifications
+                    </span>
+                    {unreadNotifsCount > 0 && (
+                      <span className="rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 border border-amber-200">
+                        {unreadNotifsCount} new
+                      </span>
+                    )}
+                  </div>
+                  {unreadNotifsCount > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        notificationsService.markAllAsRead();
+                        refreshNotifications();
+                      }}
+                      className="text-[11px] font-semibold text-[#287C75] hover:underline cursor-pointer"
+                    >
+                      Mark all read
+                    </button>
+                  )}
+                </div>
+
+                <div className="max-h-72 overflow-y-auto divide-y divide-[#EBF1EE]">
+                  {notifList.length === 0 ? (
+                    <div className="p-6 text-center text-xs text-[#7D908C]">
+                      No notifications right now. All caught up!
+                    </div>
+                  ) : (
+                    notifList.slice(0, 5).map((item) => (
+                      <div
+                        key={item.id}
+                        onClick={() => {
+                          notificationsService.markAsRead(item.id);
+                          setIsNotifOpen(false);
+                          if (item.actionUrl) navigate(item.actionUrl);
+                        }}
+                        className={`p-3 text-left transition cursor-pointer hover:bg-teal-50/40 ${
+                          !item.read ? 'bg-teal-50/20' : 'bg-white'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <p className={`text-xs font-heading ${!item.read ? 'font-bold text-[#10201F]' : 'font-medium text-[#4E6460]'}`}>
+                            {item.title}
+                          </p>
+                          {!item.read && (
+                            <span className="h-1.5 w-1.5 rounded-full bg-amber-500 shrink-0 mt-1" />
+                          )}
+                        </div>
+                        <p className="mt-0.5 text-[11px] text-[#4E6460] line-clamp-2">
+                          {item.message}
+                        </p>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                <div className="border-t border-[#D9E6E2] p-2 bg-[#F7FAF8] text-center">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsNotifOpen(false);
+                      navigate('/notifications');
+                    }}
+                    className="w-full py-1 text-xs font-semibold text-[#287C75] hover:underline cursor-pointer"
+                  >
+                    View All Notifications & History →
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Doctor Avatar Badge */}
           <button
