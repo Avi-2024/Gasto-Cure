@@ -7,6 +7,8 @@ import {
   ShieldCheck,
   Users,
   Stethoscope,
+  Search,
+  Trash2,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import StatCard from '../../components/ui/StatCard';
@@ -43,6 +45,14 @@ function DashboardPage() {
   const { user } = useAuth();
   const doctorTitle = formatDoctorName(user);
   const [queue, setQueue] = useState([]);
+  const [queueSearch, setQueueSearch] = useState('');
+
+  const handleRemoveFromQueue = (apptId) => {
+    localAppointments.markCompleted(apptId);
+    const updated = localAppointments.getQueue();
+    setQueue(updated);
+    setStats((prev) => ({ ...prev, pendingConsultations: updated.length }));
+  };
   const [stats, setStats] = useState({
     totalPatients: 0,
     pendingConsultations: 0,
@@ -109,6 +119,16 @@ function DashboardPage() {
       followUpsDue: followUpKeys.size,
     });
   }, []);
+
+  const filteredQueue = queue.filter((p) => {
+    if (!queueSearch.trim()) return true;
+    const q = queueSearch.toLowerCase();
+    return (
+      (p.patientName || '').toLowerCase().includes(q) ||
+      (p.reason || '').toLowerCase().includes(q) ||
+      String(p.patientId || '').toLowerCase().includes(q)
+    );
+  });
 
   // Nivara 3-Stage Outpatient Lifecycle + System Status
   const statCards = [
@@ -214,44 +234,94 @@ function DashboardPage() {
               <StatusBadge label={`${queue.length} Patients`} variant="info" />
             </div>
 
-            {queue.length === 0 ? (
+            {/* Fast search if queue has 4 or more patients */}
+            {queue.length > 3 && (
+              <div className="relative mt-3">
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#7D908C]" />
+                <input
+                  type="text"
+                  value={queueSearch}
+                  onChange={(e) => setQueueSearch(e.target.value)}
+                  placeholder="Search waiting patient by name or reason..."
+                  aria-label="Search waiting queue"
+                  className="w-full rounded-xl border border-[#D9E6E2] bg-[#F7FAF8] py-1.5 pl-8 pr-3 text-xs text-[#10201F] placeholder-[#7D908C] focus:border-[#287C75] focus:bg-white focus:outline-none transition"
+                />
+              </div>
+            )}
+
+            {filteredQueue.length === 0 ? (
               <div className="mt-5 rounded-2xl border border-dashed border-[#D9E6E2] bg-[#F7FAF8] p-8 text-center">
-                <p className="text-sm font-semibold text-[#10201F]">No patients in queue</p>
-                <p className="mt-1 text-sm text-[#4E6460]">
-                  Add patients from the Patients page to start consultations.
+                <p className="text-sm font-semibold text-[#10201F]">
+                  {queueSearch ? 'No matching patients in queue' : 'No patients in queue'}
                 </p>
-                <Link to="/patients" className="btn-primary mt-4 inline-flex">
-                  Go to Patients
-                </Link>
+                <p className="mt-1 text-sm text-[#4E6460]">
+                  {queueSearch
+                    ? 'Try clearing the search query or search by another keyword.'
+                    : 'Add patients from the Patients page to start consultations.'}
+                </p>
+                {!queueSearch && (
+                  <Link to="/patients" className="btn-primary mt-4 inline-flex">
+                    Go to Patients
+                  </Link>
+                )}
               </div>
             ) : (
-              <ul className="mt-4 space-y-3">
-                {queue.map((patient) => (
-                  <li
-                    key={patient.id}
-                    className="rounded-2xl border border-[#D9E6E2] bg-[#F7FAF8]/70 p-4 transition hover:-translate-y-0.5 hover:bg-white hover:border-[#287C75]/40 hover:shadow-nivara-xs"
-                  >
-                    <div className="grid gap-3 lg:grid-cols-[1fr_auto] lg:items-center">
-                      <div>
-                        <div className="flex flex-wrap items-center gap-2">
-                          <p className="text-sm font-heading font-bold text-[#10201F]">{patient.patientName}</p>
-                          <StatusBadge label={patient.status} variant={statusToVariant[patient.status] || 'warning'} />
+              <ul className="mt-4 space-y-3 max-h-[460px] overflow-y-auto pr-1">
+                {filteredQueue.map((patient, index) => {
+                  const isNext = index === 0 && !queueSearch.trim();
+                  return (
+                    <li
+                      key={patient.id}
+                      className={`rounded-2xl border p-4 transition ${
+                        isNext
+                          ? 'border-emerald-300 bg-emerald-50/40 ring-1 ring-emerald-300/40'
+                          : 'border-[#D9E6E2] bg-[#F7FAF8]/70 hover:-translate-y-0.5 hover:bg-white hover:border-[#287C75]/40 hover:shadow-nivara-xs'
+                      }`}
+                    >
+                      <div className="grid gap-3 lg:grid-cols-[1fr_auto] lg:items-center">
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="inline-flex items-center justify-center rounded-lg bg-teal-100/70 border border-teal-200 px-2 py-0.5 text-[11px] font-mono font-bold text-teal-800">
+                              Token #{index + 1}
+                            </span>
+                            <p className="text-sm font-heading font-bold text-[#10201F]">{patient.patientName}</p>
+                            {isNext && (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 border border-emerald-300">
+                                Next in Line
+                              </span>
+                            )}
+                            <StatusBadge label={patient.status} variant={statusToVariant[patient.status] || 'warning'} />
+                          </div>
+                          <p className="mt-1 text-sm text-[#4E6460]">{patient.reason}</p>
+                          <div className="mt-2 flex flex-wrap items-center gap-4 text-xs font-semibold uppercase tracking-[0.08em] text-[#7D908C]">
+                            <span className="flex items-center gap-1">
+                              <Clock3 size={12} className="text-[#7D908C]" />
+                              Time {patient.startTime}
+                            </span>
+                          </div>
                         </div>
-                        <p className="mt-1 text-sm text-[#4E6460]">{patient.reason}</p>
-                        <div className="mt-2 flex flex-wrap gap-4 text-xs font-semibold uppercase tracking-[0.08em] text-[#7D908C]">
-                          <span>Time {patient.startTime}</span>
+
+                        <div className="flex items-center gap-2 shrink-0">
+                          <Link
+                            to={`/prescription/new?patientId=${encodeURIComponent(patient.patientId || patient.id)}`}
+                            className="btn-primary inline-flex items-center gap-1.5"
+                          >
+                            Start Consultation
+                          </Link>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveFromQueue(patient.id)}
+                            className="p-2 text-[#7D908C] hover:text-rose-600 hover:bg-rose-50 rounded-xl transition cursor-pointer"
+                            title="Remove / Mark Completed"
+                            aria-label={`Remove ${patient.patientName} from queue`}
+                          >
+                            <Trash2 size={14} />
+                          </button>
                         </div>
                       </div>
-
-                      <Link
-                        to={`/prescription/new?patientId=${encodeURIComponent(patient.patientId || patient.id)}`}
-                        className="btn-primary inline-flex items-center gap-1.5"
-                      >
-                        Start Consultation
-                      </Link>
-                    </div>
-                  </li>
-                ))}
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </div>

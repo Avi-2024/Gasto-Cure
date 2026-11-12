@@ -330,6 +330,17 @@ function PrescriptionPage() {
     const savedVisit = localVisits.save(visitPayload);
     setCurrentRxId(savedVisit.id);
 
+    // Auto-clear patient from waiting queue once prescription is saved
+    try {
+      const activeQueue = localAppointments.getQueue();
+      const matched = activeQueue.find(
+        (a) => a.patientId === patient?.id || a.patientId === savedVisit.patientId
+      );
+      if (matched) {
+        localAppointments.markCompleted(matched.id);
+      }
+    } catch {}
+
     setSaveFeedback({
       type: 'success',
       message: `Prescription saved permanently (${savedVisit.id})`,
