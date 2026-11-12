@@ -384,7 +384,13 @@ export default function AppHeader({ onMenuClick, navigate: customNavigate }) {
           </button>
 
           {/* Doctor Avatar Badge */}
-          <div className="flex items-center gap-2.5 rounded-xl border border-[#D9E6E2] bg-white px-2.5 py-1.5 shadow-nivara-xs">
+          <button
+            type="button"
+            onClick={() => navigate('/profile')}
+            className="flex items-center gap-2.5 rounded-xl border border-[#D9E6E2] bg-white px-2.5 py-1.5 shadow-nivara-xs hover:border-[#287C75]/50 hover:bg-[#F7FAF8] transition cursor-pointer text-left"
+            title="View & Edit Doctor Profile"
+            aria-label="Doctor Profile"
+          >
             <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#123A3A] text-xs font-bold text-white shadow-sm">
               {doctorInitial}
             </span>
@@ -396,7 +402,7 @@ export default function AppHeader({ onMenuClick, navigate: customNavigate }) {
                 {roleLabel}
               </p>
             </div>
-          </div>
+          </button>
         </div>
       </div>
     </header>

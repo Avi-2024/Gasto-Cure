@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import {
   Activity,
   CalendarDays,
@@ -207,19 +207,24 @@ export default function Sidebar({ isOpen, onClose }) {
         {/* Doctor Profile Pill & Logout */}
         <div className="mt-auto pt-4 border-t border-white/10">
           <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 p-2.5">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#287C75] text-xs font-bold text-white shadow-sm ring-1 ring-white/20">
+            <Link
+              to="/profile"
+              onClick={onClose}
+              className="flex items-center gap-2.5 min-w-0 hover:opacity-90 transition group cursor-pointer"
+              title="View & Edit Doctor Profile"
+            >
+              <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#287C75] text-xs font-bold text-white shadow-sm ring-1 ring-white/20 group-hover:ring-[#C9A45C]/50 transition">
                 {initials}
               </span>
               <div className="min-w-0">
-                <p className="truncate text-xs font-semibold text-white">
+                <p className="truncate text-xs font-semibold text-white group-hover:text-teal-200 transition">
                   {displayName}
                 </p>
                 <span className="inline-block text-[10px] uppercase tracking-wider text-teal-200/80 font-medium">
                   {roleLabel}
                 </span>
               </div>
-            </div>
+            </Link>
 
             <button
               type="button"
