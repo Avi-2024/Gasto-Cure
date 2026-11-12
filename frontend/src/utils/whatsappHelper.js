@@ -164,6 +164,10 @@ export const generatePrescriptionWhatsAppLink = (patient = {}, prescription = {}
 
 /**
  * Generate a follow-up reminder WhatsApp link for a patient.
+ * Uses interactive English quick-reply format:
+ * "Hi MR/MS [PATIENT], I would like to know if you would be coming for your follow up appointment [Tomorrow / Date]...
+ *  * Tap 'Yes' to confirm.
+ *  * Tap 'No' if you are not coming."
  *
  * @param {Object} patient - Patient record with contact and nextFollowUp
  * @param {Object} clinic - Clinic settings
@@ -177,9 +181,11 @@ export const generateFollowUpReminderWhatsAppLink = (patient = {}, clinic = {}, 
     ? (cleanPhone.length === 10 ? `91${cleanPhone}` : (cleanPhone.startsWith('91') ? cleanPhone : `91${cleanPhone}`))
     : '';
 
-  const patientName = patient?.name || patient?.patientName || 'Patient';
-  const clinicName = clinic?.clinicName || 'ClinicRx Medical Centre';
-  const doctorName = clinic?.doctorName || 'Dr. Aarav Sharma';
+  const rawName = patient?.name || patient?.patientName || 'Patient';
+  const prefix = String(patient?.gender || '').toLowerCase() === 'female' ? 'MS' : 'MR';
+  const patientName = rawName;
+  const clinicName = clinic?.clinicName || 'Gastro Cure Clinic';
+  const doctorName = clinic?.doctorName || 'Dr. Snehal Makwana';
   const followUpDate = patient?.nextFollowUp || patient?.followUpDate || '';
 
   let timingText = followUpDate ? `for ${followUpDate}` : 'soon';
@@ -196,11 +202,60 @@ export const generateFollowUpReminderWhatsAppLink = (patient = {}, clinic = {}, 
   }
 
   const docPrefix = doctorName.startsWith('Dr.') || doctorName.startsWith('Dr ') ? '' : 'Dr. ';
-  const clinicPhone = clinic?.phone || clinic?.contact || '9876543210';
 
-  const message = `Namaste ${patientName} ji, this is a reminder from ${docPrefix}${doctorName} / ${clinicName}. Your follow-up consultation is scheduled ${timingText}. Please visit the clinic on time. Contact: ${clinicPhone}`;
+  const message = `Hi ${prefix} ${patientName},
+
+I would like to know if you would be coming for your follow-up appointment ${timingText} with ${docPrefix}${doctorName} at ${clinicName}.
+
+* Tap 'Yes' to confirm.
+* Tap 'No' if you are not coming.`;
 
   return `https://wa.me/${waPhone}?text=${encodeURIComponent(message)}`;
+};
+
+/**
+ * Generate English interactive follow-up confirmation message.
+ */
+export const generateEnglishFollowUpConfirmationMessage = ({
+  patientName = 'Patient',
+  gender = 'Male',
+  followUpDate = '',
+  timingText = 'Tomorrow',
+  clinicName = 'Gastro Cure Clinic',
+  doctorName = 'Dr. Snehal Makwana',
+}) => {
+  const prefix = String(gender).toLowerCase() === 'female' ? 'MS' : 'MR';
+  const docPrefix = doctorName.startsWith('Dr.') || doctorName.startsWith('Dr ') ? '' : 'Dr. ';
+  return `Hi ${prefix} ${patientName},
+
+I would like to know if you would be coming for your follow up appointment ${timingText} (${followUpDate}) with ${docPrefix}${doctorName} at ${clinicName}.
+
+* Tap 'Yes' to confirm.
+* Tap 'No' if you are not coming.`;
+};
+
+/**
+ * Generate English automated reply when patient taps 'Yes' to confirm.
+ */
+export const generateEnglishConfirmationReply = ({
+  patientName = 'Patient',
+  clinicName = 'Gastro Cure Clinic',
+  doctorName = 'Dr. Snehal Makwana',
+  dateText = 'tomorrow',
+}) => {
+  const docPrefix = doctorName.startsWith('Dr.') || doctorName.startsWith('Dr ') ? '' : 'Dr. ';
+  return `Thank you, ${patientName}! Your follow-up appointment is confirmed for ${dateText} with ${docPrefix}${doctorName} at ${clinicName}. Please arrive 10 minutes prior to your slot. See you soon!`;
+};
+
+/**
+ * Generate English automated reply when patient taps 'No' (reschedule).
+ */
+export const generateEnglishDeclinedReply = ({
+  patientName = 'Patient',
+  clinicName = 'Gastro Cure Clinic',
+  clinicPhone = '9876543210',
+}) => {
+  return `Understood, ${patientName}. If you would like to reschedule your consultation, please call ${clinicName} at ${clinicPhone} or reply here with your preferred date.`;
 };
 
 /**

@@ -95,12 +95,23 @@ describe('Automated Follow-Up Reminders Service Tests', () => {
       daysLeft: 1,
     };
 
-    const res = automatedRemindersService.sendAutomatedReminder(patient);
+    const res = automatedRemindersService.sendAutomatedReminder(patient, { useHindi: true });
     expect(res.success).toBe(true);
     expect(res.message).toContain('Aarav Sharma');
     expect(res.message).toContain('Gastro Cure Clinic');
     expect(res.message).toContain('Dr. Snehal Makwana');
     expect(res.message).toContain('Kripya samay par padharein.');
+
+    // Also verify English interactive confirmation template format
+    const englishMsg = automatedRemindersService.generateEnglishConfirmationMessage(
+      'Avi Tamrakar',
+      '2026-09-14',
+      1
+    );
+    expect(englishMsg).toContain('Hi MR Avi Tamrakar,');
+    expect(englishMsg).toContain("I would like to know if you would be coming for your follow up appointment Tomorrow");
+    expect(englishMsg).toContain("* Tap 'Yes' to confirm.");
+    expect(englishMsg).toContain("* Tap 'No' if you are not coming.");
 
     // Verify history recorded
     const history = automatedRemindersService.getHistory();
@@ -138,5 +149,35 @@ describe('Automated Follow-Up Reminders Service Tests', () => {
     // Re-running batch should process 0 duplicates
     const rerun = automatedRemindersService.processAutomatedReminders();
     expect(rerun.processed).toBe(0);
+  });
+
+  it('records patient response (YES/NO) and dispatches automated English reply', () => {
+    // 1. Patient taps 'Yes' to confirm
+    const yesRecord = automatedRemindersService.recordPatientResponse(
+      'PT-TEST-1',
+      '2026-11-15',
+      'YES',
+      { name: 'Avi Tamrakar', clinicName: 'Gastro Cure Clinic', doctorName: 'Dr. Snehal Makwana' }
+    );
+    expect(yesRecord.status).toBe('CONFIRMED');
+    expect(yesRecord.replyMessage).toContain('Thank you, Avi Tamrakar!');
+    expect(yesRecord.replyMessage).toContain('appointment is confirmed');
+    expect(yesRecord.replyMessage).toContain('Dr. Snehal Makwana at Gastro Cure Clinic');
+
+    // 2. Patient taps 'No' to reschedule
+    const noRecord = automatedRemindersService.recordPatientResponse(
+      'PT-TEST-2',
+      '2026-11-16',
+      'NO',
+      { name: 'Maya Verma', clinicName: 'Gastro Cure Clinic' }
+    );
+    expect(noRecord.status).toBe('DECLINED');
+    expect(noRecord.replyMessage).toContain('Understood, Maya Verma.');
+    expect(noRecord.replyMessage).toContain('If you would like to reschedule');
+
+    // 3. Responses persisted in store
+    const stored = automatedRemindersService.getResponses();
+    expect(stored['PT-TEST-1-2026-11-15'].status).toBe('CONFIRMED');
+    expect(stored['PT-TEST-2-2026-11-16'].status).toBe('DECLINED');
   });
 });

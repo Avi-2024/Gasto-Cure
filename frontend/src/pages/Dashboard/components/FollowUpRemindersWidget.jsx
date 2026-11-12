@@ -68,6 +68,9 @@ export default function FollowUpRemindersWidget() {
   });
 
   const [autoAlert, setAutoAlert] = useState(null);
+  const [patientResponses, setPatientResponses] = useState(() => {
+    return automatedRemindersService.getResponses();
+  });
   const [followUps, setFollowUps] = useState([]);
   const clinic = useMemo(() => localSettings.get(), []);
 
@@ -211,11 +214,37 @@ export default function FollowUpRemindersWidget() {
       localStorage.setItem('clinicrx_reminded_followups', JSON.stringify(newRemindedKeys));
     } catch {}
 
-    const sampleDate = eligible[0]?.followUpDate ? formatDisplayDate(eligible[0].followUpDate) : 'upcoming checkup';
+    const firstPatientName = eligible[0]?.name || 'Patient';
     setAutoAlert({
-      title: `Automated WhatsApp Reminders Dispatched (${sentCount} patient${sentCount > 1 ? 's' : ''})`,
-      message: `Delivered template: "Namaste ${eligible[0]?.name || 'Patient'}, ${clinic?.clinicName || 'Gastro Cure Clinic'} me ${clinic?.doctorName || 'Dr. Snehal Makwana'} ke saath aapka follow-up checkup ${sampleDate} ko scheduled hai. Kripya samay par padharein."`,
+      title: `Automated WhatsApp Interactive Reminders Dispatched (${sentCount} patient${sentCount > 1 ? 's' : ''})`,
+      message: `Delivered English Interactive Confirmation to ${firstPatientName}: "Hi MR/MS ${firstPatientName.toUpperCase()}, I would like to know if you would be coming for your follow up appointment Tomorrow... * Tap 'Yes' to confirm. * Tap 'No' if you are not coming."`,
     });
+  };
+
+  const handleRecordResponse = (item, responseType) => {
+    const record = automatedRemindersService.recordPatientResponse(
+      item.patientId,
+      item.followUpDate,
+      responseType,
+      {
+        name: item.name,
+        clinicName: clinic?.clinicName || 'Gastro Cure Clinic',
+        doctorName: clinic?.doctorName || 'Dr. Snehal Makwana',
+      }
+    );
+    setPatientResponses((prev) => ({ ...prev, [item.key]: record }));
+
+    if (responseType === 'YES') {
+      setAutoAlert({
+        title: `Appointment Confirmed: ${item.name}`,
+        message: `Patient tapped 'Yes'. Automated English reply dispatched: "${record.replyMessage}"`,
+      });
+    } else {
+      setAutoAlert({
+        title: `Follow-Up Reschedule Requested: ${item.name}`,
+        message: `Patient tapped 'No'. Automated English reply dispatched: "${record.replyMessage}"`,
+      });
+    }
   };
 
   const getBadgeConfig = (daysLeft) => {
@@ -290,7 +319,7 @@ export default function FollowUpRemindersWidget() {
                 </span>
               </div>
               <p className="text-[11px] text-[#4E6460] mt-0.5">
-                Auto-template: &ldquo;Namaste [Patient], Gastro Cure Clinic me Dr. Snehal Makwana ke saath aapka follow-up checkup [Date] ko scheduled hai...&rdquo;
+                Auto-template: &ldquo;Hi MR/MS [Patient], I would like to know if you would be coming for your follow up appointment Tomorrow... * Tap &apos;Yes&apos; to confirm. * Tap &apos;No&apos; if you are not coming.&rdquo;
               </p>
             </div>
           </div>
@@ -403,7 +432,52 @@ export default function FollowUpRemindersWidget() {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center gap-2 pt-2 sm:pt-0 shrink-0">
+                    <div className="flex flex-wrap items-center gap-2 pt-2 sm:pt-0 shrink-0">
+                      {/* Patient Response Status Badge or Quick Reply Buttons */}
+                      {patientResponses[item.key] ? (
+                        <span
+                          className={`inline-flex items-center gap-1 rounded-xl px-2.5 py-1 text-xs font-semibold border ${
+                            patientResponses[item.key].status === 'CONFIRMED'
+                              ? 'border-emerald-300 bg-emerald-100 text-emerald-800'
+                              : 'border-rose-300 bg-rose-100 text-rose-800'
+                          }`}
+                          title={`Replied: "${patientResponses[item.key].replyMessage}"`}
+                        >
+                          {patientResponses[item.key].status === 'CONFIRMED' ? (
+                            <>
+                              <CheckCircle2 size={13} className="text-emerald-700" />
+                              Confirmed (Yes)
+                            </>
+                          ) : (
+                            <>
+                              <X size={13} className="text-rose-700" />
+                              Declined (No)
+                            </>
+                          )}
+                        </span>
+                      ) : (
+                        <div className="inline-flex items-center gap-1 bg-white border border-[#D9E6E2] rounded-xl p-0.5 text-xs">
+                          <span className="text-[10px] text-[#7D908C] px-1 font-medium">Reply:</span>
+                          <button
+                            type="button"
+                            onClick={() => handleRecordResponse(item, 'YES')}
+                            className="inline-flex items-center gap-0.5 rounded-lg px-2 py-0.5 text-[11px] font-semibold text-emerald-700 hover:bg-emerald-50 active:scale-95 transition cursor-pointer"
+                            title="Simulate patient tapping 'Yes' (Confirm)"
+                          >
+                            + Yes
+                          </button>
+                          <span className="text-[#D9E6E2]">|</span>
+                          <button
+                            type="button"
+                            onClick={() => handleRecordResponse(item, 'NO')}
+                            className="inline-flex items-center gap-0.5 rounded-lg px-2 py-0.5 text-[11px] font-semibold text-rose-700 hover:bg-rose-50 active:scale-95 transition cursor-pointer"
+                            title="Simulate patient tapping 'No' (Reschedule)"
+                          >
+                            - No
+                          </button>
+                        </div>
+                      )}
+
                       {/* WhatsApp Reminder Button */}
                       <button
                         type="button"

@@ -213,7 +213,7 @@
 
 - [ ] **Step 2: Redesign `frontend/src/pages/Patients/components/PatientProfileDrawer.jsx`**
   - Slide-over drawer with backdrop blur and smooth entrance.
-  - Patient summary header with initials avatar, blood group tag, and allergy alert banner (highlighted in crimson rose `#B94A48` when present).
+  - Patient summary header with initials avatar,  and allergy alert banner (highlighted in crimson rose `#B94A48` when present).
   - Chronological Visit Timeline:
     - Date badge with tabular numerals.
     - Diagnosis tag with clinical icon.

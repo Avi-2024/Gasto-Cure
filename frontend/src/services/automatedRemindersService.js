@@ -15,6 +15,7 @@ import { cleanPhoneNumber } from '../utils/whatsappHelper';
 const STORAGE_KEY_CONFIG = 'clinicrx_auto_reminders_config';
 const STORAGE_KEY_HISTORY = 'clinicrx_auto_reminders_history';
 const STORAGE_KEY_REMINDED = 'clinicrx_reminded_followups';
+const STORAGE_KEY_RESPONSES = 'clinicrx_followup_responses';
 
 const DEFAULT_CONFIG = {
   enabled: true,
@@ -107,6 +108,93 @@ export const automatedRemindersService = {
   },
 
   /**
+   * Builds the English interactive confirmation reminder message with Tap 'Yes' / 'No'.
+   * "Hi MR AVI TAMRAKAR,
+   *  I would like to know if you would be coming for your follow up appointment Tomorrow, 14th Sep'26.
+   *  * Tap 'Yes' to confirm.
+   *  * Tap 'No' if you are not coming."
+   */
+  generateEnglishConfirmationMessage: (patientName, followUpDate, daysLeft = 1, options = {}) => {
+    const prefix = String(options.gender || '').toLowerCase() === 'female' ? 'MS' : 'MR';
+    const timing =
+      daysLeft === 1
+        ? 'Tomorrow'
+        : daysLeft === 0
+        ? 'Today'
+        : `in ${daysLeft} days`;
+    const formattedDate = formatDisplayDate(followUpDate);
+
+    return `Hi ${prefix} ${patientName},
+
+I would like to know if you would be coming for your follow up appointment ${timing}, ${formattedDate}.
+
+* Tap 'Yes' to confirm.
+* Tap 'No' if you are not coming.`;
+  },
+
+  /**
+   * Retrieves all recorded patient replies (CONFIRMED / DECLINED).
+   */
+  getResponses: () => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY_RESPONSES);
+      return stored ? JSON.parse(stored) : {};
+    } catch {
+      return {};
+    }
+  },
+
+  /**
+   * Records a patient's reply ('YES' to confirm or 'NO' to decline/reschedule)
+   * and generates the appropriate English automated response.
+   */
+  recordPatientResponse: (patientId, followUpDate, responseType = 'YES', options = {}) => {
+    const key = `${patientId}-${followUpDate}`;
+    const isYes = String(responseType).toUpperCase() === 'YES';
+    const status = isYes ? 'CONFIRMED' : 'DECLINED';
+
+    const patient = localPatients.getById(patientId);
+    const patientName = patient?.name || options.name || 'Patient';
+    const config = automatedRemindersService.getConfig();
+    const clinicName = options.clinicName || config.clinicName || 'Gastro Cure Clinic';
+    const doctorName = options.doctorName || config.doctorName || 'Dr. Snehal Makwana';
+
+    const replyMessage = isYes
+      ? `Thank you, ${patientName}! Your follow-up appointment is confirmed for ${formatDisplayDate(followUpDate)} with ${doctorName} at ${clinicName}. Please arrive 10 minutes prior to your slot. See you soon!`
+      : `Understood, ${patientName}. If you would like to reschedule your consultation, please call ${clinicName} or reply here with your preferred date.`;
+
+    const record = {
+      key,
+      patientId,
+      patientName,
+      followUpDate,
+      response: isYes ? 'Yes' : 'No',
+      status,
+      replyMessage,
+      repliedAt: new Date().toISOString(),
+    };
+
+    const all = automatedRemindersService.getResponses();
+    all[key] = record;
+    try {
+      localStorage.setItem(STORAGE_KEY_RESPONSES, JSON.stringify(all));
+    } catch {}
+
+    // Also update history log if found
+    try {
+      const history = automatedRemindersService.getHistory();
+      const entry = history.find((h) => h.key === key);
+      if (entry) {
+        entry.patientResponse = status;
+        entry.autoReplySent = replyMessage;
+        localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(history));
+      }
+    } catch {}
+
+    return record;
+  },
+
+  /**
    * Builds the exact Hindi/Hinglish reminder message requested by clinic doctors.
    */
   generateReminderMessage: (patientName, followUpDate, options = {}) => {
@@ -170,11 +258,14 @@ export const automatedRemindersService = {
       return { success: false, error: 'Invalid patient item' };
     }
 
-    const message = automatedRemindersService.generateReminderMessage(
-      item.name,
-      item.followUpDate,
-      options
-    );
+    const message = options.useHindi
+      ? automatedRemindersService.generateReminderMessage(item.name, item.followUpDate, options)
+      : automatedRemindersService.generateEnglishConfirmationMessage(
+          item.name,
+          item.followUpDate,
+          item.daysLeft,
+          options
+        );
 
     const key = `${item.patientId}-${item.followUpDate}`;
     const cleanPhone = cleanPhoneNumber(item.contact);

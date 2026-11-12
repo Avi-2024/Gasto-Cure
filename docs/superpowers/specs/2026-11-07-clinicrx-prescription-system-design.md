@@ -179,7 +179,7 @@ interface ClinicSettings {
 
 ### 5.2 Patient Management (`/patients` & `/patients/:id`)
 - Patient table with instant filtering, sorting, and pagination.
-- **Add Patient Modal:** Name, Mobile, Age, Gender, Address, Blood Group, Allergies, Notes.
+- **Add Patient Modal:** Name, Mobile, Age, Gender, Address,  Allergies, Notes.
 - **Edit Patient Modal:** Complete inline update capability.
 - **Patient Profile View:**
   - Header: Demographics, Allergies tag, Contact details.

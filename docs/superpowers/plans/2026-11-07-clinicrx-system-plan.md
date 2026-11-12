@@ -318,7 +318,7 @@ git commit -m "feat: complete prescription builder with visit persistence, pad o
 **Interfaces:**
 - Consumes: `localPatients`, `localVisits`
 - Produces:
-  - Edit patient information modal (Name, Mobile, Age, Gender, Address, Blood Group, Allergies, Notes).
+  - Edit patient information modal (Name, Mobile, Age, Gender, Address,  Allergies, Notes).
   - Patient Profile drawer/modal showing patient demographics, medical history tags, and chronological past visits with 1-click View/Reprint.
   - Direct WhatsApp quick chat button on patient row.
 
@@ -334,12 +334,12 @@ Expected: FAIL.
 
 - [ ] **Step 3: Implement `EditPatientModal.jsx`**
 Build modal allowing doctor/staff to edit:
-  - Full Name, Age, Gender, Mobile Number, Address, Blood Group, Allergies, Important Notes.
+  - Full Name, Age, Gender, Mobile Number, Address,  Allergies, Important Notes.
   - Updates patient record via `localPatients.update(patientId, formData)`.
 
 - [ ] **Step 4: Implement `PatientProfileDrawer.jsx`**
 Build profile view showing:
-  - Patient header with demographic badges, Blood Group, Allergies alert.
+  - Patient header with demographic badges, Allergies alert.
   - Actions: `+ New Prescription`, `Edit Details`, `Open WhatsApp`.
   - Visit History Timeline: Every past prescription date, diagnosis, vitals, prescribed medicines, and `Reprint Prescription` button.
 
