@@ -186,20 +186,20 @@ function DashboardPage() {
 
         <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#287C75]">
-              Doctor Dashboard
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#126857]">
+              Doctor Dashboard · Gastro Cure Digestive & Liver Centre
             </p>
             <h1 className="mt-1 font-heading text-2xl font-bold text-[#10201F] tracking-tight sm:text-3xl">
               Welcome back, {doctorTitle}
             </h1>
             <p className="mt-1 text-sm text-[#4E6460]">
-              Offline mode active - All clinical data stored locally in browser.
+              OPD Consultation Session Active · Patient records, queue & WhatsApp follow-ups ready.
             </p>
           </div>
 
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-[#2E7D5B] shrink-0 self-start md:self-auto">
-            <span className="h-2 w-2 rounded-full bg-[#2E7D5B] animate-pulse" />
-            <span>Local Clinical Engine Online</span>
+          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1.5 text-xs font-semibold text-[#126857] shrink-0 self-start md:self-auto shadow-2xs">
+            <span className="h-2 w-2 rounded-full bg-[#25D366] animate-pulse" />
+            <span>Gastro & Liver OPD Ready</span>
           </div>
         </div>
       </section>
@@ -281,12 +281,13 @@ function DashboardPage() {
                       <div className="grid gap-3 lg:grid-cols-[1fr_auto] lg:items-center">
                         <div>
                           <div className="flex flex-wrap items-center gap-2">
-                            <span className="inline-flex items-center justify-center rounded-lg bg-teal-100/70 border border-teal-200 px-2 py-0.5 text-[11px] font-mono font-bold text-teal-800">
+                            <span className="inline-flex items-center justify-center rounded-lg bg-[#FDF6E2] border border-[#EBD7A9] px-2 py-0.5 text-[11px] font-mono font-bold text-[#8C6B1F]">
                               Token #{index + 1}
                             </span>
                             <p className="text-sm font-heading font-bold text-[#10201F]">{patient.patientName}</p>
                             {isNext && (
                               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 border border-emerald-300">
+                                <span className="h-1.5 w-1.5 rounded-full bg-[#25D366] animate-pulse" />
                                 Next in Line
                               </span>
                             )}

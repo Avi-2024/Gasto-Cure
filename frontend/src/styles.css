@@ -50,6 +50,22 @@
     @apply antialiased;
   }
 
+  /* Ergonomic sleek scrollbars for clinical lists and chat */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #CBD5D1;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #9DB3AC;
+  }
+
   h1,
   h2,
   h3,

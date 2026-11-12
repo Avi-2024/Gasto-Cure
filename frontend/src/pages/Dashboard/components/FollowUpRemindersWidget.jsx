@@ -251,25 +251,25 @@ export default function FollowUpRemindersWidget() {
     if (daysLeft < 0) {
       return {
         label: 'Overdue',
-        className: 'bg-rose-50 text-[#B94A48] border-rose-200',
+        className: 'bg-[#FDECEB] text-[#C05646] border-[#F5C2BE] font-bold',
       };
     }
     if (daysLeft === 0) {
       return {
         label: 'Today',
-        className: 'bg-amber-50 text-[#B7791F] border-amber-200',
+        className: 'bg-[#FEF5E7] text-[#B5671B] border-[#FAD7A0] font-bold',
       };
     }
     if (daysLeft === 1) {
       return {
         label: 'Tomorrow',
-        className: 'bg-teal-50 text-[#287C75] border-teal-200',
+        className: 'bg-[#EAF3EF] text-[#126857] border-[#C2DDD3] font-bold',
       };
     }
     if (daysLeft === 2) {
       return {
         label: 'In 2 Days',
-        className: 'bg-teal-50 text-[#287C75] border-teal-200',
+        className: 'bg-[#EBF2F4] text-[#1D6072] border-[#C3DDE6] font-bold',
       };
     }
     return {

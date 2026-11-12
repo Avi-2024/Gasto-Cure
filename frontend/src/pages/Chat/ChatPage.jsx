@@ -169,13 +169,13 @@ export default function ChatPage() {
                     key={c.patientId}
                     type="button"
                     onClick={() => setSelectedPatientId(c.patientId)}
-                    className={`w-full text-left p-3.5 transition flex items-start gap-3 cursor-pointer ${
+                    className={`w-full text-left p-3.5 transition-all flex items-start gap-3 cursor-pointer ${
                       isSelected
-                        ? 'bg-teal-50/70 border-l-4 border-l-[#287C75]'
-                        : 'hover:bg-white bg-transparent'
+                        ? 'bg-[#E7F3EF] border-l-4 border-l-[#126857] shadow-2xs'
+                        : 'hover:bg-[#F2F6F4] bg-transparent'
                     }`}
                   >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#123A3A] text-xs font-bold text-white shadow-2xs">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#0F3933] to-[#1E6F5C] text-xs font-bold text-white shadow-xs">
                       {initials}
                     </div>
 
@@ -185,7 +185,7 @@ export default function ChatPage() {
                           {c.patientName}
                         </span>
                         {c.nextFollowUp && (
-                          <span className="text-[10px] font-mono text-[#287C75] bg-teal-50 px-1.5 py-0.2 rounded border border-teal-200">
+                          <span className="text-[10px] font-mono font-semibold text-[#8C6B1F] bg-[#FDF6E2] px-2 py-0.5 rounded-md border border-[#EBD7A9]">
                             {formatDisplayDate(c.nextFollowUp)}
                           </span>
                         )}
@@ -199,7 +199,10 @@ export default function ChatPage() {
                       <div className="mt-1 flex items-center justify-between text-[10px] text-[#7D908C]">
                         <span>{c.contact || 'No phone'}</span>
                         {c.unread && (
-                          <span className="h-2 w-2 rounded-full bg-amber-500" title="Unread response" />
+                          <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded-full border border-emerald-200">
+                            <span className="h-1.5 w-1.5 rounded-full bg-[#25D366] animate-pulse" />
+                            New reply
+                          </span>
                         )}
                       </div>
                     </div>
@@ -264,8 +267,8 @@ export default function ChatPage() {
                 </div>
               </div>
 
-              {/* Messages Scroll Area */}
-              <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3 bg-[#F7FAF8]/30">
+              {/* Messages Scroll Area - Warm WhatsApp Wall Texture */}
+              <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3 bg-[#EFEAE2]/65">
                 {messages.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center p-8">
                     <MessageCircle size={36} className="text-[#7D908C] opacity-40 mb-2" />
@@ -283,40 +286,40 @@ export default function ChatPage() {
                         key={msg.id}
                         className={`flex flex-col ${isClinic ? 'items-end' : 'items-start'}`}
                       >
-                        <div className="text-[10px] font-semibold text-[#7D908C] mb-1 px-1 flex items-center gap-1">
+                        <div className="text-[10px] font-semibold text-[#667781] mb-1 px-1 flex items-center gap-1.5">
                           {isClinic ? (
                             <>
-                              <span>{msg.senderName || 'Gastro Cure Clinic'}</span>
+                              <span className="text-[#126857] font-bold">{msg.senderName || 'Gastro Cure Clinic'}</span>
                               {msg.type === 'AUTO_REMINDER' && (
-                                <span className="bg-teal-100 text-teal-800 text-[9px] px-1.5 py-0.2 rounded-full">
+                                <span className="bg-[#126857]/10 text-[#126857] text-[9px] font-semibold px-2 py-0.2 rounded-full border border-[#126857]/20">
                                   Auto-Reminder
                                 </span>
                               )}
                               {msg.type === 'AUTO_REPLY' && (
-                                <span className="bg-emerald-100 text-emerald-800 text-[9px] px-1.5 py-0.2 rounded-full">
+                                <span className="bg-emerald-100 text-emerald-900 text-[9px] font-semibold px-2 py-0.2 rounded-full border border-emerald-300">
                                   Auto-Reply
                                 </span>
                               )}
                             </>
                           ) : (
                             <>
-                              <span>{msg.senderName} (Patient)</span>
+                              <span className="text-[#10201F] font-bold">{msg.senderName} (Patient)</span>
                             </>
                           )}
                         </div>
 
                         <div
-                          className={`max-w-[85%] sm:max-w-[70%] rounded-2xl px-4 py-2.5 text-xs shadow-2xs whitespace-pre-wrap leading-relaxed ${
+                          className={`max-w-[85%] sm:max-w-[72%] px-4 py-2.5 text-xs whitespace-pre-wrap leading-relaxed ${
                             isClinic
-                              ? 'bg-[#287C75] text-white rounded-tr-none'
-                              : 'bg-white border border-[#D9E6E2] text-[#10201F] rounded-tl-none'
+                              ? 'bg-[#126857] text-white rounded-2xl rounded-tr-xs shadow-[0_1px_3px_rgba(18,104,87,0.22)]'
+                              : 'bg-white border border-[#E1DDD5] text-[#111B21] rounded-2xl rounded-tl-xs shadow-[0_1px_2px_rgba(11,20,26,0.06)]'
                           }`}
                         >
                           {msg.text}
 
                           <div
-                            className={`mt-1.5 flex items-center justify-end gap-1 text-[10px] ${
-                              isClinic ? 'text-teal-100/70' : 'text-[#7D908C]'
+                            className={`mt-1.5 flex items-center justify-end gap-1.5 text-[10px] ${
+                              isClinic ? 'text-emerald-100/85 font-medium' : 'text-[#667781]'
                             }`}
                           >
                             <span>
@@ -325,7 +328,7 @@ export default function ChatPage() {
                                 minute: '2-digit',
                               })}
                             </span>
-                            {isClinic && <CheckCheck size={13} className="text-teal-200" />}
+                            {isClinic && <CheckCheck size={14} className="text-[#34B7F1]" />}
                           </div>
                         </div>
                       </div>
@@ -336,16 +339,16 @@ export default function ChatPage() {
               </div>
 
               {/* Quick Template Chips */}
-              <div className="shrink-0 p-2.5 bg-white border-t border-[#D9E6E2] flex items-center gap-1.5 overflow-x-auto text-xs">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-[#7D908C] shrink-0 pl-1">
-                  Templates:
+              <div className="shrink-0 p-2.5 bg-[#FAF9F6] border-t border-[#E5ECE9] flex items-center gap-2 overflow-x-auto text-xs">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#637C76] shrink-0 pl-1">
+                  Quick Templates:
                 </span>
                 {QUICK_TEMPLATES.map((tmpl, idx) => (
                   <button
                     key={idx}
                     type="button"
                     onClick={() => handleApplyTemplate(tmpl)}
-                    className="shrink-0 rounded-full border border-teal-200 bg-teal-50/70 px-2.5 py-1 text-[11px] font-medium text-[#287C75] hover:bg-teal-100 transition cursor-pointer"
+                    className="shrink-0 rounded-full border border-[#CDE1DA] bg-white hover:bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-[#126857] hover:border-[#126857] transition shadow-2xs cursor-pointer"
                   >
                     {tmpl.label}
                   </button>
@@ -353,20 +356,20 @@ export default function ChatPage() {
               </div>
 
               {/* Composer Input Bar */}
-              <form onSubmit={handleSendMessage} className="shrink-0 p-2.5 border-t border-[#D9E6E2] bg-white flex items-center gap-2">
+              <form onSubmit={handleSendMessage} className="shrink-0 p-3 border-t border-[#E5ECE9] bg-[#FAF9F6] flex items-center gap-2.5">
                 <input
                   type="text"
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
-                  placeholder={`Type a manual WhatsApp message to ${activePatient.name}...`}
-                  className="flex-1 rounded-xl border border-[#D9E6E2] bg-[#F7FAF8] px-3.5 py-2.5 text-xs text-[#10201F] focus:border-[#287C75] focus:bg-white focus:outline-none transition"
+                  placeholder={`Type a WhatsApp message to ${activePatient.name}...`}
+                  className="flex-1 rounded-2xl border border-[#D5DDD9] bg-white px-4 py-2.5 text-xs text-[#111B21] placeholder:text-[#8696A0] focus:border-[#126857] focus:ring-2 focus:ring-[#126857]/15 focus:outline-none transition shadow-2xs"
                 />
                 <button
                   type="submit"
                   disabled={!inputText.trim()}
-                  className={`inline-flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition active:scale-95 cursor-pointer ${
+                  className={`inline-flex items-center gap-1.5 rounded-2xl px-5 py-2.5 text-xs font-bold text-white shadow-sm transition active:scale-95 cursor-pointer ${
                     inputText.trim()
-                      ? 'bg-[#2E7D5B] hover:bg-[#25664a]'
+                      ? 'bg-[#128C7E] hover:bg-[#075E54]'
                       : 'bg-slate-300 cursor-not-allowed opacity-60'
                   }`}
                   title="Send via WhatsApp"
