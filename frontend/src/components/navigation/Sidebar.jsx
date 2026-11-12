@@ -11,6 +11,7 @@ import {
   Receipt,
   Settings,
   Users,
+  MessageSquare,
   X,
 } from 'lucide-react';
 import NivaraLogo from '../common/NivaraLogo';
@@ -41,6 +42,12 @@ const navigationGroups = [
         label: 'Appointments',
         to: '/appointments',
         icon: CalendarDays,
+        roles: ['CLINIC_OWNER', 'DOCTOR', 'RECEPTIONIST'],
+      },
+      {
+        label: 'Patient Chat',
+        to: '/chat',
+        icon: MessageSquare,
         roles: ['CLINIC_OWNER', 'DOCTOR', 'RECEPTIONIST'],
       },
       {
