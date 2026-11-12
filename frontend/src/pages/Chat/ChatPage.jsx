@@ -15,8 +15,6 @@ import {
   ExternalLink,
   MessageCircle,
   FileText,
-  Bot,
-  HelpCircle,
 } from 'lucide-react';
 import { chatService } from '../../services/chatService';
 import { localPatients, localSettings } from '../../services/localStore';
@@ -50,7 +48,6 @@ export default function ChatPage() {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [simulationPrompt, setSimulationPrompt] = useState('');
 
   const messagesEndRef = useRef(null);
   const clinic = localSettings.get();
@@ -94,15 +91,6 @@ export default function ChatPage() {
     }
   };
 
-  const handleSimulateIncoming = (textToSimulate) => {
-    if (!selectedPatientId || !textToSimulate.trim()) return;
-
-    chatService.receivePatientMessage(selectedPatientId, textToSimulate);
-    setMessages(chatService.getThread(selectedPatientId));
-    setSimulationPrompt('');
-    loadConversations();
-  };
-
   const handleApplyTemplate = (tmpl) => {
     setInputText(tmpl.text);
   };
@@ -143,11 +131,11 @@ export default function ChatPage() {
       </div>
 
       {/* Main 2-Column Chat Studio */}
-      <div className="mt-4 flex-1 grid grid-cols-1 md:grid-cols-12 gap-4 min-h-0 bg-white rounded-3xl border border-[#D9E6E2] shadow-nivara-xs overflow-hidden">
+      <div className="mt-4 flex-1 grid grid-cols-1 md:grid-cols-12 gap-0 min-h-0 bg-white rounded-3xl border border-[#D9E6E2] shadow-nivara-xs overflow-hidden">
         {/* Left Column: Conversations List (4 cols) */}
-        <div className="md:col-span-4 border-r border-[#D9E6E2] flex flex-col h-full bg-[#F7FAF8]/50">
+        <div className="md:col-span-4 border-r border-[#D9E6E2] flex flex-col h-full bg-[#F7FAF8]/50 overflow-hidden">
           {/* Search Box */}
-          <div className="p-3.5 border-b border-[#D9E6E2] bg-white">
+          <div className="shrink-0 p-3.5 border-b border-[#D9E6E2] bg-white">
             <div className="relative">
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#7D908C]" />
               <input
@@ -160,8 +148,8 @@ export default function ChatPage() {
             </div>
           </div>
 
-          {/* Conversations Thread List */}
-          <div className="flex-1 overflow-y-auto divide-y divide-[#EBF1EE]">
+          {/* Conversations Thread List - scrollable contacts */}
+          <div className="flex-1 min-h-0 overflow-y-auto divide-y divide-[#EBF1EE]">
             {filteredConversations.length === 0 ? (
               <div className="p-6 text-center text-xs text-[#7D908C]">
                 No patient chats matching your search.
@@ -222,12 +210,12 @@ export default function ChatPage() {
           </div>
         </div>
 
-        {/* Right Column: Chat Window & Composer (8 cols) */}
-        <div className="md:col-span-8 flex flex-col h-full bg-white">
+        {/* Right Column: Chat Window & Composer (8 cols) - fixed size screen */}
+        <div className="md:col-span-8 flex flex-col h-full bg-white overflow-hidden">
           {activePatient ? (
             <>
               {/* Chat Thread Header */}
-              <div className="p-4 border-b border-[#D9E6E2] bg-white flex items-center justify-between gap-4">
+              <div className="shrink-0 p-4 border-b border-[#D9E6E2] bg-white flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-600 text-sm font-bold text-white shadow-2xs">
                     {activePatient.name.charAt(0)}
@@ -277,7 +265,7 @@ export default function ChatPage() {
               </div>
 
               {/* Messages Scroll Area */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#F7FAF8]/30">
+              <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3 bg-[#F7FAF8]/30">
                 {messages.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center p-8">
                     <MessageCircle size={36} className="text-[#7D908C] opacity-40 mb-2" />
@@ -348,7 +336,7 @@ export default function ChatPage() {
               </div>
 
               {/* Quick Template Chips */}
-              <div className="p-2.5 bg-white border-t border-[#D9E6E2] flex items-center gap-1.5 overflow-x-auto text-xs">
+              <div className="shrink-0 p-2.5 bg-white border-t border-[#D9E6E2] flex items-center gap-1.5 overflow-x-auto text-xs">
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-[#7D908C] shrink-0 pl-1">
                   Templates:
                 </span>
@@ -364,42 +352,8 @@ export default function ChatPage() {
                 ))}
               </div>
 
-              {/* Simulation Trigger Bar (Test Patient Inbound Replies) */}
-              <div className="px-3 py-1.5 bg-slate-50 border-t border-[#D9E6E2] flex flex-wrap items-center justify-between gap-2 text-[11px] text-[#4E6460]">
-                <div className="flex items-center gap-1.5">
-                  <Bot size={13} className="text-[#287C75]" />
-                  <span className="font-semibold text-[#10201F]">Simulate Inbound Patient Message:</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => handleSimulateIncoming('Yes, I will be coming on time.')}
-                    className="rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-900 px-2 py-0.5 font-semibold text-[10px] transition cursor-pointer"
-                    title="Simulate patient tapping Yes"
-                  >
-                    + Tap 'Yes'
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleSimulateIncoming('No, I cannot come tomorrow. Please reschedule.')}
-                    className="rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-900 px-2 py-0.5 font-semibold text-[10px] transition cursor-pointer"
-                    title="Simulate patient tapping No"
-                  >
-                    - Tap 'No'
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleSimulateIncoming('Doctor, can I take my medicines after lunch?')}
-                    className="rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-800 px-2 py-0.5 font-semibold text-[10px] transition cursor-pointer"
-                    title="Simulate asking a question"
-                  >
-                    Ask Medicine Question
-                  </button>
-                </div>
-              </div>
-
               {/* Composer Input Bar */}
-              <form onSubmit={handleSendMessage} className="p-3 border-t border-[#D9E6E2] bg-white flex items-center gap-2">
+              <form onSubmit={handleSendMessage} className="shrink-0 p-3 border-t border-[#D9E6E2] bg-white flex items-center gap-2">
                 <input
                   type="text"
                   value={inputText}
