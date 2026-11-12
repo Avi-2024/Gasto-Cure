@@ -21,6 +21,8 @@ export default function DashboardLayout() {
     setSidebarOpen(false);
   }, [location.pathname]);
 
+  const isChatRoute = location.pathname.startsWith('/chat');
+
   return (
     <div className="h-screen w-screen overflow-hidden flex bg-[#F7FAF8] text-[#10201F]">
       {/* Pinned Desktop Sidebar & Mobile Drawer */}
@@ -33,9 +35,19 @@ export default function DashboardLayout() {
           <AppHeader onMenuClick={() => setSidebarOpen(true)} />
         </div>
 
-        {/* Dedicated Scrollable Content Container */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-3 sm:px-5 sm:py-4 lg:px-7 lg:py-5">
-          <div className="mx-auto w-full max-w-[1600px] pb-36">
+        {/* Dedicated Workspace Content Container */}
+        <main
+          className={`flex-1 overflow-x-hidden ${
+            isChatRoute
+              ? 'overflow-y-hidden flex flex-col min-h-0 px-3 py-2 sm:px-5 sm:py-3 lg:px-7 lg:py-3'
+              : 'overflow-y-auto px-3 py-3 sm:px-5 sm:py-4 lg:px-7 lg:py-5'
+          }`}
+        >
+          <div
+            className={`mx-auto w-full max-w-[1600px] ${
+              isChatRoute ? 'h-full flex-1 flex flex-col min-h-0' : 'pb-36'
+            }`}
+          >
             <AnimatePresence mode="wait">
               <motion.section
                 key={location.pathname}
@@ -43,6 +55,7 @@ export default function DashboardLayout() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
                 transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                className={isChatRoute ? 'h-full flex-1 flex flex-col min-h-0' : undefined}
               >
                 <Outlet />
               </motion.section>

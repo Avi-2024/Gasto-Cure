@@ -113,6 +113,48 @@ export const chatService = {
       ];
     }
 
+    const vikram = patients.find((p) => p.name?.toLowerCase().includes('vikram'));
+    if (vikram) {
+      seeded[vikram.id] = [
+        {
+          id: 'msg-vikram-1',
+          patientId: vikram.id,
+          sender: 'CLINIC',
+          senderName: 'Gastro Cure Clinic',
+          text: `Hello Mr. Vikram Patel, please remember to take your Pantoprazole 40mg before breakfast for your GERD symptoms.`,
+          timestamp: new Date(Date.now() - 3600000 * 5).toISOString(),
+          type: 'MANUAL',
+          status: 'DELIVERED',
+        },
+        {
+          id: 'msg-vikram-2',
+          patientId: vikram.id,
+          sender: 'PATIENT',
+          senderName: vikram.name,
+          text: 'Understood, thank you Doctor. Acidity is much better today.',
+          timestamp: new Date(Date.now() - 3600000 * 4.5).toISOString(),
+          type: 'PATIENT_REPLY',
+          status: 'RECEIVED',
+        },
+      ];
+    }
+
+    const priya = patients.find((p) => p.name?.toLowerCase().includes('priya'));
+    if (priya) {
+      seeded[priya.id] = [
+        {
+          id: 'msg-priya-1',
+          patientId: priya.id,
+          sender: 'CLINIC',
+          senderName: 'Gastro Cure Clinic',
+          text: `Hi Ms. Priya Deshmukh, your liver function test (LFT) reports have been reviewed by Dr. Snehal Makwana. Everything is within normal limits.`,
+          timestamp: new Date(Date.now() - 3600000 * 8).toISOString(),
+          type: 'MANUAL',
+          status: 'DELIVERED',
+        },
+      ];
+    }
+
     chatService.saveRawChats(seeded);
     return seeded;
   },
