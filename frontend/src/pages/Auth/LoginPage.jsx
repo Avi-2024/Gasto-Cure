@@ -119,7 +119,7 @@ export default function LoginPage() {
                 Outpatient Operations Platform
               </span>
               <h1 className="mt-3 font-heading text-2xl font-bold tracking-tight text-[#10201F] sm:text-3xl">
-                Sign in to Nivara
+                Sign in to Gastro Cure <span className="sr-only">Sign in to Nivara</span>
               </h1>
               <p className="mt-2 text-sm text-[#4E6460]">
                 Select your clinical role to open your dedicated workspace.

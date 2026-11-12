@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" fill="none">
+  <defs>
+    <!-- Background Circle Gradient -->
+    <linearGradient id="gc-bg-grad" x1="10" y1="10" x2="110" y2="110" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#1E4D48" />
+      <stop offset="50%" stopColor="#123A3A" />
+      <stop offset="100%" stopColor="#0B2525" />
+    </linearGradient>
+
+    <!-- Medical Crest Ring Gradient -->
+    <linearGradient id="gc-ring-grad" x1="20" y1="20" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#52B2A7" />
+      <stop offset="50%" stopColor="#287C75" />
+      <stop offset="100%" stopColor="#C9A45C" />
+    </linearGradient>
+
+    <!-- Digestive & Health Curve Gradient -->
+    <linearGradient id="gc-glow-grad" x1="30" y1="40" x2="90" y2="80" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#4ADE80" />
+      <stop offset="50%" stopColor="#2DD4BF" />
+      <stop offset="100%" stopColor="#38BDF8" />
+    </linearGradient>
+
+    <!-- Gold Accent Gradient -->
+    <linearGradient id="gc-gold-grad" x1="45" y1="35" x2="75" y2="85" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#F6E05E" />
+      <stop offset="100%" stopColor="#C9A45C" />
+    </linearGradient>
+
+    <filter id="gc-shadow" x="0" y="0" width="120" height="120" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <!-- Outer Rounded Shield / Hex-Circle Container -->
+  <rect x="8" y="8" width="104" height="104" rx="30" fill="url(#gc-bg-grad)" stroke="url(#gc-ring-grad)" stroke-width="3" filter="url(#gc-shadow)" />
+
+  <!-- Inner Soft Medical Aura -->
+  <circle cx="60" cy="60" r="42" fill="#287C75" fill-opacity="0.15" />
+
+  <!-- Medical Cross Foundation (Soft Glow) -->
+  <path d="M54 36 H66 V54 H84 V66 H66 V84 H54 V66 H36 V54 H54 Z" fill="#FFFFFF" fill-opacity="0.12" />
+
+  <!-- Stylized Digestive / Gastro Health Curve (Stomach & Vital Health Symbol) -->
+  <path d="M44 42 C44 35, 56 34, 66 36 C76 38, 84 46, 82 58 C80 70, 68 76, 68 84 C68 88, 62 90, 56 86 C50 82, 52 74, 56 68 C60 62, 70 58, 68 50 C66 44, 58 44, 52 48"
+        stroke="url(#gc-glow-grad)"
+        stroke-width="5.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        fill="none" />
+
+  <!-- Medical Healing Sparkle / Cross Centerpiece -->
+  <path d="M60 48 L61.5 56.5 L70 58 L61.5 59.5 L60 68 L58.5 59.5 L50 58 L58.5 56.5 Z" fill="url(#gc-gold-grad)" />
+
+  <!-- Vital Status Pulse Dots (Entry, Consultation, Recovery) -->
+  <circle cx="44" cy="42" r="4" fill="#38BDF8" stroke="#123A3A" stroke-width="1.5" />
+  <circle cx="60" cy="60" r="4.5" fill="#F6E05E" stroke="#123A3A" stroke-width="1.5" />
+  <circle cx="56" cy="86" r="4" fill="#4ADE80" stroke="#123A3A" stroke-width="1.5" />
+</svg>

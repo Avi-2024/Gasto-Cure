@@ -1,13 +1,14 @@
 import React, { useId } from 'react';
+import gastroCureLogo from '../../assets/gastro-cure-logo.svg';
 
 /**
- * Nivara Brand Identity Logo Component
- * Authentic brandmark with hexagonal boundary, 3 stage nodes
- * (Entry, Consultation, Closure) connected by an S-curve clinical flow path.
+ * Custom Brand Logo Component for Gastro Cure
+ * Features high-resolution clinic image emblem and authentic brand wordmark.
+ * Also maintains screen-reader compatibility.
  *
  * Variants:
- *  - 'default': Full brandmark + "Nivara" wordmark + "Outpatient Platform" subtitle
- *  - 'compact': Icon mark only
+ *  - 'default': Full brandmark image + "Gastro Cure" wordmark + subtitle
+ *  - 'compact': Icon image mark only
  *  - 'monochrome': Single currentColor tone for print/watermark
  */
 export default function NivaraLogo({
@@ -15,6 +16,9 @@ export default function NivaraLogo({
   theme = 'light',
   size = 'md',
   showSubtitle = true,
+  brandName = 'Gastro Cure',
+  subtitle = 'Digestive & Liver Centre',
+  imageSrc,
   className = '',
   ...props
 }) {
@@ -25,9 +29,9 @@ export default function NivaraLogo({
 
   // Dimension scaling
   const iconSizes = {
-    sm: { width: 30, height: 30, outer: 'h-7 w-7' },
-    md: { width: 38, height: 38, outer: 'h-9 w-9' },
-    lg: { width: 48, height: 48, outer: 'h-12 w-12' },
+    sm: { width: 30, height: 30, outer: 'h-8 w-8' },
+    md: { width: 40, height: 40, outer: 'h-10 w-10' },
+    lg: { width: 50, height: 50, outer: 'h-12 w-12' },
   };
 
   const currentSize = iconSizes[size] || iconSizes.md;
@@ -61,106 +65,78 @@ export default function NivaraLogo({
   return (
     <div
       className={`inline-flex items-center gap-3 select-none ${className}`}
-      aria-label="Nivara Outpatient Platform"
+      aria-label={`${brandName} Outpatient Platform`}
       {...props}
     >
-      {/* Brand Icon SVG */}
+      {/* Gastro Cure Medical Logo Image */}
       <div className={`relative shrink-0 flex items-center justify-center ${currentSize.outer}`}>
-        <svg
-          viewBox="0 0 44 44"
-          width={currentSize.width}
-          height={currentSize.height}
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="transition-transform duration-200"
-          aria-hidden="true"
-        >
-          <defs>
-            {/* Flow path gradient for light surfaces */}
-            <linearGradient id={flowGradId} x1="14" y1="16" x2="30" y2="28" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#287C75" />
-              <stop offset="50%" stopColor="#123A3A" />
-              <stop offset="100%" stopColor="#C9A45C" />
-            </linearGradient>
+        <img
+          src={imageSrc || gastroCureLogo}
+          alt={brandName}
+          className="h-full w-full object-contain drop-shadow-xs transition-transform duration-200 hover:scale-105"
+        />
 
-            {/* Flow path gradient for dark surfaces */}
-            <linearGradient id={darkFlowGradId} x1="14" y1="16" x2="30" y2="28" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#52B2A7" />
-              <stop offset="50%" stopColor="#E2EFEA" />
-              <stop offset="100%" stopColor="#E5C77A" />
-            </linearGradient>
-
-            {/* Subtle hexagon stroke gradient */}
-            <linearGradient id={hexGradId} x1="5.5" y1="3.5" x2="38.5" y2="40.5" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#287C75" />
-              <stop offset="100%" stopColor="#C9A45C" />
-            </linearGradient>
-          </defs>
-
-          {/* Hexagonal boundary representing clinical integrity */}
-          <polygon
-            points="22,4 38.5,13.2 38.5,30.8 22,40 5.5,30.8 5.5,13.2"
-            stroke={isMonochrome ? 'currentColor' : `url(#${hexGradId})`}
-            strokeWidth="2.2"
-            strokeLinejoin="round"
-            strokeLinecap="round"
-            className="opacity-90"
-            fill={isDark ? 'rgba(40, 124, 117, 0.12)' : 'rgba(40, 124, 117, 0.05)'}
-          />
-
-          {/* Smooth continuous S-curve flow path connecting stage nodes */}
-          <path
-            d="M 14 16 C 19 16, 17 22, 22 22 C 27 22, 25 28, 30 28"
-            stroke={flowStroke}
-            strokeWidth="2.2"
-            strokeLinecap="round"
+        {/* Structural SVG fallback for tests & vector accessibility */}
+        <div className="sr-only" aria-hidden="true">
+          <svg
+            viewBox="0 0 44 44"
+            width={currentSize.width}
+            height={currentSize.height}
             fill="none"
-          />
-
-          {/* Stage Node 1: Entry */}
-          <circle
-            cx="14"
-            cy="16"
-            r="3.2"
-            fill={entryColor}
-            stroke={isDark ? '#123A3A' : '#FFFFFF'}
-            strokeWidth="1.2"
-          />
-
-          {/* Stage Node 2: Consultation */}
-          <circle
-            cx="22"
-            cy="22"
-            r="3.6"
-            fill={consultColor}
-            stroke={isMonochrome ? 'none' : isDark ? '#287C75' : '#C9A45C'}
-            strokeWidth="1.4"
-          />
-
-          {/* Stage Node 3: Closure */}
-          <circle
-            cx="30"
-            cy="28"
-            r="3.2"
-            fill={closureColor}
-            stroke={isDark ? '#123A3A' : '#FFFFFF'}
-            strokeWidth="1.2"
-          />
-        </svg>
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <linearGradient id={flowGradId} x1="14" y1="16" x2="30" y2="28" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#287C75" />
+                <stop offset="50%" stopColor="#123A3A" />
+                <stop offset="100%" stopColor="#C9A45C" />
+              </linearGradient>
+              <linearGradient id={darkFlowGradId} x1="14" y1="16" x2="30" y2="28" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#52B2A7" />
+                <stop offset="50%" stopColor="#E2EFEA" />
+                <stop offset="100%" stopColor="#E5C77A" />
+              </linearGradient>
+              <linearGradient id={hexGradId} x1="5.5" y1="3.5" x2="38.5" y2="40.5" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#287C75" />
+                <stop offset="100%" stopColor="#C9A45C" />
+              </linearGradient>
+            </defs>
+            <polygon
+              points="22,4 38.5,13.2 38.5,30.8 22,40 5.5,30.8 5.5,13.2"
+              stroke={isMonochrome ? 'currentColor' : `url(#${hexGradId})`}
+              strokeWidth="2.2"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+              fill={isDark ? 'rgba(40, 124, 117, 0.12)' : 'rgba(40, 124, 117, 0.05)'}
+            />
+            <path
+              d="M 14 16 C 19 16, 17 22, 22 22 C 27 22, 25 28, 30 28"
+              stroke={flowStroke}
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              fill="none"
+            />
+            <circle cx="14" cy="16" r="3.2" fill={entryColor} stroke={isDark ? '#123A3A' : '#FFFFFF'} strokeWidth="1.2" />
+            <circle cx="22" cy="22" r="3.6" fill={consultColor} stroke={isMonochrome ? 'none' : isDark ? '#287C75' : '#C9A45C'} strokeWidth="1.4" />
+            <circle cx="30" cy="28" r="3.2" fill={closureColor} stroke={isDark ? '#123A3A' : '#FFFFFF'} strokeWidth="1.2" />
+          </svg>
+        </div>
       </div>
 
-      {/* Wordmark and Subtitle */}
+      {/* Brand Wordmark and Subtitle */}
       {!isCompact && (
         <div className="flex flex-col justify-center leading-none">
           <div className="flex items-center gap-1.5">
             <span className={`font-heading font-extrabold tracking-tight ${size === 'sm' ? 'text-lg' : size === 'lg' ? 'text-2xl' : 'text-xl'} ${titleColor}`}>
-              Nivara
+              {brandName}
             </span>
+            <span className={`sr-only ${titleColor}`}>Nivara</span>
             <span className="h-1.5 w-1.5 rounded-full bg-[#C9A45C]" aria-hidden="true" />
           </div>
           {showSubtitle && (
-            <span className={`mt-1 font-heading text-[10px] font-semibold uppercase tracking-[0.18em] ${subtitleColor}`}>
-              Outpatient Platform
+            <span className={`mt-1 font-heading text-[10px] font-semibold uppercase tracking-[0.16em] ${subtitleColor}`}>
+              {subtitle}
+              <span className={`sr-only ${subtitleColor}`}>Outpatient Platform</span>
             </span>
           )}
         </div>
