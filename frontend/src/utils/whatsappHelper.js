@@ -202,3 +202,17 @@ export const generateFollowUpReminderWhatsAppLink = (patient = {}, clinic = {}, 
 
   return `https://wa.me/${waPhone}?text=${encodeURIComponent(message)}`;
 };
+
+/**
+ * Generate Hindi/Hinglish automated follow-up reminder text:
+ * "Namaste [Patient], Gastro Cure Clinic me Dr. Snehal Makwana ke saath aapka follow-up checkup [Date] ko scheduled hai. Kripya samay par padharein."
+ */
+export const generateExactHindiFollowUpMessage = ({
+  patientName = 'Patient',
+  clinicName = 'Gastro Cure Clinic',
+  doctorName = 'Dr. Snehal Makwana',
+  followUpDate = '',
+}) => {
+  const docPrefix = doctorName.startsWith('Dr.') || doctorName.startsWith('Dr ') ? '' : 'Dr. ';
+  return `Namaste ${patientName}, ${clinicName} me ${docPrefix}${doctorName} ke saath aapka follow-up checkup ${followUpDate} ko scheduled hai. Kripya samay par padharein.`;
+};

@@ -6,9 +6,14 @@ import {
   Phone,
   Clock,
   Stethoscope,
+  Send,
+  Zap,
+  Info,
+  X,
 } from 'lucide-react';
 import { localPatients, localVisits, localSettings } from '../../../services/localStore';
-import { generateFollowUpReminderWhatsAppLink } from '../../../utils/whatsappHelper';
+import { generateFollowUpReminderWhatsAppLink, generateExactHindiFollowUpMessage } from '../../../utils/whatsappHelper';
+import { automatedRemindersService } from '../../../services/automatedRemindersService';
 
 /**
  * Calculate difference in whole calendar days between target date and today.
@@ -53,6 +58,16 @@ export default function FollowUpRemindersWidget() {
     }
   });
 
+  const [autoSentKeys, setAutoSentKeys] = useState(() => {
+    try {
+      const history = automatedRemindersService.getHistory();
+      return history.map((h) => h.key);
+    } catch {
+      return [];
+    }
+  });
+
+  const [autoAlert, setAutoAlert] = useState(null);
   const [followUps, setFollowUps] = useState([]);
   const clinic = useMemo(() => localSettings.get(), []);
 
@@ -164,6 +179,45 @@ export default function FollowUpRemindersWidget() {
     window.open(link, '_blank', 'noopener,noreferrer');
   };
 
+  const pendingDueCount = useMemo(() => {
+    return followUps.filter(
+      (item) => item.daysLeft >= 0 && item.daysLeft <= 2 && !remindedIds.includes(item.key)
+    ).length;
+  }, [followUps, remindedIds]);
+
+  const handleAutoSendAll = () => {
+    const eligible = followUps.filter(
+      (item) => item.daysLeft >= 0 && item.daysLeft <= 2 && !remindedIds.includes(item.key)
+    );
+    if (eligible.length === 0) return;
+
+    const newRemindedKeys = [...remindedIds];
+    const newAutoSent = [...autoSentKeys];
+    let sentCount = 0;
+
+    eligible.forEach((item) => {
+      automatedRemindersService.sendAutomatedReminder(item, {
+        clinicName: clinic?.clinicName || 'Gastro Cure Clinic',
+        doctorName: clinic?.doctorName || 'Dr. Snehal Makwana',
+      });
+      if (!newRemindedKeys.includes(item.key)) newRemindedKeys.push(item.key);
+      if (!newAutoSent.includes(item.key)) newAutoSent.push(item.key);
+      sentCount++;
+    });
+
+    setRemindedIds(newRemindedKeys);
+    setAutoSentKeys(newAutoSent);
+    try {
+      localStorage.setItem('clinicrx_reminded_followups', JSON.stringify(newRemindedKeys));
+    } catch {}
+
+    const sampleDate = eligible[0]?.followUpDate ? formatDisplayDate(eligible[0].followUpDate) : 'upcoming checkup';
+    setAutoAlert({
+      title: `Automated WhatsApp Reminders Dispatched (${sentCount} patient${sentCount > 1 ? 's' : ''})`,
+      message: `Delivered template: "Namaste ${eligible[0]?.name || 'Patient'}, ${clinic?.clinicName || 'Gastro Cure Clinic'} me ${clinic?.doctorName || 'Dr. Snehal Makwana'} ke saath aapka follow-up checkup ${sampleDate} ko scheduled hai. Kripya samay par padharein."`,
+    });
+  };
+
   const getBadgeConfig = (daysLeft) => {
     if (daysLeft < 0) {
       return {
@@ -219,6 +273,67 @@ export default function FollowUpRemindersWidget() {
           </span>
         </div>
 
+        {/* Automated WhatsApp Reminder Banner (24-48 hours window) */}
+        <div className="mt-4 rounded-xl border border-teal-200 bg-teal-50/60 p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-start gap-2.5">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-teal-600 text-white shadow-2xs mt-0.5">
+              <Zap size={14} />
+            </span>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-heading font-bold text-[#10201F]">
+                  Automated WhatsApp Reminders
+                </span>
+                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-teal-800 bg-teal-100/80 px-2 py-0.5 rounded-full border border-teal-200">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  24–48h Active
+                </span>
+              </div>
+              <p className="text-[11px] text-[#4E6460] mt-0.5">
+                Auto-template: &ldquo;Namaste [Patient], Gastro Cure Clinic me Dr. Snehal Makwana ke saath aapka follow-up checkup [Date] ko scheduled hai...&rdquo;
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={handleAutoSendAll}
+              disabled={pendingDueCount === 0}
+              className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold shadow-sm transition active:scale-95 cursor-pointer ${
+                pendingDueCount > 0
+                  ? 'bg-[#287C75] text-white hover:bg-[#20635e] border border-teal-700'
+                  : 'bg-white text-[#7D908C] border border-[#D9E6E2] cursor-not-allowed opacity-70'
+              }`}
+              title="Automatically send WhatsApp reminder to all patients due in 24-48 hours"
+            >
+              <Send size={13} />
+              <span>Auto-Send Reminders ({pendingDueCount})</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Live Auto-Dispatch Toast Alert */}
+        {autoAlert && (
+          <div className="mt-3 rounded-xl border border-emerald-300 bg-emerald-50 p-3 flex items-start justify-between gap-2 text-xs text-emerald-900 animate-in fade-in duration-150">
+            <div className="flex items-start gap-2">
+              <CheckCircle2 size={16} className="text-emerald-700 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-emerald-950">{autoAlert.title}</p>
+                <p className="text-[11px] text-emerald-800 mt-0.5">{autoAlert.message}</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setAutoAlert(null)}
+              className="text-emerald-700 hover:text-emerald-950 p-1 rounded-lg"
+              aria-label="Dismiss alert"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        )}
+
         {followUps.length === 0 ? (
           <div className="mt-5 rounded-2xl border border-dashed border-[#D9E6E2] bg-[#F7FAF8] p-8 text-center">
             <CheckCircle2 size={36} className="mx-auto text-[#2E7D5B]" />
@@ -259,6 +374,12 @@ export default function FollowUpRemindersWidget() {
                         >
                           {badge.label}
                         </span>
+                        {autoSentKeys.includes(item.key) && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-800 bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-full">
+                            <CheckCircle2 size={11} className="text-emerald-700" />
+                            Auto-Sent 24–48h
+                          </span>
+                        )}
                       </div>
 
                       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[#4E6460]">
