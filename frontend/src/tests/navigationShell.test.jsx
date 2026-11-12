@@ -101,8 +101,12 @@ describe('Task 2: Global Navigation Shell & Brand Identity', () => {
       expect(screen.getByText('Dashboard')).toBeDefined();
       expect(screen.getByText('Patients')).toBeDefined();
       expect(screen.getByText('Prescriptions')).toBeDefined();
-      expect(screen.getByText('New Prescription')).toBeDefined();
+      expect(screen.getByText('Doctor Console')).toBeDefined();
       expect(screen.getByText('Master Formulary')).toBeDefined();
+
+      // Redundant action links should not appear in sidebar
+      expect(screen.queryByText('New Prescription')).toBeNull();
+      expect(screen.queryByText('Consultation')).toBeNull();
 
       // Configuration should not appear for DOCTOR
       expect(screen.queryByText('Configuration')).toBeNull();

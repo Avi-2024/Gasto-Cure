@@ -8,10 +8,8 @@ import {
   LayoutDashboard,
   LogOut,
   Pill,
-  PlusCircle,
   Receipt,
   Settings,
-  Stethoscope,
   Users,
   X,
 } from 'lucide-react';
@@ -52,21 +50,9 @@ const navigationGroups = [
         roles: ['CLINIC_OWNER', 'DOCTOR'],
       },
       {
-        label: 'New Prescription',
-        to: '/prescription/new',
-        icon: PlusCircle,
-        roles: ['CLINIC_OWNER', 'DOCTOR'],
-      },
-      {
         label: 'Doctor Console',
         to: '/doctor',
         icon: Activity,
-        roles: ['CLINIC_OWNER', 'DOCTOR'],
-      },
-      {
-        label: 'Consultation',
-        to: '/doctor/consultation',
-        icon: Stethoscope,
         roles: ['CLINIC_OWNER', 'DOCTOR'],
       },
       {
