@@ -22,6 +22,15 @@ import {
   ArrowRight,
   Clock3,
   ChevronRight,
+  Heart,
+  Droplet,
+  Thermometer,
+  HeartPulse,
+  Wind,
+  Scale,
+  AlertTriangle,
+  CheckCircle2,
+  Stethoscope,
 } from 'lucide-react';
 import MedicineTable from './components/MedicineTable';
 import AutoResizeTextarea from './components/AutoResizeTextarea';
@@ -37,6 +46,38 @@ const getInitials = (name = '') => {
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 };
+
+// 1-Click Clinical Suggestion Chips tailored for Gastroenterology & General Practice
+const GASTRO_SYMPTOMS = [
+  'Epigastric Pain',
+  'Heartburn & Acidity',
+  'Abdominal Bloating',
+  'Nausea & Vomiting',
+  'Constipation',
+  'Loose Stools (Diarrhea)',
+  'Loss of Appetite',
+  'Belching & Gas',
+];
+
+const GASTRO_DIAGNOSES = [
+  'GERD / Acid Reflux',
+  'Acute Gastritis',
+  'Irritable Bowel (IBS)',
+  'Fatty Liver (NAFLD)',
+  'Acid Peptic Disease (APD)',
+  'Dyspepsia / Indigestion',
+  'H. Pylori Infection',
+];
+
+const GASTRO_ADVICE = [
+  'Avoid spicy, fried & oily foods',
+  'Drink 2.5–3L water daily',
+  'Small frequent meals on fixed timings',
+  'Avoid tea/coffee on empty stomach',
+  '20–30 mins walk post-dinner',
+  'High fiber diet (fruits & green vegetables)',
+  'Elevate head of bed by 6 inches',
+];
 
 /**
  * PrescriptionPage Component
@@ -253,6 +294,30 @@ function PrescriptionPage() {
 
   const handleVitalChange = (field, value) => {
     setVitals((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleAddSymptom = (text) => {
+    setSymptoms((prev) => {
+      if (!prev || !prev.trim()) return text;
+      if (prev.toLowerCase().includes(text.toLowerCase())) return prev;
+      return `${prev.trim()}, ${text}`;
+    });
+  };
+
+  const handleAddDiagnosis = (text) => {
+    setDiagnosis((prev) => {
+      if (!prev || !prev.trim()) return text;
+      if (prev.toLowerCase().includes(text.toLowerCase())) return prev;
+      return `${prev.trim()} & ${text}`;
+    });
+  };
+
+  const handleAddAdvice = (text) => {
+    setAdvice((prev) => {
+      if (!prev || !prev.trim()) return `• ${text}`;
+      if (prev.toLowerCase().includes(text.toLowerCase())) return prev;
+      return `${prev.trim()}\n• ${text}`;
+    });
   };
 
   const addMedicineRow = () => {
@@ -891,11 +956,15 @@ function PrescriptionPage() {
             <ArrowLeft size={15} />
             Back
           </button>
-          {currentRxId && (
-            <span className="inline-flex items-center px-3 py-1 text-xs font-mono font-bold rounded-lg bg-[#E8F3F1] text-[#287C75] border border-[#D9E6E2]">
-              Rx: {currentRxId}
-            </span>
-          )}
+          <div className="rx-studio-clinic-badge">
+            <span className="clinic-dot" />
+            <span className="font-semibold text-xs text-[#123A3A] hidden sm:inline">Gastro Cure Studio</span>
+            {currentRxId && (
+              <span className="rx-badge-id font-mono">
+                Rx: {currentRxId}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Quick Print Alignment Bar */}
@@ -1016,29 +1085,57 @@ function PrescriptionPage() {
           <div className="patient-banner-container">
             <div className="patient-banner-left">
               <div className="patient-avatar-badge no-print">
-                {getInitials(patient.name)}
+                <span className="patient-avatar-initials">{getInitials(patient.name)}</span>
+                <span className="patient-avatar-subicon">
+                  <Stethoscope size={10} />
+                </span>
               </div>
-              <div>
+              <div className="patient-banner-details">
                 <div className="flex items-center gap-2.5 flex-wrap">
                   <h2 className="patient-banner-name font-heading">{patient.name}</h2>
                   {patient.id && (
                     <span className="patient-id-pill font-mono tabular-nums">{patient.id}</span>
                   )}
+                  {/* Blood Group Badge */}
+                  <span className="patient-blood-pill font-mono">
+                    <Droplet size={11} className="text-rose-500 fill-rose-500 inline mr-1" />
+                    <strong>Blood:</strong> {patient.bloodGroup || 'B+'}
+                  </span>
+                  {/* Known Allergy Alert */}
+                  {patient.allergies && patient.allergies !== 'None' ? (
+                    <span className="patient-allergy-alert-pill">
+                      <AlertTriangle size={11} className="text-amber-700 inline mr-1" />
+                      <strong>Allergy:</strong> {patient.allergies}
+                    </span>
+                  ) : (
+                    <span className="patient-allergy-safe-pill">
+                      <CheckCircle2 size={11} className="text-emerald-700 inline mr-1" />
+                      NKDA
+                    </span>
+                  )}
+                  {/* In Consultation Status Dot */}
+                  <span className="patient-status-pulse no-print">
+                    <span className="pulse-indicator" />
+                    In Consultation
+                  </span>
                 </div>
                 <div className="patient-banner-meta">
-                  <span>
+                  <span className="meta-chip">
+                    <User size={12} className="text-[#287C75]" />
                     <strong>Age/Sex:</strong>{' '}
                     <span className="tabular-nums">
                       {patient.age ? `${patient.age} Yrs` : 'N/A'} / {patient.gender || 'N/A'}
                     </span>
                   </span>
                   <span>•</span>
-                  <span>
+                  <span className="meta-chip">
+                    <Phone size={12} className="text-[#287C75]" />
                     <strong>Phone:</strong>{' '}
                     <span className="tabular-nums">{patient.contact || patient.mobile || 'N/A'}</span>
                   </span>
                   <span>•</span>
-                  <span>
+                  <span className="meta-chip">
+                    <Calendar size={12} className="text-[#287C75]" />
                     <strong>Date:</strong>{' '}
                     <span className="tabular-nums">
                       {prescriptionDate
@@ -1140,11 +1237,18 @@ function PrescriptionPage() {
               <Activity size={14} className="text-[#287C75]" />
               Vitals Strip
             </h3>
+            <span className="vitals-guidance-badge no-print">
+              <HeartPulse size={12} className="text-rose-500 inline mr-1" />
+              Standard Adult Clinical Baseline
+            </span>
           </div>
           <div className="vitals-grid">
             <div className="vital-item">
               <div className="vital-header-row">
-                <label htmlFor="bp">BP:</label>
+                <span className="vital-label-group">
+                  <Heart size={12} className="text-rose-500" />
+                  <label htmlFor="bp">BP:</label>
+                </span>
                 <span className="vital-unit">mmHg</span>
               </div>
               <input
@@ -1158,7 +1262,10 @@ function PrescriptionPage() {
             </div>
             <div className="vital-item">
               <div className="vital-header-row">
-                <label htmlFor="weight">Weight:</label>
+                <span className="vital-label-group">
+                  <Scale size={12} className="text-amber-600" />
+                  <label htmlFor="weight">Weight:</label>
+                </span>
                 <span className="vital-unit">kg</span>
               </div>
               <input
@@ -1172,7 +1279,10 @@ function PrescriptionPage() {
             </div>
             <div className="vital-item">
               <div className="vital-header-row">
-                <label htmlFor="bloodSugar">Blood Sugar:</label>
+                <span className="vital-label-group">
+                  <Droplet size={12} className="text-red-500" />
+                  <label htmlFor="bloodSugar">Blood Sugar:</label>
+                </span>
                 <span className="vital-unit">mg/dL</span>
               </div>
               <input
@@ -1186,7 +1296,10 @@ function PrescriptionPage() {
             </div>
             <div className="vital-item">
               <div className="vital-header-row">
-                <label htmlFor="temperature">Temp:</label>
+                <span className="vital-label-group">
+                  <Thermometer size={12} className="text-orange-500" />
+                  <label htmlFor="temperature">Temp:</label>
+                </span>
                 <span className="vital-unit">°F</span>
               </div>
               <input
@@ -1200,7 +1313,10 @@ function PrescriptionPage() {
             </div>
             <div className="vital-item">
               <div className="vital-header-row">
-                <label htmlFor="pulse">Pulse:</label>
+                <span className="vital-label-group">
+                  <HeartPulse size={12} className="text-rose-600" />
+                  <label htmlFor="pulse">Pulse:</label>
+                </span>
                 <span className="vital-unit">bpm</span>
               </div>
               <input
@@ -1214,7 +1330,10 @@ function PrescriptionPage() {
             </div>
             <div className="vital-item">
               <div className="vital-header-row">
-                <label htmlFor="spo2">SpO2:</label>
+                <span className="vital-label-group">
+                  <Wind size={12} className="text-cyan-600" />
+                  <label htmlFor="spo2">SpO2:</label>
+                </span>
                 <span className="vital-unit">%</span>
               </div>
               <input
@@ -1231,7 +1350,32 @@ function PrescriptionPage() {
 
         {/* 3. Chief Complaints / Symptoms */}
         <section className="prescription-section">
-          <h3 className="section-title font-heading">Chief Complaints / Symptoms</h3>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-2">
+            <h3 className="section-title font-heading mb-0">Chief Complaints / Symptoms</h3>
+            <span className="text-[11px] font-semibold text-[#7D908C] no-print">
+              Tap chips below to quick-fill common gastro complaints
+            </span>
+          </div>
+
+          {/* Quick GI Symptom Chips */}
+          <div className="clinical-chips-bar no-print">
+            <span className="chips-hint">
+              <Sparkles size={11} className="text-[#C9A45C]" />
+              Quick:
+            </span>
+            {GASTRO_SYMPTOMS.map((item) => (
+              <button
+                key={item}
+                type="button"
+                className="clinical-suggestion-chip"
+                onClick={() => handleAddSymptom(item)}
+                title={`Add ${item} to symptoms`}
+              >
+                + {item}
+              </button>
+            ))}
+          </div>
+
           <AutoResizeTextarea
             id="symptoms"
             value={symptoms}
@@ -1244,7 +1388,32 @@ function PrescriptionPage() {
 
         {/* 4. Diagnosis */}
         <section className="prescription-section">
-          <h3 className="section-title font-heading">Clinical Diagnosis</h3>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-2">
+            <h3 className="section-title font-heading mb-0">Clinical Diagnosis</h3>
+            <span className="text-[11px] font-semibold text-[#7D908C] no-print">
+              Tap chips to insert verified GI & hepatology diagnoses
+            </span>
+          </div>
+
+          {/* Quick GI Diagnosis Chips */}
+          <div className="clinical-chips-bar no-print">
+            <span className="chips-hint">
+              <Sparkles size={11} className="text-[#C9A45C]" />
+              Quick:
+            </span>
+            {GASTRO_DIAGNOSES.map((item) => (
+              <button
+                key={item}
+                type="button"
+                className="clinical-suggestion-chip diagnosis-chip"
+                onClick={() => handleAddDiagnosis(item)}
+                title={`Add ${item} to diagnosis`}
+              >
+                + {item}
+              </button>
+            ))}
+          </div>
+
           <AutoResizeTextarea
             id="diagnosis"
             value={diagnosis}
@@ -1282,7 +1451,32 @@ function PrescriptionPage() {
 
         {/* 6. Advice / Dietary Instructions */}
         <section className="prescription-section">
-          <h3 className="section-title font-heading">Advice & Dietary Instructions</h3>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-2">
+            <h3 className="section-title font-heading mb-0">Advice & Dietary Instructions</h3>
+            <span className="text-[11px] font-semibold text-[#7D908C] no-print">
+              Tap chips for dietary & lifestyle recommendations
+            </span>
+          </div>
+
+          {/* Quick Dietary & Lifestyle Chips */}
+          <div className="clinical-chips-bar no-print">
+            <span className="chips-hint">
+              <Sparkles size={11} className="text-[#C9A45C]" />
+              Quick:
+            </span>
+            {GASTRO_ADVICE.map((item) => (
+              <button
+                key={item}
+                type="button"
+                className="clinical-suggestion-chip advice-chip"
+                onClick={() => handleAddAdvice(item)}
+                title={`Add ${item} to advice`}
+              >
+                + {item}
+              </button>
+            ))}
+          </div>
+
           <AutoResizeTextarea
             id="advice"
             value={advice}
@@ -1376,6 +1570,11 @@ function PrescriptionPage() {
               </div>
             </div>
           </div>
+
+          <p className="followup-reassurance-note no-print">
+            <MessageCircle size={13} className="text-emerald-600 inline mr-1.5" />
+            Patient <strong>{patient.name}</strong> will receive an automated WhatsApp appointment reminder 2 days before this follow-up date.
+          </p>
         </section>
 
         {/* Doctor Signature Block (Prints at bottom) */}
