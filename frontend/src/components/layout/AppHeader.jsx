@@ -134,7 +134,7 @@ export default function AppHeader({ onMenuClick, navigate: customNavigate }) {
   }, []);
 
   return (
-    <header className="mb-0 rounded-2xl border border-[#D9E6E2] bg-white/85 p-3.5 shadow-nivara-xs backdrop-blur-md transition-all sm:p-4 relative z-30">
+    <header className="mb-0 rounded-2xl border border-[#D9E6E2] bg-white/85 p-3.5 shadow-nivara-xs backdrop-blur-md transition-all sm:p-4 relative z-[100]">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         {/* Left: Mobile Menu Toggle & Global Search Spotlight */}
         <div ref={searchContainerRef} className="relative flex items-center gap-3">
@@ -421,7 +421,7 @@ export default function AppHeader({ onMenuClick, navigate: customNavigate }) {
 
             {/* Notifications Popover Dropdown */}
             {isNotifOpen && (
-              <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl border border-[#D9E6E2] bg-white shadow-xl z-50 overflow-hidden animate-in fade-in duration-150">
+              <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl border border-[#D9E6E2] bg-white shadow-2xl z-[9999] overflow-hidden animate-in fade-in duration-150">
                 <div className="flex items-center justify-between border-b border-[#D9E6E2] px-4 py-3 bg-[#F7FAF8]">
                   <div className="flex items-center gap-2">
                     <span className="font-heading text-xs font-bold text-[#10201F]">

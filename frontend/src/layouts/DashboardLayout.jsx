@@ -31,7 +31,7 @@ export default function DashboardLayout() {
       {/* Main Content Column */}
       <div className="flex-1 h-screen flex flex-col min-w-0 overflow-hidden">
         {/* Fixed/Sticky Top Header */}
-        <div className="shrink-0 z-30 px-3 pt-3 sm:px-5 sm:pt-4 lg:px-7 lg:pt-5">
+        <div className="shrink-0 relative z-[100] px-3 pt-3 sm:px-5 sm:pt-4 lg:px-7 lg:pt-5">
           <AppHeader onMenuClick={() => setSidebarOpen(true)} />
         </div>
 
