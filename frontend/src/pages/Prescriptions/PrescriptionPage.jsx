@@ -950,15 +950,15 @@ function PrescriptionPage() {
       )}
 
       {/* Screen Controls Header Bar */}
-      <div className="prescription-controls no-print app-card">
+      <div className="prescription-controls no-print">
         <div className="controls-left">
-          <button type="button" className="btn-secondary" onClick={() => navigate(-1)}>
-            <ArrowLeft size={15} />
-            Back
+          <button type="button" className="btn-secondary btn-header-back" onClick={() => navigate(-1)} title="Go back to previous page">
+            <ArrowLeft size={14} />
+            <span>Back</span>
           </button>
-          <div className="rx-studio-clinic-badge">
+          <div className="rx-studio-clinic-badge" title="Gastro Cure Rx Studio">
             <span className="clinic-dot" />
-            <span className="font-semibold text-xs text-[#123A3A] hidden sm:inline">Gastro Cure Studio</span>
+            <span className="clinic-badge-title">Gastro Cure Studio</span>
             {currentRxId && (
               <span className="rx-badge-id font-mono">
                 Rx: {currentRxId}
@@ -969,7 +969,7 @@ function PrescriptionPage() {
 
         {/* Quick Print Alignment Bar */}
         <div className="prescription-quick-alignment">
-          <div className="flex items-center gap-1.5">
+          <div className="prescription-segmented-control">
             <button
               type="button"
               className={`prescription-mode-toggle-btn ${printSettings.padMode ? 'is-active' : ''}`}
@@ -989,9 +989,9 @@ function PrescriptionPage() {
           </div>
 
           {printSettings.padMode && (
-            <div className="flex items-center gap-2 pl-3 border-l border-[#D9E6E2]">
-              <label htmlFor="quick-top-offset" className="flex items-center gap-1.5 text-xs font-semibold text-[#4E6460]">
-                <Sliders size={13} className="text-[#287C75]" />
+            <div className="pad-offset-inline">
+              <label htmlFor="quick-top-offset" className="flex items-center gap-1 text-[11px] font-semibold text-[#4E6460]">
+                <Sliders size={12} className="text-[#287C75]" />
                 Pad Offset:
               </label>
               <input
@@ -1002,7 +1002,7 @@ function PrescriptionPage() {
                 step="5"
                 value={printSettings.topOffsetMm || 60}
                 onChange={handleQuickOffsetChange}
-                className="w-24 accent-[#287C75] cursor-pointer"
+                className="w-16 accent-[#287C75] cursor-pointer"
               />
               <span className="prescription-offset-badge tabular-nums">
                 {printSettings.topOffsetMm || 60} mm
@@ -1019,8 +1019,8 @@ function PrescriptionPage() {
             onClick={() => setIsPreviewOpen(true)}
             title="Preview how prescription will look when printed"
           >
-            <Eye size={15} />
-            Preview
+            <Eye size={14} />
+            <span>Preview</span>
           </button>
 
           <button
@@ -1029,28 +1029,28 @@ function PrescriptionPage() {
             onClick={handleShareWhatsApp}
             title="Save and share prescription via WhatsApp"
           >
-            <MessageCircle size={15} />
-            WhatsApp
+            <MessageCircle size={14} />
+            <span>WhatsApp</span>
           </button>
 
           <button
             type="button"
-            className="btn-secondary"
+            className="btn-secondary btn-header-save"
             onClick={() => handleSavePrescription('SAVED', false)}
             title="Save prescription record to database"
           >
-            <Save size={15} />
-            Save
+            <Save size={14} />
+            <span>Save</span>
           </button>
 
           <button
             type="button"
-            className="btn-primary"
+            className="btn-primary btn-header-print"
             onClick={handlePrint}
             title="Save and print prescription"
           >
-            <Printer size={15} />
-            Print Prescription
+            <Printer size={14} />
+            <span>Print Prescription</span>
           </button>
         </div>
       </div>
