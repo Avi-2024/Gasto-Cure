@@ -86,9 +86,7 @@ function MedicineTable({ medicines = [], onUpdate, onRemove, onUpdateMedicineFul
           <tr>
             <th className="col-number">#</th>
             <th className="col-medicine">Medicine Name</th>
-            <th className="col-dosage">Dosage</th>
             <th className="col-frequency">Frequency</th>
-            <th className="col-timing">Timing / Instructions</th>
             <th className="col-duration">Duration</th>
             <th className="col-remarks">Remarks</th>
             <th className="col-action no-print">Action</th>
@@ -97,7 +95,6 @@ function MedicineTable({ medicines = [], onUpdate, onRemove, onUpdateMedicineFul
         <tbody>
           {medicines.map((medicine, index) => {
             const freqLabel = getFrequencyLabel(medicine.frequency);
-            const timingLabel = getTimingLabel(medicine.timing);
 
             return (
               <tr key={medicine.id} className={medicine.name ? 'has-medicine-data' : ''}>
@@ -110,15 +107,13 @@ function MedicineTable({ medicines = [], onUpdate, onRemove, onUpdateMedicineFul
                     onChange={(e) => handleFieldChange(medicine.id, 'name', e.target.value)}
                     onSelect={(selectedMed) => handleSelectMedicine(medicine.id, selectedMed)}
                   />
-                  {medicine.name && (medicine.dosage || medicine.frequency || medicine.timing || medicine.duration) && (
+                  {medicine.name && (medicine.frequency || medicine.duration || medicine.remarks) && (
                     <div
                       className="medicine-row-summary no-print"
                       title="Quick summary of filled prescription details"
                     >
                       <span className="summary-pill">
-                        {medicine.dosage && <strong>{medicine.dosage}</strong>}
-                        {freqLabel && <span> • {freqLabel}</span>}
-                        {timingLabel && <span> • {timingLabel}</span>}
+                        {freqLabel && <strong>{freqLabel}</strong>}
                         {medicine.duration && <span> • for {medicine.duration}</span>}
                       </span>
                       {medicine.remarks && (
@@ -126,16 +121,6 @@ function MedicineTable({ medicines = [], onUpdate, onRemove, onUpdateMedicineFul
                       )}
                     </div>
                   )}
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    className="medicine-input tabular-nums font-semibold"
-                    placeholder="e.g. 500mg"
-                    title={medicine.dosage || 'Dosage'}
-                    value={medicine.dosage || ''}
-                    onChange={(e) => handleFieldChange(medicine.id, 'dosage', e.target.value)}
-                  />
                 </td>
                 <td>
                   <select
@@ -152,24 +137,6 @@ function MedicineTable({ medicines = [], onUpdate, onRemove, onUpdateMedicineFul
                     {medicine.frequency &&
                       !FREQUENCY_OPTIONS.some((o) => o.value === medicine.frequency) && (
                         <option value={medicine.frequency}>{medicine.frequency}</option>
-                      )}
-                  </select>
-                </td>
-                <td>
-                  <select
-                    className="medicine-select font-semibold"
-                    title={timingLabel || 'Timing / Instructions'}
-                    value={medicine.timing || ''}
-                    onChange={(e) => handleFieldChange(medicine.id, 'timing', e.target.value)}
-                  >
-                    {TIMING_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                    {medicine.timing &&
-                      !TIMING_OPTIONS.some((o) => o.value === medicine.timing) && (
-                        <option value={medicine.timing}>{medicine.timing}</option>
                       )}
                   </select>
                 </td>

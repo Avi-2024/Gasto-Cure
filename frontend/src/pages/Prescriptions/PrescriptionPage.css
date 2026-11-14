@@ -1235,32 +1235,22 @@
 }
 
 .medicine-table th.col-medicine {
-  width: 290px;
-  min-width: 240px;
-}
-
-.medicine-table th.col-dosage {
-  width: 120px;
-  min-width: 110px;
+  width: 340px;
+  min-width: 280px;
 }
 
 .medicine-table th.col-frequency {
-  width: 200px;
-  min-width: 185px;
-}
-
-.medicine-table th.col-timing {
-  width: 165px;
-  min-width: 150px;
+  width: 240px;
+  min-width: 210px;
 }
 
 .medicine-table th.col-duration {
-  width: 115px;
-  min-width: 105px;
+  width: 130px;
+  min-width: 115px;
 }
 
 .medicine-table th.col-remarks {
-  min-width: 170px;
+  min-width: 200px;
 }
 
 .medicine-table th.col-action {

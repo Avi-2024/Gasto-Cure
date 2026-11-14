@@ -194,7 +194,7 @@ function AddEditMedicineModal({ isOpen, onClose, onSave, initialData }) {
 
             <div>
               <label className="field-label" htmlFor="med-form">
-                Dosage Form
+                Form (Type)
               </label>
               <select
                 id="med-form"
@@ -227,11 +227,11 @@ function AddEditMedicineModal({ isOpen, onClose, onSave, initialData }) {
             </div>
           </div>
 
-          {/* Default Dosage & Quick Frequency Chips */}
+          {/* Default Frequency (Schedule) */}
           <div>
             <div className="flex items-center justify-between mb-1">
               <label className="field-label !mb-0" htmlFor="med-dosage">
-                Default Dosage
+                Default Frequency (Schedule)
               </label>
               <span className="text-[11px] text-[#7D908C]">Common Prescribing Schedules</span>
             </div>

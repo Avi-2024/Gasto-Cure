@@ -158,18 +158,18 @@ describe('MedicineTable with MedicineAutocomplete Integration', () => {
     localMedicines.seed();
   });
 
-  it('renders table columns including Timing / Instructions', () => {
+  it('renders table columns for Medicine Name, Frequency, Duration, and Remarks', () => {
     const medicines = [
       { id: 1, name: '', dosage: '', frequency: '', timing: '', duration: '', remarks: '' },
     ];
     render(<MedicineTable medicines={medicines} onUpdate={vi.fn()} onRemove={vi.fn()} />);
 
     expect(screen.getByRole('columnheader', { name: /Medicine Name/i })).toBeTruthy();
-    expect(screen.getByRole('columnheader', { name: /^Dosage$/i })).toBeTruthy();
     expect(screen.getByRole('columnheader', { name: /^Frequency$/i })).toBeTruthy();
-    expect(screen.getByRole('columnheader', { name: /Timing \/ Instructions/i })).toBeTruthy();
     expect(screen.getByRole('columnheader', { name: /^Duration$/i })).toBeTruthy();
     expect(screen.getByRole('columnheader', { name: /^Remarks$/i })).toBeTruthy();
+    expect(screen.queryByRole('columnheader', { name: /^Dosage$/i })).toBeNull();
+    expect(screen.queryByRole('columnheader', { name: /Timing \/ Instructions/i })).toBeNull();
   });
 
   it('calls onUpdateMedicineFull when an autocomplete option is chosen', async () => {
@@ -264,11 +264,6 @@ describe('MedicineTable with MedicineAutocomplete Integration', () => {
     ];
 
     render(<MedicineTable medicines={medicines} onUpdate={onUpdate} onRemove={vi.fn()} />);
-
-    // Edit dosage
-    const dosageInput = screen.getByPlaceholderText('e.g. 500mg');
-    fireEvent.change(dosageInput, { target: { value: '80mg' } });
-    expect(onUpdate).toHaveBeenCalledWith(102, 'dosage', '80mg');
 
     // Edit duration
     const durationInput = screen.getByPlaceholderText('e.g. 5 days');

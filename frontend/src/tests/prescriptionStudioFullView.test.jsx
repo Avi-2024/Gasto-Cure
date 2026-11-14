@@ -89,17 +89,15 @@ describe('Prescription Studio Full-View Ergonomics & Zero-Clipping Tests', () =>
     const medicineInput = screen.getByPlaceholderText('Medicine name');
     expect(medicineInput.getAttribute('title')).toBeDefined();
 
-    const dosageInput = screen.getByPlaceholderText('e.g. 500mg');
     const durationInput = screen.getByPlaceholderText('e.g. 5 days');
     const remarksInput = screen.getByPlaceholderText('e.g. After food');
 
-    expect(dosageInput.getAttribute('title')).toBe('Dosage');
     expect(durationInput.getAttribute('title')).toBe('Duration');
     expect(remarksInput.getAttribute('title')).toBe('Remarks');
 
-    // Type dosage and verify title updates with the filled value
-    fireEvent.change(dosageInput, { target: { value: '650mg' } });
-    expect(dosageInput.getAttribute('title')).toBe('650mg');
+    // Type duration and verify title updates with the filled value
+    fireEvent.change(durationInput, { target: { value: '7 days' } });
+    expect(durationInput.getAttribute('title')).toBe('7 days');
 
     // Select frequency and verify title updates with the filled value
     const frequencySelects = screen.getAllByRole('combobox');

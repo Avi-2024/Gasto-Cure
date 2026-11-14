@@ -276,13 +276,11 @@ function PrintPreviewModal({
                 <table className="preview-med-table">
                   <thead>
                     <tr>
-                      <th style={{ width: '5%' }}>#</th>
-                      <th style={{ width: '30%' }}>Medicine</th>
-                      <th style={{ width: '12%' }}>Dosage</th>
-                      <th style={{ width: '15%' }}>Frequency</th>
-                      <th style={{ width: '18%' }}>Timing</th>
-                      <th style={{ width: '10%' }}>Duration</th>
-                      <th style={{ width: '10%' }}>Remarks</th>
+                      <th style={{ width: '6%' }}>#</th>
+                      <th style={{ width: '38%' }}>Medicine</th>
+                      <th style={{ width: '22%' }}>Frequency</th>
+                      <th style={{ width: '16%' }}>Duration</th>
+                      <th style={{ width: '18%' }}>Remarks</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -290,9 +288,7 @@ function PrintPreviewModal({
                       <tr key={med.id || idx}>
                         <td className="text-center tabular-nums text-slate-500">{idx + 1}</td>
                         <td className="font-semibold text-[#10201F]">{med.name}</td>
-                        <td className="tabular-nums">{med.dosage || '-'}</td>
                         <td className="font-medium text-[#287C75]">{med.frequency || '-'}</td>
-                        <td>{med.timing || '-'}</td>
                         <td className="tabular-nums">{med.duration || '-'}</td>
                         <td className="text-[#4E6460]">{med.remarks || '-'}</td>
                       </tr>
