@@ -31,11 +31,15 @@ import {
   AlertTriangle,
   CheckCircle2,
   Stethoscope,
+  SlidersHorizontal,
+  RotateCcw,
+  Tag,
 } from 'lucide-react';
 import MedicineTable from './components/MedicineTable';
 import AutoResizeTextarea from './components/AutoResizeTextarea';
 import PrintPreviewModal from './components/PrintPreviewModal';
 import { localPatients, localVisits, localSettings, localAppointments } from '../../services/localStore';
+import { quickChipsService, DEFAULT_QUICK_CHIPS } from '../../services/quickChipsService';
 import { applyPrintSettings } from '../../utils/printStyles';
 import { generatePrescriptionWhatsAppLink } from '../../utils/whatsappHelper';
 import './PrescriptionPage.css';
@@ -48,36 +52,9 @@ const getInitials = (name = '') => {
 };
 
 // 1-Click Clinical Suggestion Chips tailored for Gastroenterology & General Practice
-const GASTRO_SYMPTOMS = [
-  'Epigastric Pain',
-  'Heartburn & Acidity',
-  'Abdominal Bloating',
-  'Nausea & Vomiting',
-  'Constipation',
-  'Loose Stools (Diarrhea)',
-  'Loss of Appetite',
-  'Belching & Gas',
-];
-
-const GASTRO_DIAGNOSES = [
-  'GERD / Acid Reflux',
-  'Acute Gastritis',
-  'Irritable Bowel (IBS)',
-  'Fatty Liver (NAFLD)',
-  'Acid Peptic Disease (APD)',
-  'Dyspepsia / Indigestion',
-  'H. Pylori Infection',
-];
-
-const GASTRO_ADVICE = [
-  'Avoid spicy, fried & oily foods',
-  'Drink 2.5–3L water daily',
-  'Small frequent meals on fixed timings',
-  'Avoid tea/coffee on empty stomach',
-  '20–30 mins walk post-dinner',
-  'High fiber diet (fruits & green vegetables)',
-  'Elevate head of bed by 6 inches',
-];
+const GASTRO_SYMPTOMS = DEFAULT_QUICK_CHIPS.symptoms;
+const GASTRO_DIAGNOSES = DEFAULT_QUICK_CHIPS.diagnosis;
+const GASTRO_ADVICE = DEFAULT_QUICK_CHIPS.advice;
 
 /**
  * PrescriptionPage Component
@@ -142,6 +119,13 @@ function PrescriptionPage() {
 
   // Preview Modal
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
+  // Clinical Quick Chips State (Doctor Customizable)
+  const [clinicalChips, setClinicalChips] = useState(() => quickChipsService.getAll());
+  const [isManageChipsOpen, setIsManageChipsOpen] = useState(false);
+  const [manageActiveTab, setManageActiveTab] = useState('symptoms'); // 'symptoms' | 'diagnosis' | 'advice'
+  const [newChipInput, setNewChipInput] = useState('');
+  const [chipNotification, setChipNotification] = useState('');
 
   // Clinical Intake & Quick Registration Modal State
   const [showIntakeAddModal, setShowIntakeAddModal] = useState(false);
@@ -318,6 +302,51 @@ function PrescriptionPage() {
       if (prev.toLowerCase().includes(text.toLowerCase())) return prev;
       return `${prev.trim()}\n• ${text}`;
     });
+  };
+
+  // Quick Chips Management Handlers
+  const handleOpenManageChips = (category = 'symptoms') => {
+    setManageActiveTab(category);
+    setNewChipInput('');
+    setChipNotification('');
+    setIsManageChipsOpen(true);
+  };
+
+  const handleAddNewCustomChip = (e) => {
+    if (e) e.preventDefault();
+    const trimmed = newChipInput.trim();
+    if (!trimmed) return;
+    const updatedList = quickChipsService.add(manageActiveTab, trimmed);
+    setClinicalChips((prev) => ({ ...prev, [manageActiveTab]: updatedList }));
+    setNewChipInput('');
+    const catLabel =
+      manageActiveTab === 'symptoms'
+        ? 'Symptoms'
+        : manageActiveTab === 'diagnosis'
+        ? 'Diagnoses'
+        : 'Advice';
+    setChipNotification(`Added "${trimmed}" to ${catLabel}!`);
+    setTimeout(() => setChipNotification(''), 3000);
+  };
+
+  const handleRemoveChip = (category, item) => {
+    const updatedList = quickChipsService.remove(category, item);
+    setClinicalChips((prev) => ({ ...prev, [category]: updatedList }));
+    setChipNotification(`Removed "${item}"`);
+    setTimeout(() => setChipNotification(''), 2500);
+  };
+
+  const handleResetCategoryChips = (category) => {
+    quickChipsService.reset(category);
+    setClinicalChips(quickChipsService.getAll());
+    const catLabel =
+      category === 'symptoms'
+        ? 'Symptoms'
+        : category === 'diagnosis'
+        ? 'Diagnosis'
+        : 'Advice';
+    setChipNotification(`Reset ${catLabel} to clinic defaults`);
+    setTimeout(() => setChipNotification(''), 3000);
   };
 
   const addMedicineRow = () => {
@@ -1363,7 +1392,7 @@ function PrescriptionPage() {
               <Sparkles size={11} className="text-[#C9A45C]" />
               Quick:
             </span>
-            {GASTRO_SYMPTOMS.map((item) => (
+            {(clinicalChips.symptoms || []).map((item) => (
               <button
                 key={item}
                 type="button"
@@ -1374,6 +1403,15 @@ function PrescriptionPage() {
                 + {item}
               </button>
             ))}
+            <button
+              type="button"
+              className="clinical-manage-trigger-btn"
+              onClick={() => handleOpenManageChips('symptoms')}
+              title="Manage Symptoms Quick Chips"
+            >
+              <SlidersHorizontal size={11} />
+              <span>Manage</span>
+            </button>
           </div>
 
           <AutoResizeTextarea
@@ -1401,7 +1439,7 @@ function PrescriptionPage() {
               <Sparkles size={11} className="text-[#C9A45C]" />
               Quick:
             </span>
-            {GASTRO_DIAGNOSES.map((item) => (
+            {(clinicalChips.diagnosis || []).map((item) => (
               <button
                 key={item}
                 type="button"
@@ -1412,6 +1450,15 @@ function PrescriptionPage() {
                 + {item}
               </button>
             ))}
+            <button
+              type="button"
+              className="clinical-manage-trigger-btn diagnosis-trigger"
+              onClick={() => handleOpenManageChips('diagnosis')}
+              title="Manage Diagnosis Quick Chips"
+            >
+              <SlidersHorizontal size={11} />
+              <span>Manage</span>
+            </button>
           </div>
 
           <AutoResizeTextarea
@@ -1464,7 +1511,7 @@ function PrescriptionPage() {
               <Sparkles size={11} className="text-[#C9A45C]" />
               Quick:
             </span>
-            {GASTRO_ADVICE.map((item) => (
+            {(clinicalChips.advice || []).map((item) => (
               <button
                 key={item}
                 type="button"
@@ -1475,6 +1522,15 @@ function PrescriptionPage() {
                 + {item}
               </button>
             ))}
+            <button
+              type="button"
+              className="clinical-manage-trigger-btn advice-trigger"
+              onClick={() => handleOpenManageChips('advice')}
+              title="Manage Advice Quick Chips"
+            >
+              <SlidersHorizontal size={11} />
+              <span>Manage</span>
+            </button>
           </div>
 
           <AutoResizeTextarea
@@ -1648,6 +1704,188 @@ function PrescriptionPage() {
           </div>
         </div>
       </div>
+
+      {/* Modal: Manage Clinical Quick Chips */}
+      {isManageChipsOpen && (
+        <div
+          className="manage-chips-overlay"
+          onClick={() => setIsManageChipsOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="manage-chips-title"
+        >
+          <div
+            className="manage-chips-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="manage-chips-header">
+              <div className="flex items-center gap-2.5">
+                <div className="manage-chips-icon-wrap">
+                  <SlidersHorizontal size={18} className="text-[#287C75]" />
+                </div>
+                <div>
+                  <h3 id="manage-chips-title" className="manage-chips-title font-heading">
+                    Manage Clinical Quick Chips
+                  </h3>
+                  <p className="manage-chips-subtitle">
+                    Personalize 1-click clinical suggestions for faster prescription writing.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsManageChipsOpen(false)}
+                className="manage-chips-close-btn"
+                aria-label="Close Quick Chips Manager"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Category Tabs */}
+            <div className="manage-chips-tabs">
+              <button
+                type="button"
+                className={`manage-tab-btn ${manageActiveTab === 'symptoms' ? 'is-active' : ''}`}
+                onClick={() => {
+                  setManageActiveTab('symptoms');
+                  setNewChipInput('');
+                }}
+              >
+                <span>Symptoms & Complaints</span>
+                <span className="tab-chip-count">{clinicalChips.symptoms?.length || 0}</span>
+              </button>
+              <button
+                type="button"
+                className={`manage-tab-btn ${manageActiveTab === 'diagnosis' ? 'is-active' : ''}`}
+                onClick={() => {
+                  setManageActiveTab('diagnosis');
+                  setNewChipInput('');
+                }}
+              >
+                <span>Clinical Diagnosis</span>
+                <span className="tab-chip-count">{clinicalChips.diagnosis?.length || 0}</span>
+              </button>
+              <button
+                type="button"
+                className={`manage-tab-btn ${manageActiveTab === 'advice' ? 'is-active' : ''}`}
+                onClick={() => {
+                  setManageActiveTab('advice');
+                  setNewChipInput('');
+                }}
+              >
+                <span>Diet & Lifestyle Advice</span>
+                <span className="tab-chip-count">{clinicalChips.advice?.length || 0}</span>
+              </button>
+            </div>
+
+            {/* Notification alert banner if any */}
+            {chipNotification && (
+              <div className="manage-chips-alert">
+                <CheckCircle2 size={14} className="text-[#287C75]" />
+                <span>{chipNotification}</span>
+              </div>
+            )}
+
+            {/* Add New Custom Chip Form */}
+            <form onSubmit={handleAddNewCustomChip} className="manage-chips-add-form">
+              <div className="relative flex-1">
+                <Tag size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#7D908C]" />
+                <input
+                  type="text"
+                  value={newChipInput}
+                  onChange={(e) => setNewChipInput(e.target.value)}
+                  placeholder={
+                    manageActiveTab === 'symptoms'
+                      ? 'Type new symptom (e.g. Severe Dysphagia, Hematemesis)...'
+                      : manageActiveTab === 'diagnosis'
+                      ? 'Type new diagnosis (e.g. Celiac Disease, Crohn’s Disease)...'
+                      : 'Type new advice (e.g. Avoid citrus fruits, Drink coconut water)...'
+                  }
+                  className="manage-chip-input"
+                  autoFocus
+                />
+              </div>
+              <button
+                type="submit"
+                className="manage-chip-add-submit-btn"
+                disabled={!newChipInput.trim()}
+              >
+                <Plus size={15} />
+                <span>Add Chip</span>
+              </button>
+            </form>
+
+            {/* Active Chips List */}
+            <div className="manage-chips-body">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-[#4E6460] uppercase tracking-wider">
+                  Active Quick Chips ({clinicalChips[manageActiveTab]?.length || 0})
+                </span>
+                <span className="text-[11px] text-[#7D908C]">
+                  Click ✕ to remove chip
+                </span>
+              </div>
+
+              <div className="manage-chips-list">
+                {clinicalChips[manageActiveTab]?.length > 0 ? (
+                  clinicalChips[manageActiveTab].map((item) => (
+                    <div
+                      key={item}
+                      className={`manage-chip-item ${
+                        manageActiveTab === 'diagnosis'
+                          ? 'chip-item-diagnosis'
+                          : manageActiveTab === 'advice'
+                          ? 'chip-item-advice'
+                          : 'chip-item-symptom'
+                      }`}
+                    >
+                      <span className="manage-chip-text">{item}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveChip(manageActiveTab, item)}
+                        className="manage-chip-delete-btn"
+                        title={`Remove "${item}"`}
+                        aria-label={`Remove ${item}`}
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <div className="manage-chips-empty">
+                    <p className="text-xs text-[#7D908C]">
+                      No chips in this section. Add one above or reset to clinic defaults below.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="manage-chips-footer">
+              <button
+                type="button"
+                onClick={() => handleResetCategoryChips(manageActiveTab)}
+                className="manage-chips-reset-btn"
+                title="Reset this category to clinic defaults"
+              >
+                <RotateCcw size={13} />
+                <span>Reset to Clinic Defaults</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsManageChipsOpen(false)}
+                className="manage-chips-done-btn"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Print Preview Modal */}
       <PrintPreviewModal

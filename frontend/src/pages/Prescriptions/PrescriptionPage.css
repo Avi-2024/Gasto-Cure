@@ -737,6 +737,397 @@
   border-color: #C9A45C;
 }
 
+/* Manage Quick Chips Trigger Button */
+.clinical-manage-trigger-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #FAFCFB;
+  color: #287C75;
+  border: 1px dashed #A3C9C2;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.clinical-manage-trigger-btn:hover {
+  background: #E8F5F2;
+  border-color: #287C75;
+  color: #164E48;
+  transform: translateY(-1px);
+  box-shadow: 0 1px 4px rgba(40, 124, 117, 0.15);
+}
+
+.clinical-manage-trigger-btn.diagnosis-trigger {
+  color: #4C2882;
+  border-color: #CBBEE8;
+  background: #FAF8FE;
+}
+
+.clinical-manage-trigger-btn.diagnosis-trigger:hover {
+  background: #F1EBFB;
+  border-color: #4C2882;
+  color: #381A66;
+}
+
+.clinical-manage-trigger-btn.advice-trigger {
+  color: #92580E;
+  border-color: #ECD4A4;
+  background: #FFFDF9;
+}
+
+.clinical-manage-trigger-btn.advice-trigger:hover {
+  background: #FEF7EA;
+  border-color: #C9A45C;
+  color: #744203;
+}
+
+/* Manage Clinical Quick Chips Modal */
+.manage-chips-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 32, 31, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.manage-chips-modal {
+  background: #ffffff;
+  width: 100%;
+  max-width: 580px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px -10px rgba(16, 32, 31, 0.3), 0 0 0 1px rgba(16, 32, 31, 0.05);
+  border: 1px solid #D9E6E2;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+  animation: manageChipsSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes manageChipsSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.manage-chips-header {
+  padding: 18px 22px;
+  border-bottom: 1px solid #EBF1EE;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #FAFDFB;
+}
+
+.manage-chips-icon-wrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: #E8F5F2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid #CFE2DC;
+}
+
+.manage-chips-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #10201F;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.manage-chips-subtitle {
+  font-size: 12px;
+  color: #4E6460;
+  margin-top: 2px;
+  margin-bottom: 0;
+}
+
+.manage-chips-close-btn {
+  padding: 6px;
+  border-radius: 8px;
+  color: #7D908C;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.manage-chips-close-btn:hover {
+  background: #F0F4F2;
+  color: #10201F;
+}
+
+.manage-chips-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 12px 22px;
+  background: #F7FAF8;
+  border-bottom: 1px solid #EBF1EE;
+  overflow-x: auto;
+}
+
+.manage-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #4E6460;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.manage-tab-btn:hover {
+  background: #EBF1EE;
+  color: #10201F;
+}
+
+.manage-tab-btn.is-active {
+  background: #ffffff;
+  color: #287C75;
+  border-color: #CFE2DC;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  font-weight: 700;
+}
+
+.tab-chip-count {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: #E8F5F2;
+  color: #287C75;
+}
+
+.manage-tab-btn.is-active .tab-chip-count {
+  background: #287C75;
+  color: #ffffff;
+}
+
+.manage-chips-alert {
+  margin: 12px 22px 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #E8F5F2;
+  border: 1px solid #A3C9C2;
+  color: #1A544E;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.manage-chips-add-form {
+  display: flex;
+  gap: 8px;
+  padding: 14px 22px 8px;
+}
+
+.manage-chip-input {
+  width: 100%;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid #D9E6E2;
+  padding: 0 12px 0 34px;
+  font-size: 12.5px;
+  color: #10201F;
+  background: #FAFDFB;
+  transition: all 0.15s ease;
+}
+
+.manage-chip-input:focus {
+  outline: none;
+  border-color: #287C75;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(40, 124, 117, 0.15);
+}
+
+.manage-chip-add-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 10px;
+  background: #287C75;
+  color: #ffffff;
+  font-size: 12.5px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.manage-chip-add-submit-btn:hover:not(:disabled) {
+  background: #1F635E;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(40, 124, 117, 0.25);
+}
+
+.manage-chip-add-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.manage-chips-body {
+  padding: 10px 22px 16px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.manage-chips-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  min-height: 80px;
+  align-content: flex-start;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.manage-chip-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.manage-chip-item.chip-item-symptom {
+  background: #F0F7F5;
+  color: #1A544E;
+  border: 1px solid #CFE2DC;
+}
+
+.manage-chip-item.chip-item-diagnosis {
+  background: #F3F1FA;
+  color: #4C2882;
+  border: 1px solid #DCD5F2;
+}
+
+.manage-chip-item.chip-item-advice {
+  background: #FFF9ED;
+  color: #92580E;
+  border: 1px solid #F8E1B7;
+}
+
+.manage-chip-text {
+  line-height: 1.2;
+}
+
+.manage-chip-delete-btn {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: rgba(0, 0, 0, 0.08);
+  color: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+  margin-left: 2px;
+}
+
+.manage-chip-delete-btn:hover {
+  background: #E11D48;
+  color: #ffffff;
+  transform: scale(1.15);
+}
+
+.manage-chips-empty {
+  padding: 24px 0;
+  text-align: center;
+  width: 100%;
+}
+
+.manage-chips-footer {
+  padding: 14px 22px;
+  border-top: 1px solid #EBF1EE;
+  background: #FAFDFB;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.manage-chips-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #7D908C;
+  background: transparent;
+  border: 1px solid #D9E6E2;
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.manage-chips-reset-btn:hover {
+  color: #B91C1C;
+  border-color: #FECACA;
+  background: #FEF2F2;
+}
+
+.manage-chips-done-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  padding: 0 18px;
+  border-radius: 8px;
+  background: #123A3A;
+  color: #ffffff;
+  font-size: 12.5px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.manage-chips-done-btn:hover {
+  background: #1A544E;
+}
+
 .followup-reassurance-note {
   margin-top: 12px;
   font-size: 12px;
