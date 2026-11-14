@@ -16,6 +16,9 @@ import {
   ShieldCheck,
   Save,
   RotateCcw,
+  PenTool,
+  Upload,
+  Trash2,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { localSettings, localPatients, localVisits } from '../../services/localStore';
@@ -59,6 +62,21 @@ export default function DoctorProfilePage() {
     setSavedSuccess(false);
   };
 
+  const handleSignatureUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target.result;
+      handleFieldChange('signatureUrl', dataUrl);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveSignature = () => {
+    handleFieldChange('signatureUrl', '');
+  };
+
   const handleSave = (e) => {
     if (e) e.preventDefault();
     const sanitizedPrint = sanitizePrintSettings(settings.print);
@@ -71,6 +89,7 @@ export default function DoctorProfilePage() {
       address: settings.address,
       timing: settings.timing,
       specialization: settings.specialization || 'Gastroenterologist & Hepatologist',
+      signatureUrl: settings.signatureUrl || '',
       print: sanitizedPrint,
     });
 
@@ -286,6 +305,74 @@ export default function DoctorProfilePage() {
                   disabled
                   className="w-full rounded-xl border border-[#D9E6E2] bg-slate-100/80 px-3.5 py-2 text-sm text-[#7D908C] cursor-not-allowed"
                 />
+              </div>
+            </div>
+
+            {/* Doctor Digital Signature Section */}
+            <div className="mt-6 pt-6 border-t border-[#D9E6E2]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-sm font-heading font-bold text-[#10201F] flex items-center gap-2">
+                    <PenTool size={16} className="text-[#287C75]" />
+                    Doctor Digital Signature
+                  </h3>
+                  <p className="text-xs text-[#4E6460] mt-0.5">
+                    Upload your digital signature to sign printed prescriptions and WhatsApp prescription summaries automatically.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <label
+                    htmlFor="profile-signature-upload"
+                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-[#287C75] bg-teal-50 text-[#287C75] text-xs font-semibold hover:bg-[#287C75] hover:text-white transition cursor-pointer"
+                  >
+                    <Upload size={14} />
+                    <span>Upload Signature Image</span>
+                  </label>
+                  <input
+                    id="profile-signature-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleSignatureUpload}
+                    className="hidden"
+                  />
+                  {settings.signatureUrl && (
+                    <button
+                      type="button"
+                      onClick={handleRemoveSignature}
+                      className="text-xs font-semibold text-rose-600 hover:text-rose-700 hover:underline inline-flex items-center gap-1"
+                    >
+                      <Trash2 size={13} />
+                      <span>Remove</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Signature Preview Area */}
+              <div className="mt-4 p-5 rounded-2xl border border-dashed border-[#CFE2DC] bg-[#FAFDFB] flex flex-col items-center justify-center min-h-[110px]">
+                {settings.signatureUrl ? (
+                  <div className="text-center space-y-2">
+                    <div className="bg-white p-3 rounded-xl border border-[#D9E6E2] inline-block shadow-xs">
+                      <img
+                        src={settings.signatureUrl}
+                        alt="Doctor Digital Signature Preview"
+                        className="h-14 max-w-[240px] object-contain mx-auto"
+                      />
+                    </div>
+                    <p className="text-[11px] font-mono font-medium text-[#287C75]">
+                      ✓ Active Doctor Signature for Prescriptions
+                    </p>
+                  </div>
+                ) : (
+                  <div className="text-center text-[#7D908C] space-y-1.5 py-2">
+                    <PenTool size={22} className="mx-auto text-[#7D908C]/60" />
+                    <p className="text-xs font-semibold text-[#10201F]">No digital signature uploaded yet</p>
+                    <p className="text-[11px] text-[#7D908C]">
+                      Click 'Upload Signature Image' above to attach your official signature (PNG, JPG, SVG)
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

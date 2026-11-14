@@ -387,8 +387,23 @@
 .preview-signature-line {
   border-top: 1.5px solid #123A3A;
   padding-top: 6px;
-  min-width: 190px;
+  min-width: 200px;
   text-align: center;
+}
+
+.preview-signature-img-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  min-height: 44px;
+  margin-bottom: 2px;
+}
+
+.preview-signature-img {
+  max-height: 44px;
+  max-width: 170px;
+  object-fit: contain;
+  display: block;
 }
 
 .preview-sign-doctor {
@@ -398,10 +413,11 @@
   margin: 0;
 }
 
-.preview-sign-clinic {
+.preview-sign-credentials {
   font-size: 11px;
   color: #4E6460;
   margin: 1px 0 0 0;
+  font-weight: 500;
 }
 
 /* Footer Bar */

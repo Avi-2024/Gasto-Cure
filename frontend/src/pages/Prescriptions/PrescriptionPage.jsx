@@ -34,6 +34,7 @@ import {
   SlidersHorizontal,
   RotateCcw,
   Tag,
+  PenTool,
 } from 'lucide-react';
 import MedicineTable from './components/MedicineTable';
 import AutoResizeTextarea from './components/AutoResizeTextarea';
@@ -114,7 +115,7 @@ function PrescriptionPage() {
 
   // Medicines
   const [medicines, setMedicines] = useState([
-    { id: 1, name: '', dosage: '', frequency: '1-0-1', timing: '', duration: '', remarks: '' },
+    { id: 1, name: '',  frequency: '1-0-1', timing: '', duration: '', remarks: '' },
   ]);
 
   // Preview Modal
@@ -354,7 +355,7 @@ function PrescriptionPage() {
       const newId = prev.length > 0 ? Math.max(...prev.map((m) => m.id)) + 1 : 1;
       return [
         ...prev,
-        { id: newId, name: '', dosage: '', frequency: '', timing: '', duration: '', remarks: '' },
+        { id: newId, name: '',  frequency: '', timing: '', duration: '', remarks: '' },
       ];
     });
   };
@@ -458,6 +459,23 @@ function PrescriptionPage() {
     if (!visit) return;
     const waUrl = generatePrescriptionWhatsAppLink(patient, visit, clinicSettings);
     window.open(waUrl, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleSignatureFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target.result;
+      const updated = localSettings.update({ signatureUrl: dataUrl });
+      setClinicSettings(updated);
+      setSaveFeedback({
+        type: 'success',
+        message: 'Doctor digital signature updated successfully!',
+      });
+      setTimeout(() => setSaveFeedback(null), 3500);
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleIntakeAddPatient = () => {
@@ -985,15 +1003,7 @@ function PrescriptionPage() {
             <ArrowLeft size={14} />
             <span>Back</span>
           </button>
-          <div className="rx-studio-clinic-badge" title="Gastro Cure Rx Studio">
-            <span className="clinic-dot" />
-            <span className="clinic-badge-title">Gastro Cure Studio</span>
-            {currentRxId && (
-              <span className="rx-badge-id font-mono">
-                Rx: {currentRxId}
-              </span>
-            )}
-          </div>
+        
         </div>
 
         {/* Quick Print Alignment Bar */}
@@ -1635,9 +1645,40 @@ function PrescriptionPage() {
 
         {/* Doctor Signature Block (Prints at bottom) */}
         <div className="prescription-doctor-signature">
-          <div className="signature-line">
+          <div className="">
+            {clinicSettings?.signatureUrl ? (
+              <div className="signature-digital-wrap">
+                <img
+                  src={clinicSettings.signatureUrl}
+                  alt="Doctor Digital Signature"
+                  className="signature-digital-img"
+                />
+              </div>
+            ) : (
+              <div className="signature-placeholder-space" />
+            )}
             <p className="signature-doctor font-heading">{clinicSettings.doctorName || 'Dr. Aarav Sharma'}</p>
-            <p className="signature-clinic">{clinicSettings.clinicName || 'Nivara Clinic & Health Centre'}</p>
+            <p className="signature-credentials">
+              {clinicSettings.qualification || 'MBBS, MD (Medicine)'}
+           
+            </p>
+            <div className="signature-upload-action no-print">
+              <label
+                htmlFor="rx-signature-upload-input"
+                className="cursor-pointer text-[10.5px] font-semibold text-[#287C75] hover:underline inline-flex items-center gap-1 mt-1"
+                title="Upload or update doctor digital signature"
+              >
+                <PenTool size={11} />
+                <span>{clinicSettings?.signatureUrl ? 'Change Digital Signature' : '+ Upload Digital Signature'}</span>
+              </label>
+              <input
+                id="rx-signature-upload-input"
+                type="file"
+                accept="image/*"
+                onChange={handleSignatureFileUpload}
+                className="hidden"
+              />
+            </div>
           </div>
         </div>
       </div>

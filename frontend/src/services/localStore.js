@@ -59,6 +59,7 @@ const DEFAULT_SETTINGS = {
   phone: '9876543210',
   address: 'Shop 4, Ground Floor, Health Plaza, New Delhi',
   timing: '10:00 AM - 02:00 PM, 06:00 PM - 09:00 PM',
+  signatureUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="160" height="48"><path d="M 15 45 C 25 20, 35 15, 45 35 C 55 55, 65 20, 80 25 C 95 30, 105 40, 120 30 C 135 20, 145 35, 160 25 M 35 32 L 85 28 M 100 48 Q 130 52 175 42" fill="none" stroke="%23123A3A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   print: {
     paperSize: 'A4',
     padMode: true, // Default to pre-printed letterhead pad mode

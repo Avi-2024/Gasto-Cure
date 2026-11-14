@@ -323,8 +323,20 @@ function PrintPreviewModal({
             {/* Doctor Signature Block */}
             <div className="preview-signature-block">
               <div className="preview-signature-line">
+                {clinicSettings?.signatureUrl && (
+                  <div className="preview-signature-img-wrap">
+                    <img
+                      src={clinicSettings.signatureUrl}
+                      alt="Doctor Digital Signature"
+                      className="preview-signature-img"
+                    />
+                  </div>
+                )}
                 <p className="preview-sign-doctor font-heading">{doctorName}</p>
-                <p className="preview-sign-clinic">{clinicName}</p>
+                <p className="preview-sign-credentials">
+                  {clinicSettings?.qualification || 'MBBS, MD (Medicine)'}
+                  {clinicSettings?.regNumber ? ` • Reg. ${clinicSettings.regNumber}` : ''}
+                </p>
               </div>
             </div>
           </div>

@@ -1645,8 +1645,27 @@
 .signature-line {
   border-top: 1.5px solid #123A3A;
   padding-top: 6px;
-  min-width: 190px;
+  min-width: 200px;
   text-align: center;
+}
+
+.signature-digital-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  min-height: 44px;
+  margin-bottom: 2px;
+}
+
+.signature-digital-img {
+  max-height: 44px;
+  max-width: 180px;
+  object-fit: contain;
+  display: block;
+}
+
+.signature-placeholder-space {
+  height: 40px;
 }
 
 .signature-doctor {
@@ -1656,10 +1675,15 @@
   margin: 0;
 }
 
-.signature-clinic {
+.signature-credentials {
   font-size: 11px;
   color: #4E6460;
   margin: 1px 0 0 0;
+  font-weight: 500;
+}
+
+.signature-upload-action {
+  margin-top: 4px;
 }
 
 /* ═════════════════════════════════════════════════════════════
