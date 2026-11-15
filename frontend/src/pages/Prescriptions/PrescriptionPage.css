@@ -1246,9 +1246,15 @@
   max-width: 145px;
 }
 
-.medicine-table th.col-duration {
-  width: 120px;
-  min-width: 105px;
+.medicine-table th.col-duration,
+.medicine-table td.col-duration-cell {
+  width: 140px;
+  min-width: 125px;
+  max-width: 155px;
+}
+
+.medicine-table td.col-duration-cell {
+  padding: 8px 6px;
 }
 
 .medicine-table th.col-remarks {
@@ -1344,6 +1350,67 @@
   outline: none;
   border-color: #287C75;
   box-shadow: 0 0 0 2px rgba(40, 124, 117, 0.12);
+}
+
+.duration-input-group {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #D9E6E2;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.15s ease;
+}
+
+.duration-input-group:focus-within {
+  border-color: #287C75;
+  box-shadow: 0 0 0 2px rgba(40, 124, 117, 0.12);
+}
+
+.duration-count-input {
+  flex: 1 1 auto;
+  min-width: 45px;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 8px 6px 8px 10px !important;
+  font-size: 13px;
+  font-weight: 600;
+  color: #10201F;
+  background: transparent !important;
+  outline: none !important;
+}
+
+.duration-count-input::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.duration-unit-select {
+  flex-shrink: 0;
+  width: 66px;
+  min-width: 66px;
+  max-width: 66px;
+  border: none;
+  border-left: 1px solid #E2E8F0;
+  background: #F8FAFC;
+  padding: 8px 4px 8px 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #123A3A;
+  cursor: pointer;
+  outline: none;
+  transition: background 0.15s ease;
+}
+
+.duration-unit-select:hover {
+  background: #EEF4F2;
+}
+
+.duration-unit-select:focus {
+  background: #E8F3F1;
+  color: #0E2E28;
 }
 
 /* High-visibility summary badge */

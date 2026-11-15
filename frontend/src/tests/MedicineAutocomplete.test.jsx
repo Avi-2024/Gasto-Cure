@@ -266,9 +266,13 @@ describe('MedicineTable with MedicineAutocomplete Integration', () => {
     render(<MedicineTable medicines={medicines} onUpdate={onUpdate} onRemove={vi.fn()} />);
 
     // Edit duration
-    const durationInput = screen.getByPlaceholderText('e.g. 5 days');
+    const durationInput = screen.getByPlaceholderText('5');
     fireEvent.change(durationInput, { target: { value: '10 days' } });
     expect(onUpdate).toHaveBeenCalledWith(102, 'duration', '10 days');
+
+    // Entering only numeric count automatically appends default Days
+    fireEvent.change(durationInput, { target: { value: '7' } });
+    expect(onUpdate).toHaveBeenCalledWith(102, 'duration', '7 Days');
 
     // Edit remarks
     const remarksInput = screen.getByPlaceholderText('e.g. After food');
@@ -316,5 +320,31 @@ describe('MedicineTable with MedicineAutocomplete Integration', () => {
     // Ensure none of the frequency options have brackets
     const bracketedOptions = options.filter((text) => text.includes('(') || text.includes(')'));
     expect(bracketedOptions.length).toBe(0);
+  });
+
+  it('renders duration input with default Days on the right and supports entering only count', () => {
+    const onUpdate = vi.fn();
+    const medicines = [
+      { id: 1, name: 'Pantoprazole 40mg', frequency: '1-0-0', duration: '5 Days', remarks: '' },
+    ];
+    render(<MedicineTable medicines={medicines} onUpdate={onUpdate} onRemove={vi.fn()} />);
+
+    // Count input shows extracted number 5
+    const countInput = screen.getByPlaceholderText('5');
+    expect(countInput).toBeTruthy();
+    expect(countInput.value).toBe('5');
+
+    // Unit select shows default Days
+    const unitSelect = document.querySelector('select.duration-unit-select');
+    expect(unitSelect).toBeTruthy();
+    expect(unitSelect.value).toBe('Days');
+
+    // Entering a count only automatically appends Days
+    fireEvent.change(countInput, { target: { value: '14' } });
+    expect(onUpdate).toHaveBeenCalledWith(1, 'duration', '14 Days');
+
+    // Changing unit to Weeks updates duration to Weeks
+    fireEvent.change(unitSelect, { target: { value: 'Weeks' } });
+    expect(onUpdate).toHaveBeenCalledWith(1, 'duration', '5 Weeks');
   });
 });

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Trash2 } from 'lucide-react';
 import MedicineAutocomplete from './MedicineAutocomplete';
 
@@ -31,6 +31,8 @@ const TIMING_OPTIONS = [
   { value: 'As Directed', label: 'As Directed' },
 ];
 
+const DURATION_UNITS = ['Days', 'Weeks', 'Months'];
+
 const cleanFrequency = (val) => {
   if (!val) return '';
   return String(val).replace(/\s*\([^)]*\)/g, '').trim();
@@ -49,6 +51,26 @@ const getTimingLabel = (val) => {
   return opt ? opt.label : val;
 };
 
+const parseDuration = (val, selectedUnits = {}, medId) => {
+  if (!val) {
+    return { count: '', unit: selectedUnits[medId] || 'Days' };
+  }
+  const str = String(val).trim();
+  const match = str.match(/^(\d+)\s*(days?|weeks?|months?)?$/i);
+  if (match) {
+    const count = match[1];
+    let unit = selectedUnits[medId] || 'Days';
+    if (match[2]) {
+      const u = match[2].toLowerCase();
+      if (u.startsWith('week')) unit = 'Weeks';
+      else if (u.startsWith('month')) unit = 'Months';
+      else unit = 'Days';
+    }
+    return { count, unit };
+  }
+  return { count: str, unit: selectedUnits[medId] || 'Days' };
+};
+
 /**
  * MedicineTable Component
  *
@@ -60,6 +82,8 @@ const getTimingLabel = (val) => {
  *   /Medicine Name/i, /^Dosage$/i, /^Frequency$/i, /Timing \/ Instructions/i, /^Duration$/i, /^Remarks$/i
  */
 function MedicineTable({ medicines = [], onUpdate, onRemove, onUpdateMedicineFull, debounceMs = 0 }) {
+  const [selectedUnits, setSelectedUnits] = useState({});
+
   const handleSelectMedicine = (medicineId, selectedMed) => {
     const fullData = {
       name: selectedMed.name || '',
@@ -69,6 +93,11 @@ function MedicineTable({ medicines = [], onUpdate, onRemove, onUpdateMedicineFul
       duration: selectedMed.defaultDuration || '',
       remarks: selectedMed.defaultInstruction || selectedMed.defaultTiming || '',
     };
+
+    if (selectedMed.defaultDuration) {
+      const parsed = parseDuration(selectedMed.defaultDuration);
+      setSelectedUnits((prev) => ({ ...prev, [medicineId]: parsed.unit }));
+    }
 
     if (typeof onUpdateMedicineFull === 'function') {
       onUpdateMedicineFull(medicineId, fullData);
@@ -83,6 +112,45 @@ function MedicineTable({ medicines = [], onUpdate, onRemove, onUpdateMedicineFul
     if (typeof onUpdate === 'function') {
       const sanitizedValue = field === 'frequency' ? cleanFrequency(value) : value;
       onUpdate(medicineId, field, sanitizedValue);
+    }
+  };
+
+  const handleDurationCountChange = (medicineId, rawVal, currentUnit) => {
+    const trimmed = rawVal.trim();
+    if (!trimmed) {
+      handleFieldChange(medicineId, 'duration', '');
+      return;
+    }
+    const match = trimmed.match(/^(\d+)\s*(days?|weeks?|months?)?$/i);
+    if (match) {
+      const count = match[1];
+      const typedUnit = match[2];
+      if (typedUnit) {
+        // e.g. "10 days" or "2 weeks" explicitly typed or tested
+        handleFieldChange(medicineId, 'duration', rawVal);
+        const lower = typedUnit.toLowerCase();
+        const normUnit = lower.startsWith('week') ? 'Weeks' : lower.startsWith('month') ? 'Months' : 'Days';
+        setSelectedUnits((prev) => ({ ...prev, [medicineId]: normUnit }));
+      } else {
+        // Only count entered (e.g. "5") -> append default "Days" or chosen unit!
+        const effectiveUnit = currentUnit || selectedUnits[medicineId] || 'Days';
+        handleFieldChange(medicineId, 'duration', `${count} ${effectiveUnit}`);
+      }
+    } else {
+      handleFieldChange(medicineId, 'duration', rawVal);
+    }
+  };
+
+  const handleDurationUnitChange = (medicineId, currentCount, newUnit) => {
+    setSelectedUnits((prev) => ({ ...prev, [medicineId]: newUnit }));
+    if (currentCount && /^\d+$/.test(String(currentCount).trim())) {
+      handleFieldChange(medicineId, 'duration', `${String(currentCount).trim()} ${newUnit}`);
+    } else if (medicines.find((m) => m.id === medicineId)?.duration) {
+      const curMed = medicines.find((m) => m.id === medicineId);
+      const parsed = parseDuration(curMed.duration, selectedUnits, medicineId);
+      if (parsed.count && /^\d+$/.test(parsed.count)) {
+        handleFieldChange(medicineId, 'duration', `${parsed.count} ${newUnit}`);
+      }
     }
   };
 
@@ -121,7 +189,14 @@ function MedicineTable({ medicines = [], onUpdate, onRemove, onUpdateMedicineFul
                     >
                       <span className="summary-pill">
                         {freqLabel && <strong>{freqLabel}</strong>}
-                        {medicine.duration && <span> • for {medicine.duration}</span>}
+                        {medicine.duration && (
+                          <span>
+                            {' • for '}
+                            {/^\d+$/.test(String(medicine.duration).trim())
+                              ? `${String(medicine.duration).trim()} Days`
+                              : medicine.duration}
+                          </span>
+                        )}
                       </span>
                       {medicine.remarks && (
                         <span className="summary-remarks">({medicine.remarks})</span>
@@ -152,15 +227,45 @@ function MedicineTable({ medicines = [], onUpdate, onRemove, onUpdateMedicineFul
                     );
                   })()}
                 </td>
-                <td>
-                  <input
-                    type="text"
-                    className="medicine-input tabular-nums font-semibold"
-                    placeholder="e.g. 5 days"
-                    title={medicine.duration || 'Duration'}
-                    value={medicine.duration || ''}
-                    onChange={(e) => handleFieldChange(medicine.id, 'duration', e.target.value)}
-                  />
+                <td className="col-duration-cell">
+                  {(() => {
+                    const { count: displayCount, unit: currentUnit } = parseDuration(
+                      medicine.duration,
+                      selectedUnits,
+                      medicine.id
+                    );
+                    return (
+                      <div className="duration-input-group">
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          className="medicine-input duration-count-input tabular-nums font-semibold"
+                          placeholder="5"
+                          aria-label="Duration"
+                          title={medicine.duration || 'Duration'}
+                          value={displayCount || ''}
+                          onChange={(e) =>
+                            handleDurationCountChange(medicine.id, e.target.value, currentUnit)
+                          }
+                        />
+                        <select
+                          className="duration-unit-select"
+                          aria-label="Duration unit"
+                          title="Duration unit"
+                          value={currentUnit || 'Days'}
+                          onChange={(e) =>
+                            handleDurationUnitChange(medicine.id, displayCount, e.target.value)
+                          }
+                        >
+                          {DURATION_UNITS.map((unit) => (
+                            <option key={unit} value={unit}>
+                              {unit}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    );
+                  })()}
                 </td>
                 <td>
                   <input

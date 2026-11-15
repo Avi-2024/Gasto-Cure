@@ -89,7 +89,7 @@ describe('Prescription Studio Full-View Ergonomics & Zero-Clipping Tests', () =>
     const medicineInput = screen.getByPlaceholderText('Medicine name');
     expect(medicineInput.getAttribute('title')).toBeDefined();
 
-    const durationInput = screen.getByPlaceholderText('e.g. 5 days');
+    const durationInput = screen.getByPlaceholderText('5');
     const remarksInput = screen.getByPlaceholderText('e.g. After food');
 
     expect(durationInput.getAttribute('title')).toBe('Duration');
