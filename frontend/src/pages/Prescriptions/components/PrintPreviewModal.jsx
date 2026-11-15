@@ -276,11 +276,11 @@ function PrintPreviewModal({
                 <table className="preview-med-table">
                   <thead>
                     <tr>
-                      <th style={{ width: '6%' }}>#</th>
-                      <th style={{ width: '38%' }}>Medicine</th>
-                      <th style={{ width: '22%' }}>Frequency</th>
-                      <th style={{ width: '16%' }}>Duration</th>
-                      <th style={{ width: '18%' }}>Remarks</th>
+                      <th style={{ width: '5%' }}>#</th>
+                      <th style={{ width: '40%' }}>Medicine</th>
+                      <th style={{ width: '14%' }}>Frequency</th>
+                      <th style={{ width: '15%' }}>Duration</th>
+                      <th style={{ width: '26%' }}>Remarks</th>
                     </tr>
                   </thead>
                   <tbody>

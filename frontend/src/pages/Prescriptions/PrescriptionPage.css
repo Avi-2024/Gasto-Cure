@@ -1235,22 +1235,24 @@
 }
 
 .medicine-table th.col-medicine {
-  width: 340px;
-  min-width: 280px;
+  width: 360px;
+  min-width: 290px;
 }
 
-.medicine-table th.col-frequency {
-  width: 240px;
-  min-width: 210px;
+.medicine-table th.col-frequency,
+.medicine-table td.col-frequency-cell {
+  width: 135px;
+  min-width: 120px;
+  max-width: 145px;
 }
 
 .medicine-table th.col-duration {
-  width: 130px;
-  min-width: 115px;
+  width: 120px;
+  min-width: 105px;
 }
 
 .medicine-table th.col-remarks {
-  min-width: 200px;
+  min-width: 240px;
 }
 
 .medicine-table th.col-action {

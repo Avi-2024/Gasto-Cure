@@ -129,7 +129,7 @@ function MedicineTable({ medicines = [], onUpdate, onRemove, onUpdateMedicineFul
                     </div>
                   )}
                 </td>
-                <td>
+                <td className="col-frequency-cell">
                   {(() => {
                     const normalizedFreq = cleanFrequency(medicine.frequency);
                     return (
