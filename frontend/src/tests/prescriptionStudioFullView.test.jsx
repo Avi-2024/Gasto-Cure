@@ -105,7 +105,7 @@ describe('Prescription Studio Full-View Ergonomics & Zero-Clipping Tests', () =>
     const freqSelect = frequencySelects.find((s) => s.classList.contains('medicine-select'));
     if (freqSelect) {
       fireEvent.change(freqSelect, { target: { value: '1-0-1' } });
-      expect(freqSelect.getAttribute('title')).toBe('1-0-1 (Morning & Evening)');
+      expect(freqSelect.getAttribute('title')).toBe('1-0-1');
     }
   });
 

@@ -4,21 +4,21 @@ import MedicineAutocomplete from './MedicineAutocomplete';
 
 const FREQUENCY_OPTIONS = [
   { value: '', label: 'Select frequency' },
-  { value: '1-0-1', label: '1-0-1 (Morning & Evening)' },
-  { value: '1-1-1', label: '1-1-1 (Morning, Afternoon & Evening)' },
-  { value: '0-0-1', label: '0-0-1 (Evening Only)' },
-  { value: '1-0-0', label: '1-0-0 (Morning Only)' },
-  { value: '0-1-0', label: '0-1-0 (Afternoon Only)' },
-  { value: '1-1-0', label: '1-1-0 (Morning & Afternoon)' },
-  { value: '0-1-1', label: '0-1-1 (Afternoon & Evening)' },
-  { value: '2-0-0', label: '2-0-0 (Twice Morning)' },
-  { value: '0-0-2', label: '0-0-2 (Twice Evening)' },
-  { value: '1-0-1-0-1', label: '1-0-1-0-1 (Every 12 hours)' },
-  { value: 'OD', label: 'OD (Once Daily)' },
-  { value: 'BD', label: 'BD (Twice Daily)' },
-  { value: 'TDS', label: 'TDS (Thrice Daily)' },
-  { value: 'QID', label: 'QID (Four Times Daily)' },
-  { value: 'SOS', label: 'SOS (As Needed)' },
+  { value: '1-0-1', label: '1-0-1' },
+  { value: '1-1-1', label: '1-1-1' },
+  { value: '0-0-1', label: '0-0-1' },
+  { value: '1-0-0', label: '1-0-0' },
+  { value: '0-1-0', label: '0-1-0' },
+  { value: '1-1-0', label: '1-1-0' },
+  { value: '0-1-1', label: '0-1-1' },
+  { value: '2-0-0', label: '2-0-0' },
+  { value: '0-0-2', label: '0-0-2' },
+  { value: '1-0-1-0-1', label: '1-0-1-0-1' },
+  { value: 'OD', label: 'OD' },
+  { value: 'BD', label: 'BD' },
+  { value: 'TDS', label: 'TDS' },
+  { value: 'QID', label: 'QID' },
+  { value: 'SOS', label: 'SOS' },
 ];
 
 const TIMING_OPTIONS = [
@@ -31,10 +31,16 @@ const TIMING_OPTIONS = [
   { value: 'As Directed', label: 'As Directed' },
 ];
 
+const cleanFrequency = (val) => {
+  if (!val) return '';
+  return String(val).replace(/\s*\([^)]*\)/g, '').trim();
+};
+
 const getFrequencyLabel = (val) => {
   if (!val) return '';
-  const opt = FREQUENCY_OPTIONS.find((o) => o.value === val);
-  return opt ? opt.label : val;
+  const cleaned = cleanFrequency(val);
+  const opt = FREQUENCY_OPTIONS.find((o) => o.value === cleaned || o.value === val);
+  return opt ? opt.label : cleaned;
 };
 
 const getTimingLabel = (val) => {
@@ -58,7 +64,7 @@ function MedicineTable({ medicines = [], onUpdate, onRemove, onUpdateMedicineFul
     const fullData = {
       name: selectedMed.name || '',
       dosage: selectedMed.strength || selectedMed.dosage || selectedMed.defaultDosage || '',
-      frequency: selectedMed.defaultDosage || '',
+      frequency: cleanFrequency(selectedMed.defaultDosage || ''),
       timing: selectedMed.defaultTiming || '',
       duration: selectedMed.defaultDuration || '',
       remarks: selectedMed.defaultInstruction || selectedMed.defaultTiming || '',
@@ -75,7 +81,8 @@ function MedicineTable({ medicines = [], onUpdate, onRemove, onUpdateMedicineFul
 
   const handleFieldChange = (medicineId, field, value) => {
     if (typeof onUpdate === 'function') {
-      onUpdate(medicineId, field, value);
+      const sanitizedValue = field === 'frequency' ? cleanFrequency(value) : value;
+      onUpdate(medicineId, field, sanitizedValue);
     }
   };
 
@@ -123,22 +130,27 @@ function MedicineTable({ medicines = [], onUpdate, onRemove, onUpdateMedicineFul
                   )}
                 </td>
                 <td>
-                  <select
-                    className="medicine-select font-semibold"
-                    title={freqLabel || 'Frequency'}
-                    value={medicine.frequency || ''}
-                    onChange={(e) => handleFieldChange(medicine.id, 'frequency', e.target.value)}
-                  >
-                    {FREQUENCY_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                    {medicine.frequency &&
-                      !FREQUENCY_OPTIONS.some((o) => o.value === medicine.frequency) && (
-                        <option value={medicine.frequency}>{medicine.frequency}</option>
-                      )}
-                  </select>
+                  {(() => {
+                    const normalizedFreq = cleanFrequency(medicine.frequency);
+                    return (
+                      <select
+                        className="medicine-select font-semibold"
+                        title={freqLabel || 'Frequency'}
+                        value={normalizedFreq || ''}
+                        onChange={(e) => handleFieldChange(medicine.id, 'frequency', e.target.value)}
+                      >
+                        {FREQUENCY_OPTIONS.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                        {normalizedFreq &&
+                          !FREQUENCY_OPTIONS.some((o) => o.value === normalizedFreq) && (
+                            <option value={normalizedFreq}>{normalizedFreq}</option>
+                          )}
+                      </select>
+                    );
+                  })()}
                 </td>
                 <td>
                   <input

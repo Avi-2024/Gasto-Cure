@@ -291,4 +291,30 @@ describe('MedicineTable with MedicineAutocomplete Integration', () => {
     fireEvent.click(removeButtons[0]);
     expect(onRemove).toHaveBeenCalledWith(1);
   });
+
+  it('renders frequency dropdown options without bracketed details', () => {
+    const medicines = [
+      { id: 1, name: 'Pantoprazole 40mg', frequency: '0-1-0', duration: '5 Days', remarks: '' },
+    ];
+    render(<MedicineTable medicines={medicines} onUpdate={vi.fn()} onRemove={vi.fn()} />);
+
+    const select = document.querySelector('select.medicine-select');
+    expect(select).toBeTruthy();
+    const options = Array.from(select.querySelectorAll('option')).map((o) => o.textContent);
+
+    // Verify key frequency options do not contain bracketed descriptions
+    expect(options).toContain('1-0-1');
+    expect(options).toContain('1-1-1');
+    expect(options).toContain('0-0-1');
+    expect(options).toContain('1-0-0');
+    expect(options).toContain('0-1-0');
+    expect(options).toContain('OD');
+    expect(options).toContain('BD');
+    expect(options).toContain('TDS');
+    expect(options).toContain('SOS');
+
+    // Ensure none of the frequency options have brackets
+    const bracketedOptions = options.filter((text) => text.includes('(') || text.includes(')'));
+    expect(bracketedOptions.length).toBe(0);
+  });
 });

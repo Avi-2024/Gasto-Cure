@@ -288,7 +288,9 @@ function PrintPreviewModal({
                       <tr key={med.id || idx}>
                         <td className="text-center tabular-nums text-slate-500">{idx + 1}</td>
                         <td className="font-semibold text-[#10201F]">{med.name}</td>
-                        <td className="font-medium text-[#287C75]">{med.frequency || '-'}</td>
+                        <td className="font-medium text-[#287C75]">
+                          {med.frequency ? String(med.frequency).replace(/\s*\([^)]*\)/g, '').trim() : '-'}
+                        </td>
                         <td className="tabular-nums">{med.duration || '-'}</td>
                         <td className="text-[#4E6460]">{med.remarks || '-'}</td>
                       </tr>
