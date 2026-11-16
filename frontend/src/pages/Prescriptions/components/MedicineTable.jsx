@@ -182,27 +182,6 @@ function MedicineTable({ medicines = [], onUpdate, onRemove, onUpdateMedicineFul
                     onChange={(e) => handleFieldChange(medicine.id, 'name', e.target.value)}
                     onSelect={(selectedMed) => handleSelectMedicine(medicine.id, selectedMed)}
                   />
-                  {medicine.name && (medicine.frequency || medicine.duration || medicine.remarks) && (
-                    <div
-                      className="medicine-row-summary no-print"
-                      title="Quick summary of filled prescription details"
-                    >
-                      <span className="summary-pill">
-                        {freqLabel && <strong>{freqLabel}</strong>}
-                        {medicine.duration && (
-                          <span>
-                            {' • for '}
-                            {/^\d+$/.test(String(medicine.duration).trim())
-                              ? `${String(medicine.duration).trim()} Days`
-                              : medicine.duration}
-                          </span>
-                        )}
-                      </span>
-                      {medicine.remarks && (
-                        <span className="summary-remarks">({medicine.remarks})</span>
-                      )}
-                    </div>
-                  )}
                 </td>
                 <td className="col-frequency-cell">
                   {(() => {

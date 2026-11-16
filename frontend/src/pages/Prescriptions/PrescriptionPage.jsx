@@ -36,12 +36,16 @@ import {
   RotateCcw,
   Tag,
   PenTool,
+  History,
+  Zap,
 } from 'lucide-react';
 import MedicineTable from './components/MedicineTable';
 import AutoResizeTextarea from './components/AutoResizeTextarea';
 import PrintPreviewModal from './components/PrintPreviewModal';
+import PatientPastHistoryDrawer from './components/PatientPastHistoryDrawer';
 import { localPatients, localVisits, localSettings, localAppointments } from '../../services/localStore';
 import { quickChipsService, DEFAULT_QUICK_CHIPS } from '../../services/quickChipsService';
+import { rxProtocolsService } from '../../services/rxProtocolsService';
 import { applyPrintSettings } from '../../utils/printStyles';
 import { generatePrescriptionWhatsAppLink } from '../../utils/whatsappHelper';
 import './PrescriptionPage.css';
@@ -121,6 +125,17 @@ function PrescriptionPage() {
 
   // Preview Modal
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
+  // 1-Click Clinical Rx Protocols (Protocol Kits) & Patient History Drawer
+  const [protocols, setProtocols] = useState(() => rxProtocolsService.getAll());
+  const [isHistoryDrawerOpen, setIsHistoryDrawerOpen] = useState(false);
+
+  // Computed count of past visits for active patient (excluding current open visit if editing)
+  const pastVisitsCount = React.useMemo(() => {
+    if (!patient?.id) return 0;
+    const all = localVisits.getByPatient(patient.id) || [];
+    return visitIdParam ? all.filter((v) => v.id !== visitIdParam).length : all.length;
+  }, [patient?.id, visitIdParam]);
 
   // Clinical Quick Chips State (Doctor Customizable)
   const [clinicalChips, setClinicalChips] = useState(() => quickChipsService.getAll());
@@ -304,6 +319,109 @@ function PrescriptionPage() {
       if (prev.toLowerCase().includes(text.toLowerCase())) return prev;
       return `${prev.trim()}\n• ${text}`;
     });
+  };
+
+  // 1-Click Clinical Protocol Application
+  const handleApplyProtocol = (proto) => {
+    if (!proto) return;
+
+    // 1. Symptoms (Chief complaints)
+    if (proto.symptoms) {
+      setSymptoms((prev) => {
+        if (!prev || !prev.trim()) return proto.symptoms;
+        return `${prev.trim()}, ${proto.symptoms}`;
+      });
+    }
+
+    // 2. Clinical Diagnosis
+    if (proto.diagnosis) {
+      setDiagnosis((prev) => {
+        if (!prev || !prev.trim()) return proto.diagnosis;
+        return `${prev.trim()} & ${proto.diagnosis}`;
+      });
+    }
+
+    // 3. Rx Medicines
+    if (proto.medicines && proto.medicines.length > 0) {
+      const mappedMeds = proto.medicines.map((m, idx) => ({
+        id: Date.now() + idx,
+        name: m.name || '',
+        dosage: m.dosage || '',
+        frequency: m.frequency || '1-0-1',
+        timing: m.timing || 'After Food',
+        duration: m.duration || '5 Days',
+        remarks: m.remarks || '',
+      }));
+
+      setMedicines((prev) => {
+        const isOnlyEmpty = prev.length === 1 && !prev[0].name?.trim();
+        return isOnlyEmpty ? mappedMeds : [...prev, ...mappedMeds];
+      });
+    }
+
+    // 4. Dietary & Lifestyle Advice
+    if (proto.advice) {
+      setAdvice((prev) => {
+        if (!prev || !prev.trim()) return `• ${proto.advice}`;
+        return `${prev.trim()}\n• ${proto.advice}`;
+      });
+    }
+
+    // 5. Follow-Up Schedule
+    if (proto.followUpDays) {
+      const dayStr = String(proto.followUpDays);
+      if (['7', '14', '30'].includes(dayStr)) {
+        setFollowUpOption(dayStr);
+      } else {
+        setFollowUpOption('custom');
+        setFollowUpCustomDays(dayStr);
+      }
+    }
+
+    setSaveFeedback({
+      message: `⚡ Applied ${proto.title} Protocol (${proto.medicines?.length || 0} medicines filled)`,
+    });
+    setTimeout(() => setSaveFeedback(null), 3500);
+  };
+
+  // 1-Click Repeat Past Rx from History Drawer
+  const handleRepeatRx = (pastMeds, pastVisit) => {
+    if (!pastMeds || pastMeds.length === 0) {
+      setSaveFeedback({ message: 'No medicines in past visit to repeat' });
+      setTimeout(() => setSaveFeedback(null), 3000);
+      return;
+    }
+
+    const clonedMeds = pastMeds.map((m, idx) => ({
+      id: Date.now() + idx,
+      name: m.name || '',
+      dosage: m.dosage || '',
+      frequency: m.frequency || '1-0-1',
+      timing: m.timing || 'After Food',
+      duration: m.duration || '5 Days',
+      remarks: m.remarks || '',
+    }));
+
+    setMedicines((prev) => {
+      const isOnlyEmpty = prev.length === 1 && !prev[0].name?.trim();
+      return isOnlyEmpty ? clonedMeds : [...prev, ...clonedMeds];
+    });
+
+    if (pastVisit?.advice && !advice) {
+      setAdvice(pastVisit.advice);
+    }
+    if (pastVisit?.diagnosis && !diagnosis) {
+      setDiagnosis(pastVisit.diagnosis);
+    }
+
+    setIsHistoryDrawerOpen(false);
+    const visitDateLabel = pastVisit?.visitDate
+      ? new Date(pastVisit.visitDate).toLocaleDateString('en-IN')
+      : 'past visit';
+    setSaveFeedback({
+      message: `⚡ Repeated ${clonedMeds.length} medicines from visit (${visitDateLabel})`,
+    });
+    setTimeout(() => setSaveFeedback(null), 3500);
   };
 
   // Quick Chips Management Handlers
@@ -1192,6 +1310,17 @@ function PrescriptionPage() {
             <div className="patient-banner-right no-print">
               <button
                 type="button"
+                className="btn-past-history"
+                onClick={() => setIsHistoryDrawerOpen(true)}
+                title="View previous clinical visits and prescriptions for this patient"
+                aria-label="Patient Past Visits History"
+              >
+                <History size={13} className="text-[#287C75]" />
+                <span>Past History</span>
+                <span className="past-history-badge tabular-nums">{pastVisitsCount}</span>
+              </button>
+              <button
+                type="button"
                 className="btn-switch-patient"
                 onClick={() => setShowPatientSwitcher(!showPatientSwitcher)}
                 title="Switch patient for this prescription"
@@ -1387,6 +1516,48 @@ function PrescriptionPage() {
                 className="vital-input tabular-nums font-semibold"
               />
             </div>
+          </div>
+        </section>
+
+        {/* 1-Click Clinical Rx Protocols (Protocol Kits) */}
+        <section className="prescription-section rx-protocol-section no-print" aria-label="Clinical Rx Protocols">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-2.5">
+            <div className="flex items-center gap-2">
+              <span className="p-1 rounded-md bg-[#287C75]/10 text-[#287C75]">
+                <Zap size={14} className="fill-[#287C75]" />
+              </span>
+              <div>
+                <h3 className="section-title font-heading mb-0 text-[13px] font-bold text-[#10201F]">
+                  1-Click Clinical Rx Protocols (Protocol Kits)
+                </h3>
+                <p className="text-[11px] text-[#7D908C] m-0">
+                  Select a protocol to auto-fill Symptoms, Diagnosis, Standard Meds & Dietary Advice in 1 click
+                </p>
+              </div>
+            </div>
+            <span className="text-[11px] font-semibold text-[#287C75] bg-[#E8F3F1] px-2.5 py-0.5 rounded-full self-start sm:self-auto border border-[#287C75]/20">
+              Gastro Specialty Kits
+            </span>
+          </div>
+
+          <div className="rx-protocol-chips-grid">
+            {protocols.map((proto) => (
+              <button
+                key={proto.id}
+                type="button"
+                className="rx-protocol-card-chip"
+                onClick={() => handleApplyProtocol(proto)}
+                title={`Apply ${proto.title} Protocol (${proto.medicines?.length || 0} medicines)`}
+              >
+                <div className="rx-protocol-chip-header">
+                  <span className="rx-protocol-chip-title">{proto.title}</span>
+                  <span className="rx-protocol-chip-count">{proto.medicines?.length || 0} meds</span>
+                </div>
+                <div className="rx-protocol-chip-summary text-truncate">
+                  {proto.medicines?.map((m) => m.name.split(' ')[0]).join(' + ')}
+                </div>
+              </button>
+            ))}
           </div>
         </section>
 
@@ -1935,6 +2106,15 @@ function PrescriptionPage() {
         document.body
       )
     ) : null)}
+
+      {/* Patient Past History Drawer */}
+      <PatientPastHistoryDrawer
+        isOpen={isHistoryDrawerOpen}
+        onClose={() => setIsHistoryDrawerOpen(false)}
+        patient={patient}
+        currentVisitId={visitIdParam}
+        onRepeatRx={handleRepeatRx}
+      />
 
       {/* Print Preview Modal */}
       <PrintPreviewModal
