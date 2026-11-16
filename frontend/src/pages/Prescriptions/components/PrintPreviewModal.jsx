@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Printer, MessageCircle, FileText, CheckCircle2 } from 'lucide-react';
 import './PrintPreviewModal.css';
 
@@ -72,9 +73,10 @@ function PrintPreviewModal({
     vitals.spo2
   );
 
-  return (
+  const modalContent = (
     <div
       className="preview-modal-overlay no-print"
+      style={{ zIndex: 9999 }}
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -367,6 +369,8 @@ function PrintPreviewModal({
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(modalContent, document.body) : modalContent;
 }
 
 export default PrintPreviewModal;

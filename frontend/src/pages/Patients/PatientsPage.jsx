@@ -816,18 +816,19 @@ function PatientsPage() {
         )}
 
       {/* Add Patient Modal */}
-      {showModal ? (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 transition-opacity"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              closeModal();
-            }
-          }}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="add-patient-title"
-        >
+      {showModal && typeof document !== 'undefined'
+        ? createPortal(
+            <div
+              className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 transition-opacity"
+              onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                  closeModal();
+                }
+              }}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="add-patient-title"
+            >
           <div
             className="w-full max-w-md rounded-2xl bg-white border border-[#D9E6E2] shadow-nivara-lg p-6 animate-in fade-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
@@ -935,7 +936,8 @@ function PatientsPage() {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       ) : null}
 
       {/* Patient Profile Drawer */}

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Pill, X } from 'lucide-react';
 
 const formOptions = [
@@ -112,9 +113,9 @@ function AddEditMedicineModal({ isOpen, onClose, onSave, initialData }) {
     });
   };
 
-  return (
+  const modalContent = (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#123A3A]/45 p-4 backdrop-blur-sm animate-in fade-in"
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#123A3A]/45 p-4 backdrop-blur-sm animate-in fade-in"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -302,6 +303,11 @@ function AddEditMedicineModal({ isOpen, onClose, onSave, initialData }) {
                 placeholder="e.g. 5 Days, 14 Days"
                 value={form.defaultDuration}
                 onChange={(e) => setForm((prev) => ({ ...prev, defaultDuration: e.target.value }))}
+                onBlur={() => {
+                  if (/^\d+$/.test(String(form.defaultDuration || '').trim())) {
+                    setForm((prev) => ({ ...prev, defaultDuration: `${prev.defaultDuration.trim()} Days` }));
+                  }
+                }}
                 className="w-full rounded-xl border border-[#D9E6E2] bg-white px-3.5 py-2.5 text-sm text-[#10201F] placeholder-[#7D908C] focus:border-[#287C75] focus:ring-2 focus:ring-[#287C75]/20 focus:outline-none transition"
               />
               {/* Quick Duration Buttons */}
@@ -404,6 +410,8 @@ function AddEditMedicineModal({ isOpen, onClose, onSave, initialData }) {
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(modalContent, document.body) : modalContent;
 }
 
 export default AddEditMedicineModal;

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import {
   X,
@@ -98,9 +99,9 @@ function PatientProfileDrawer({ isOpen, patient, onClose, onEdit, clinicSettings
     }
   };
 
-  return (
+  const drawerContent = (
     <div
-      className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-xs transition-opacity"
+      className="fixed inset-0 z-[9999] flex justify-end bg-black/40 backdrop-blur-xs transition-opacity"
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
@@ -431,6 +432,8 @@ function PatientProfileDrawer({ isOpen, patient, onClose, onEdit, clinicSettings
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(drawerContent, document.body) : drawerContent;
 }
 
 export default PatientProfileDrawer;

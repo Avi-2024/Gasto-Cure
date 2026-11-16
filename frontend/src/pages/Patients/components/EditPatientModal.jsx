@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, User, AlertCircle } from 'lucide-react';
 import { localPatients } from '../../../services/localStore';
 
@@ -98,9 +99,9 @@ function EditPatientModal({ isOpen, patient, onClose, onSave }) {
     }
   };
 
-  return (
+  const modalContent = (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs transition-opacity"
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs transition-opacity"
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
@@ -309,6 +310,8 @@ function EditPatientModal({ isOpen, patient, onClose, onSave }) {
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(modalContent, document.body) : modalContent;
 }
 
 export default EditPatientModal;

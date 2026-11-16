@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Printer, X, Info, Sparkles, Check } from 'lucide-react';
 
 const CALIBRATION_MARKS = [30, 40, 50, 60, 70, 80, 90, 100, 110, 120];
@@ -34,8 +35,8 @@ export function TestPrintSheet({ onClose, onPrint }) {
     }
   };
 
-  return (
-    <div className="test-print-modal-overlay fixed inset-0 z-50 bg-[#123A3A]/75 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+  const sheetContent = (
+    <div className="test-print-modal-overlay fixed inset-0 z-[9999] bg-[#123A3A]/75 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
       <div
         className="test-print-modal bg-white rounded-2xl shadow-nivara-lg max-w-4xl w-full border border-[#D9E6E2] overflow-hidden flex flex-col my-auto"
         role="dialog"
@@ -443,6 +444,8 @@ export function TestPrintSheet({ onClose, onPrint }) {
       `}</style>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(sheetContent, document.body) : sheetContent;
 }
 
 export default TestPrintSheet;

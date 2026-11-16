@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Printer,
@@ -842,16 +843,17 @@ function PrescriptionPage() {
         </div>
 
         {/* Modal: Quick Register New Patient */}
-        {showIntakeAddModal && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 transition-opacity"
-            onClick={(e) => {
-              if (e.target === e.currentTarget) {
-                setShowIntakeAddModal(false);
-                setIntakeFormError('');
-              }
-            }}
-            role="dialog"
+        {showIntakeAddModal && typeof document !== 'undefined' &&
+          createPortal(
+            <div
+              className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 transition-opacity"
+              onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                  setShowIntakeAddModal(false);
+                  setIntakeFormError('');
+                }
+              }}
+              role="dialog"
             aria-modal="true"
           >
             <div
@@ -978,7 +980,8 @@ function PrescriptionPage() {
                 </button>
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
     );
@@ -1747,14 +1750,17 @@ function PrescriptionPage() {
       </div>
 
       {/* Modal: Manage Clinical Quick Chips */}
-      {isManageChipsOpen && (
-        <div
-          className="manage-chips-overlay"
-          onClick={() => setIsManageChipsOpen(false)}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="manage-chips-title"
-        >
+      {isManageChipsOpen &&
+        (typeof document !== 'undefined' ? (
+          createPortal(
+            <div
+              className="manage-chips-overlay"
+              style={{ zIndex: 9999 }}
+              onClick={() => setIsManageChipsOpen(false)}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="manage-chips-title"
+            >
           <div
             className="manage-chips-modal"
             onClick={(e) => e.stopPropagation()}
@@ -1925,8 +1931,10 @@ function PrescriptionPage() {
               </button>
             </div>
           </div>
-        </div>
-      )}
+        </div>,
+        document.body
+      )
+    ) : null)}
 
       {/* Print Preview Modal */}
       <PrintPreviewModal

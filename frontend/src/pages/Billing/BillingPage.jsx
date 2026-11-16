@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   ArrowDownLeft,
   ArrowUpRight,
@@ -375,8 +376,9 @@ export default function BillingPage() {
       </section>
 
       {/* Create Invoice Modal */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs">
+      {showModal && typeof document !== 'undefined' &&
+        createPortal(
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs">
           <div className="w-full max-w-md rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-2xl">
             <div className="flex items-center justify-between border-b border-[#D9E6E2]/60 pb-3">
               <h2 className="font-heading text-lg font-bold text-[#10201F]">
@@ -503,7 +505,8 @@ export default function BillingPage() {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
