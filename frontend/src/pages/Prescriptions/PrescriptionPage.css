@@ -1207,7 +1207,7 @@
 
 .medicine-table {
   width: 100%;
-  min-width: 1040px;
+  min-width: 760px;
   border-collapse: collapse;
   font-size: 13px;
 }
@@ -1217,48 +1217,49 @@
 }
 
 .medicine-table th {
-  padding: 12px 10px;
+  padding: 11px 8px;
   text-align: left;
   font-weight: 700;
   color: #123A3A;
   border-bottom: 1.5px solid #D9E6E2;
   font-size: 11.5px;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.5px;
   white-space: nowrap;
 }
 
 .medicine-table th.col-number {
-  width: 38px;
-  min-width: 38px;
+  width: 34px;
+  min-width: 34px;
   text-align: center;
+  padding: 11px 4px;
 }
 
 .medicine-table th.col-medicine {
-  width: 360px;
-  min-width: 290px;
+  width: 280px;
+  min-width: 210px;
 }
 
 .medicine-table th.col-frequency,
 .medicine-table td.col-frequency-cell {
-  width: 135px;
-  min-width: 120px;
-  max-width: 145px;
+  width: 110px;
+  min-width: 95px;
+  max-width: 120px;
 }
 
 .medicine-table th.col-duration,
 .medicine-table td.col-duration-cell {
-  width: 140px;
-  min-width: 125px;
-  max-width: 155px;
+  width: 130px;
+  min-width: 115px;
+  max-width: 135px;
 }
 
 .medicine-table td.col-duration-cell {
-  padding: 8px 6px;
+  padding: 8px 4px;
 }
 
 .medicine-table th.col-remarks {
-  min-width: 240px;
+  min-width: 160px;
 }
 
 .medicine-table th.col-action {
@@ -1268,7 +1269,7 @@
 }
 
 .medicine-table td {
-  padding: 8px 10px;
+  padding: 8px 8px;
   border-bottom: 1px solid #EBF1EE;
   vertical-align: middle;
 }
@@ -1296,6 +1297,9 @@
 
 .action-cell {
   text-align: center;
+  width: 44px;
+  min-width: 44px;
+  padding: 8px 4px;
 }
 
 .medicine-input {

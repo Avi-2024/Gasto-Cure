@@ -267,7 +267,7 @@ function MedicineTable({ medicines = [], onUpdate, onRemove, onUpdateMedicineFul
                     );
                   })()}
                 </td>
-                <td>
+                <td className="col-remarks-cell">
                   <input
                     type="text"
                     className="medicine-input font-medium"
