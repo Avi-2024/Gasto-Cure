@@ -39,6 +39,8 @@ import {
   History,
   Zap,
   Menu,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react';
 import MedicineTable from './components/MedicineTable';
 import AutoResizeTextarea from './components/AutoResizeTextarea';
@@ -1122,15 +1124,16 @@ function PrescriptionPage() {
       {/* Screen Controls Header Bar */}
       <div className="prescription-controls no-print">
         <div className="controls-left">
-          {outletContext?.onMenuClick && (
+          {(outletContext?.toggleSidebar || outletContext?.onMenuClick) && (
             <button
               type="button"
-              className="md:hidden btn-secondary btn-header-back"
-              onClick={outletContext.onMenuClick}
-              title="Open navigation menu"
-              aria-label="Open navigation menu"
+              className="btn-secondary btn-header-back"
+              onClick={outletContext.toggleSidebar || outletContext.onMenuClick}
+              title={outletContext.sidebarOpen ? "Hide Sidebar (Ctrl+B)" : "Show Sidebar (Ctrl+B)"}
+              aria-label="Toggle navigation sidebar"
             >
-              <Menu size={14} />
+              {outletContext.sidebarOpen ? <PanelLeftClose size={14} /> : <PanelLeftOpen size={14} />}
+              <span className="hidden sm:inline">{outletContext.sidebarOpen ? 'Hide Menu' : 'Menu'}</span>
             </button>
           )}
           <button type="button" className="btn-secondary btn-header-back" onClick={() => navigate(-1)} title="Go back to previous page">

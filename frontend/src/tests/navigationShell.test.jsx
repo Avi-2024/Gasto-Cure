@@ -327,5 +327,42 @@ describe('Task 2: Global Navigation Shell & Brand Identity', () => {
       expect(container.querySelector('header')).toBeDefined();
       expect(container.querySelector('aside')).toBeDefined();
     });
+
+    it('toggles sidebar on and off when menu button is clicked', () => {
+      const { container } = render(
+        <MemoryRouter initialEntries={['/dashboard']}>
+          <DashboardLayout />
+        </MemoryRouter>
+      );
+
+      const menuBtn = screen.getByLabelText('Open menu');
+      const aside = container.querySelector('aside');
+      
+      // Initially open on desktop
+      expect(aside.className).toContain('w-[268px]');
+
+      // Click to turn off sidebar
+      fireEvent.click(menuBtn);
+      expect(aside.className).toContain('w-0');
+
+      // Click to turn on sidebar
+      fireEvent.click(menuBtn);
+      expect(aside.className).toContain('w-[268px]');
+    });
+
+    it('turns off sidebar when close button inside sidebar is clicked', () => {
+      const { container } = render(
+        <MemoryRouter initialEntries={['/dashboard']}>
+          <DashboardLayout />
+        </MemoryRouter>
+      );
+
+      const closeBtn = screen.getByLabelText('Close menu');
+      const aside = container.querySelector('aside');
+
+      expect(aside.className).toContain('w-[268px]');
+      fireEvent.click(closeBtn);
+      expect(aside.className).toContain('w-0');
+    });
   });
 });

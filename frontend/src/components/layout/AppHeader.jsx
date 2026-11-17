@@ -10,7 +10,7 @@ import { notificationsService } from '../../services/notificationsService';
  * Floating frosted card with omni-search spotlight, keyboard shortcut cue (⌘K / Ctrl+K),
  * contextual clinic selector pill with active status dot, + Patient quick action, and doctor profile badge.
  */
-export default function AppHeader({ onMenuClick, navigate: customNavigate }) {
+export default function AppHeader({ onMenuClick, sidebarOpen, navigate: customNavigate }) {
   const { activeClinicId, user, switchClinic } = useAuth();
   const searchInputRef = useRef(null);
   const searchContainerRef = useRef(null);
@@ -140,8 +140,9 @@ export default function AppHeader({ onMenuClick, navigate: customNavigate }) {
         <div ref={searchContainerRef} className="relative flex items-center gap-3">
           <button
             type="button"
-            className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#D9E6E2] bg-white text-[#4E6460] hover:bg-[#F7FAF8] hover:text-[#10201F] transition md:hidden"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#D9E6E2] bg-white text-[#4E6460] shadow-nivara-xs hover:border-[#287C75]/50 hover:bg-[#F7FAF8] hover:text-[#287C75] transition cursor-pointer"
             aria-label="Open menu"
+            title={sidebarOpen ? "Close sidebar (Ctrl+B)" : "Open sidebar (Ctrl+B)"}
             onClick={onMenuClick}
           >
             <Menu size={18} />

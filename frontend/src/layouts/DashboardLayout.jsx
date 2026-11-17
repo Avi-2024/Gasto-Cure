@@ -14,11 +14,44 @@ import AppHeader from '../components/layout/AppHeader';
  */
 export default function DashboardLayout() {
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Close mobile drawer automatically when route changes
+  // Desktop/Mobile sidebar open/close state (persisted across sessions)
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('nivara_sidebar_open');
+      if (saved !== null) return saved === 'true';
+      return window.innerWidth >= 768; // default open on desktop, closed on small mobile
+    }
+    return true;
+  });
+
+  const toggleSidebar = () => {
+    setSidebarOpen((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('nivara_sidebar_open', String(next));
+      } catch {}
+      return next;
+    });
+  };
+
+  // Global Ctrl+B / Cmd+B keyboard shortcut to toggle sidebar On/Off
   useEffect(() => {
-    setSidebarOpen(false);
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        e.preventDefault();
+        toggleSidebar();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Close mobile drawer automatically when route changes on small screens
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setSidebarOpen(false);
+    }
   }, [location.pathname]);
 
   const isChatRoute = location.pathname.startsWith('/chat');
@@ -28,15 +61,24 @@ export default function DashboardLayout() {
 
   return (
     <div className="h-screen w-screen overflow-hidden flex bg-[#F7FAF8] text-[#10201F]">
-      {/* Pinned Desktop Sidebar & Mobile Drawer */}
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      {/* Pinned Desktop Sidebar & Mobile Drawer with On/Off Toggle */}
+      <Sidebar
+        isOpen={sidebarOpen}
+        onClose={() => {
+          setSidebarOpen(false);
+          try {
+            localStorage.setItem('nivara_sidebar_open', 'false');
+          } catch {}
+        }}
+        onToggle={toggleSidebar}
+      />
 
       {/* Main Content Column */}
       <div className="flex-1 h-screen flex flex-col min-w-0 overflow-hidden">
         {/* Fixed/Sticky Top Header (Omitted in Prescription Studio to eliminate double header and maximize vertical writing space) */}
         {!isPrescriptionEditor && (
           <div className="shrink-0 relative z-[100] px-3 pt-3 sm:px-5 sm:pt-4 lg:px-7 lg:pt-5">
-            <AppHeader onMenuClick={() => setSidebarOpen(true)} />
+            <AppHeader onMenuClick={toggleSidebar} sidebarOpen={sidebarOpen} />
           </div>
         )}
 
@@ -64,7 +106,13 @@ export default function DashboardLayout() {
                 transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                 className={isChatRoute ? 'h-full flex-1 flex flex-col min-h-0' : undefined}
               >
-                <Outlet context={{ onMenuClick: () => setSidebarOpen(true) }} />
+                <Outlet
+                  context={{
+                    onMenuClick: toggleSidebar,
+                    toggleSidebar,
+                    sidebarOpen,
+                  }}
+                />
               </motion.section>
             </AnimatePresence>
           </div>

@@ -13,6 +13,7 @@ import {
   Users,
   MessageSquare,
   X,
+  PanelLeftClose,
 } from 'lucide-react';
 import NivaraLogo from '../common/NivaraLogo';
 import { useAuth } from '../../contexts/AuthContext';
@@ -146,102 +147,107 @@ export default function Sidebar({ isOpen, onClose }) {
 
       {/* Main Sidebar Shell */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-[268px] shrink-0 flex-col bg-[#123A3A] p-4 text-slate-100 shadow-2xl transition-transform duration-300 ease-in-out md:sticky md:top-0 md:h-screen md:translate-x-0 md:shadow-none overflow-hidden ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed inset-y-0 left-0 z-50 flex shrink-0 flex-col bg-[#123A3A] text-slate-100 shadow-2xl transition-all duration-300 ease-in-out md:sticky md:top-0 md:h-screen md:shadow-none overflow-hidden ${
+          isOpen
+            ? 'w-[268px] p-4 translate-x-0 opacity-100 pointer-events-auto'
+            : 'w-0 p-0 -translate-x-full md:w-0 md:p-0 md:opacity-0 md:pointer-events-none'
         }`}
         aria-label="Main Navigation"
       >
-        {/* Brand Header */}
-        <div className="flex items-center justify-between border-b border-white/10 pb-4 pt-1">
-          <NivaraLogo theme="dark" size="md" />
-          <button
-            type="button"
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/15 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white transition md:hidden"
-            aria-label="Close menu"
-            onClick={onClose}
-          >
-            <X size={16} />
-          </button>
-        </div>
-
-        {/* Grouped Navigation */}
-        <nav className="mt-4 flex-1 space-y-5 overflow-y-auto pr-1" aria-label="Sidebar">
-          {filteredGroups.map((group) => (
-            <div key={group.id} className="space-y-1">
-              <p className="px-3 text-[11px] font-bold uppercase tracking-[0.16em] text-teal-200/50">
-                {group.title}
-              </p>
-              <div className="space-y-1">
-                {group.items.map((item) => (
-                  <NavLink
-                    key={item.to}
-                    to={item.to}
-                    onClick={onClose}
-                    className={({ isActive }) =>
-                      `group relative flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all ${
-                        isActive
-                          ? 'bg-[#287C75] text-white shadow-sm font-semibold'
-                          : 'text-slate-200/80 hover:bg-white/5 hover:text-white'
-                      }`
-                    }
-                  >
-                    {({ isActive }) => (
-                      <>
-                        <div className="flex items-center gap-3 min-w-0">
-                          <item.icon
-                            size={18}
-                            className={`shrink-0 transition-colors ${
-                              isActive ? 'text-white' : 'text-slate-300 group-hover:text-white'
-                            }`}
-                          />
-                          <span className="truncate">{item.label}</span>
-                        </div>
-                        {isActive && (
-                          <span
-                            className="h-2 w-2 shrink-0 rounded-full bg-[#C9A45C] shadow-[0_0_8px_#C9A45C]"
-                            aria-hidden="true"
-                          />
-                        )}
-                      </>
-                    )}
-                  </NavLink>
-                ))}
-              </div>
-            </div>
-          ))}
-        </nav>
-
-        {/* Doctor Profile Pill & Logout */}
-        <div className="mt-auto pt-4 border-t border-white/10">
-          <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 p-2.5">
-            <Link
-              to="/profile"
-              onClick={onClose}
-              className="flex items-center gap-2.5 min-w-0 hover:opacity-90 transition group cursor-pointer"
-              title="View & Edit Doctor Profile"
-            >
-              <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#287C75] text-xs font-bold text-white shadow-sm ring-1 ring-white/20 group-hover:ring-[#C9A45C]/50 transition">
-                {initials}
-              </span>
-              <div className="min-w-0">
-                <p className="truncate text-xs font-semibold text-white group-hover:text-teal-200 transition">
-                  {displayName}
-                </p>
-                <span className="inline-block text-[10px] uppercase tracking-wider text-teal-200/80 font-medium">
-                  {roleLabel}
-                </span>
-              </div>
-            </Link>
-
+        <div className="w-[236px] flex flex-col flex-1 min-h-0">
+          {/* Brand Header */}
+          <div className="flex items-center justify-between border-b border-white/10 pb-4 pt-1">
+            <NivaraLogo theme="dark" size="md" />
             <button
               type="button"
-              onClick={logout}
-              title="Logout"
-              aria-label="Logout"
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-transparent text-slate-300 transition hover:border-rose-400/30 hover:bg-rose-500/15 hover:text-rose-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/15 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer"
+              aria-label="Close menu"
+              title="Close sidebar (Turn off)"
+              onClick={onClose}
             >
-              <LogOut size={16} />
+              <PanelLeftClose size={16} />
             </button>
+          </div>
+
+          {/* Grouped Navigation */}
+          <nav className="mt-4 flex-1 space-y-5 overflow-y-auto pr-1" aria-label="Sidebar">
+            {filteredGroups.map((group) => (
+              <div key={group.id} className="space-y-1">
+                <p className="px-3 text-[11px] font-bold uppercase tracking-[0.16em] text-teal-200/50">
+                  {group.title}
+                </p>
+                <div className="space-y-1">
+                  {group.items.map((item) => (
+                    <NavLink
+                      key={item.to}
+                      to={item.to}
+                      onClick={onClose}
+                      className={({ isActive }) =>
+                        `group relative flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all ${
+                          isActive
+                            ? 'bg-[#287C75] text-white shadow-sm font-semibold'
+                            : 'text-slate-200/80 hover:bg-white/5 hover:text-white'
+                        }`
+                      }
+                    >
+                      {({ isActive }) => (
+                        <>
+                          <div className="flex items-center gap-3 min-w-0">
+                            <item.icon
+                              size={18}
+                              className={`shrink-0 transition-colors ${
+                                isActive ? 'text-white' : 'text-slate-300 group-hover:text-white'
+                              }`}
+                            />
+                            <span className="truncate">{item.label}</span>
+                          </div>
+                          {isActive && (
+                            <span
+                              className="h-2 w-2 shrink-0 rounded-full bg-[#C9A45C] shadow-[0_0_8px_#C9A45C]"
+                              aria-hidden="true"
+                            />
+                          )}
+                        </>
+                      )}
+                    </NavLink>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </nav>
+
+          {/* Doctor Profile Pill & Logout */}
+          <div className="mt-auto pt-4 border-t border-white/10">
+            <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 p-2.5">
+              <Link
+                to="/profile"
+                onClick={onClose}
+                className="flex items-center gap-2.5 min-w-0 hover:opacity-90 transition group cursor-pointer"
+                title="View & Edit Doctor Profile"
+              >
+                <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#287C75] text-xs font-bold text-white shadow-sm ring-1 ring-white/20 group-hover:ring-[#C9A45C]/50 transition">
+                  {initials}
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-semibold text-white group-hover:text-teal-200 transition">
+                    {displayName}
+                  </p>
+                  <span className="inline-block text-[10px] uppercase tracking-wider text-teal-200/80 font-medium">
+                    {roleLabel}
+                  </span>
+                </div>
+              </Link>
+
+              <button
+                type="button"
+                onClick={logout}
+                title="Logout"
+                aria-label="Logout"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-transparent text-slate-300 transition hover:border-rose-400/30 hover:bg-rose-500/15 hover:text-rose-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
+              >
+                <LogOut size={16} />
+              </button>
+            </div>
           </div>
         </div>
       </aside>
