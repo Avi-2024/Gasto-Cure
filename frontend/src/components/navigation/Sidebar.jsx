@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import {
   Activity,
@@ -106,9 +106,111 @@ const navigationGroups = [
   },
 ];
 
+// Theme styles configuration for doctor customization (Previewable & Persistent)
+export const SIDEBAR_THEMES = {
+  classic: {
+    id: 'classic',
+    label: 'Classic Teal',
+    asideClasses: 'bg-[#123A3A] text-slate-100',
+    borderClasses: 'border-white/10',
+    headerTheme: 'dark',
+    sectionTitle: 'text-teal-200/50',
+    navInactive: 'text-slate-200/80 hover:bg-white/5 hover:text-white',
+    navActive: 'bg-[#287C75] text-white shadow-sm font-semibold',
+    accentDot: 'bg-[#C9A45C] shadow-[0_0_8px_#C9A45C]',
+    navIconInactive: 'text-slate-300 group-hover:text-white',
+    navIconActive: 'text-white',
+    profileBox: 'border-white/10 bg-white/5 text-white',
+    profileSubtext: 'text-teal-200/80',
+    profileHover: 'group-hover:text-teal-200',
+    railItemInactive: 'text-slate-300 hover:bg-white/10 hover:text-white',
+    railItemActive: 'bg-[#287C75] text-white shadow-sm ring-1 ring-white/20 font-semibold',
+    tooltipBg: 'bg-[#0D2929] border-white/15 text-white',
+    toggleBtn: 'bg-white text-slate-800 border-slate-300/90 shadow-[0_4px_14px_rgba(0,0,0,0.14)]',
+  },
+  light: {
+    id: 'light',
+    label: 'Light Luxury (Travigo)',
+    asideClasses: 'bg-white text-slate-800 border-r border-slate-200/80 shadow-[4px_0_24px_rgba(0,0,0,0.03)]',
+    borderClasses: 'border-slate-100',
+    headerTheme: 'light',
+    sectionTitle: 'text-slate-400 font-semibold tracking-wider',
+    navInactive: 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
+    navActive: 'bg-[#287C75] text-white shadow-sm font-semibold ring-1 ring-[#287C75]/20',
+    accentDot: 'bg-[#C9A45C] shadow-[0_0_8px_#C9A45C]',
+    navIconInactive: 'text-slate-400 group-hover:text-slate-700',
+    navIconActive: 'text-white',
+    profileBox: 'border-slate-200/90 bg-slate-50/80 text-slate-800',
+    profileSubtext: 'text-slate-500',
+    profileHover: 'group-hover:text-[#287C75]',
+    railItemInactive: 'text-slate-500 hover:bg-slate-100 hover:text-slate-800',
+    railItemActive: 'bg-[#287C75] text-white shadow-sm ring-1 ring-[#287C75]/20 font-semibold',
+    tooltipBg: 'bg-slate-900 border-slate-700 text-white',
+    toggleBtn: 'bg-white text-slate-800 border-slate-300 shadow-[0_4px_14px_rgba(0,0,0,0.12)] hover:border-slate-400',
+  },
+  obsidian: {
+    id: 'obsidian',
+    label: 'Midnight & Gold',
+    asideClasses: 'bg-[#0A1012] text-slate-100 border-r border-white/5 shadow-2xl',
+    borderClasses: 'border-white/10',
+    headerTheme: 'dark',
+    sectionTitle: 'text-[#C9A45C]/70 font-bold tracking-widest',
+    navInactive: 'text-slate-400 hover:bg-white/5 hover:text-white',
+    navActive: 'bg-gradient-to-r from-[#172D2B] to-[#122422] text-[#F5E6BE] border border-[#C9A45C]/40 shadow-sm font-semibold',
+    accentDot: 'bg-[#C9A45C] shadow-[0_0_10px_#C9A45C]',
+    navIconInactive: 'text-slate-400 group-hover:text-slate-200',
+    navIconActive: 'text-[#E5C77A]',
+    profileBox: 'border-[#C9A45C]/20 bg-[#121A1C] text-white',
+    profileSubtext: 'text-[#C9A45C]/80',
+    profileHover: 'group-hover:text-[#E5C77A]',
+    railItemInactive: 'text-slate-400 hover:bg-white/5 hover:text-white',
+    railItemActive: 'bg-[#172D2B] text-[#F5E6BE] border border-[#C9A45C]/40 font-semibold',
+    tooltipBg: 'bg-[#080E10] border-[#C9A45C]/30 text-white',
+    toggleBtn: 'bg-[#0E1A1C] text-[#C9A45C] border-[#C9A45C]/50 shadow-[0_4px_14px_rgba(0,0,0,0.4)] hover:border-[#C9A45C]',
+  },
+  sage: {
+    id: 'sage',
+    label: 'Minimalist Slate',
+    asideClasses: 'bg-[#1E293B] text-slate-100 border-r border-slate-700/60 shadow-xl',
+    borderClasses: 'border-slate-700/60',
+    headerTheme: 'dark',
+    sectionTitle: 'text-slate-400 font-semibold tracking-wider',
+    navInactive: 'text-slate-300 hover:bg-slate-700/40 hover:text-white',
+    navActive: 'bg-[#287C75] text-white shadow-sm font-semibold',
+    accentDot: 'bg-[#C9A45C] shadow-[0_0_8px_#C9A45C]',
+    navIconInactive: 'text-slate-400 group-hover:text-white',
+    navIconActive: 'text-white',
+    profileBox: 'border-slate-700 bg-slate-800/80 text-white',
+    profileSubtext: 'text-slate-400',
+    profileHover: 'group-hover:text-teal-300',
+    railItemInactive: 'text-slate-300 hover:bg-slate-700/50 hover:text-white',
+    railItemActive: 'bg-[#287C75] text-white shadow-sm ring-1 ring-white/20 font-semibold',
+    tooltipBg: 'bg-slate-900 border-slate-700 text-white',
+    toggleBtn: 'bg-slate-800 text-white border-slate-600 shadow-md hover:bg-slate-700',
+  },
+};
+
 export default function Sidebar({ isOpen, onClose, onToggle }) {
   const { user, logout } = useAuth();
   const role = user?.role || 'DOCTOR';
+
+  // Sidebar theme selection with persistent storage
+  const [currentTheme, setCurrentTheme] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('nivara_sidebar_theme');
+      if (saved && SIDEBAR_THEMES[saved]) return saved;
+    }
+    return 'classic';
+  });
+
+  const activeTheme = SIDEBAR_THEMES[currentTheme] || SIDEBAR_THEMES.classic;
+
+  const handleThemeChange = (newTheme) => {
+    setCurrentTheme(newTheme);
+    try {
+      localStorage.setItem('nivara_sidebar_theme', newTheme);
+    } catch {}
+  };
 
   // Compute user name and initials without redundant "Dr." prefixes
   const rawName = user?.name || (user?.email ? user.email.split('@')[0].replace(/[._-]/g, ' ') : 'Doctor');
@@ -156,7 +258,7 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
 
       {/* Main Sidebar Shell (Collapsible between Expanded 268px and Mini Icon Rail) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex shrink-0 flex-col bg-[#123A3A] text-slate-100 shadow-2xl transition-all duration-300 ease-in-out md:sticky md:top-0 md:h-screen md:shadow-none relative md:overflow-visible ${
+        className={`fixed inset-y-0 left-0 z-50 flex shrink-0 flex-col ${activeTheme.asideClasses} shadow-2xl transition-all duration-300 ease-in-out md:sticky md:top-0 md:h-screen md:shadow-none relative md:overflow-visible ${
           isOpen
             ? 'w-[268px] p-4 translate-x-0 opacity-100 pointer-events-auto'
             : 'w-0 p-0 -translate-x-full md:w-[76px] md:px-2 md:py-3.5 md:translate-x-0 md:opacity-100 md:pointer-events-auto'
@@ -184,8 +286,8 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
              ═══════════════════════════════════════════════════════════════ */
           <div className="w-[236px] flex flex-col flex-1 min-h-0">
             {/* Brand Header */}
-            <div className="flex items-center justify-between border-b border-white/10 pb-4 pt-1 w-full">
-              <NivaraLogo theme="dark" size="md" />
+            <div className={`flex items-center justify-between border-b ${activeTheme.borderClasses} pb-4 pt-1 w-full`}>
+              <NivaraLogo theme={activeTheme.headerTheme} size="md" />
               {/* Mobile drawer close button */}
               <button
                 type="button"
@@ -198,11 +300,68 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
               </button>
             </div>
 
+            {/* Interactive Theme Preview Switcher Strip */}
+            <div className={`mt-3 mb-1 px-2.5 py-1.5 rounded-xl border ${activeTheme.borderClasses} flex items-center justify-between text-xs`}>
+              <span className={`text-[9.5px] font-bold uppercase tracking-wider ${activeTheme.sectionTitle}`}>
+                Theme Style
+              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => handleThemeChange('light')}
+                  title="Option 1: Modern Light Luxury (Travigo Style)"
+                  className={`h-5 px-1.5 rounded-md text-[9.5px] font-bold transition cursor-pointer ${
+                    currentTheme === 'light'
+                      ? 'bg-slate-900 text-white shadow-xs'
+                      : 'hover:bg-black/5 text-slate-500'
+                  }`}
+                >
+                  1: Light
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleThemeChange('obsidian')}
+                  title="Option 2: Midnight Obsidian & Champagne Gold"
+                  className={`h-5 px-1.5 rounded-md text-[9.5px] font-bold transition cursor-pointer ${
+                    currentTheme === 'obsidian'
+                      ? 'bg-[#C9A45C] text-[#0A1012] shadow-xs'
+                      : 'hover:bg-white/10 text-slate-400'
+                  }`}
+                >
+                  2: Obsidian
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleThemeChange('sage')}
+                  title="Option 3: Refined Minimalist Slate"
+                  className={`h-5 px-1.5 rounded-md text-[9.5px] font-bold transition cursor-pointer ${
+                    currentTheme === 'sage'
+                      ? 'bg-slate-700 text-white shadow-xs'
+                      : 'hover:bg-white/10 text-slate-400'
+                  }`}
+                >
+                  3: Slate
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleThemeChange('classic')}
+                  title="Original Spruce Teal"
+                  className={`h-5 px-1 rounded-md text-[9px] font-bold transition cursor-pointer ${
+                    currentTheme === 'classic'
+                      ? 'bg-[#287C75] text-white shadow-xs'
+                      : 'hover:bg-white/10 text-slate-400'
+                  }`}
+                >
+                  Teal
+                </button>
+              </div>
+            </div>
+
             {/* Grouped Navigation */}
-            <nav className="mt-4 flex-1 space-y-5 overflow-y-auto pr-1" aria-label="Sidebar">
+            <nav className="mt-3 flex-1 space-y-4 overflow-y-auto pr-1" aria-label="Sidebar">
               {filteredGroups.map((group) => (
                 <div key={group.id} className="space-y-1">
-                  <p className="px-3 text-[11px] font-bold uppercase tracking-[0.16em] text-teal-200/50">
+                  <p className={`px-3 text-[11px] font-bold uppercase tracking-[0.16em] ${activeTheme.sectionTitle}`}>
                     {group.title}
                   </p>
                   <div className="space-y-1">
@@ -213,9 +372,7 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
                         onClick={handleLinkClick}
                         className={({ isActive }) =>
                           `group relative flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all ${
-                            isActive
-                              ? 'bg-[#287C75] text-white shadow-sm font-semibold'
-                              : 'text-slate-200/80 hover:bg-white/5 hover:text-white'
+                            isActive ? activeTheme.navActive : activeTheme.navInactive
                           }`
                         }
                       >
@@ -225,14 +382,14 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
                               <item.icon
                                 size={18}
                                 className={`shrink-0 transition-colors ${
-                                  isActive ? 'text-white' : 'text-slate-300 group-hover:text-white'
+                                  isActive ? activeTheme.navIconActive : activeTheme.navIconInactive
                                 }`}
                               />
                               <span className="truncate">{item.label}</span>
                             </div>
                             {isActive && (
                               <span
-                                className="h-2 w-2 shrink-0 rounded-full bg-[#C9A45C] shadow-[0_0_8px_#C9A45C]"
+                                className={`h-2 w-2 shrink-0 rounded-full ${activeTheme.accentDot}`}
                                 aria-hidden="true"
                               />
                             )}
@@ -246,8 +403,8 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
             </nav>
 
             {/* Doctor Profile Pill & Logout */}
-            <div className="mt-auto pt-4 border-t border-white/10">
-              <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 p-2.5">
+            <div className={`mt-auto pt-3 border-t ${activeTheme.borderClasses}`}>
+              <div className={`flex items-center justify-between gap-3 rounded-2xl border ${activeTheme.profileBox} p-2.5`}>
                 <Link
                   to="/profile"
                   onClick={handleLinkClick}
@@ -258,10 +415,10 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
                     {initials}
                   </span>
                   <div className="min-w-0">
-                    <p className="truncate text-xs font-semibold text-white group-hover:text-teal-200 transition">
+                    <p className={`truncate text-xs font-semibold ${activeTheme.profileHover} transition`}>
                       {displayName}
                     </p>
-                    <span className="inline-block text-[10px] uppercase tracking-wider text-teal-200/80 font-medium">
+                    <span className={`inline-block text-[10px] uppercase tracking-wider ${activeTheme.profileSubtext} font-medium`}>
                       {roleLabel}
                     </span>
                   </div>
@@ -272,7 +429,7 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
                   onClick={logout}
                   title="Logout"
                   aria-label="Logout"
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-transparent text-slate-300 transition hover:border-rose-400/30 hover:bg-rose-500/15 hover:text-rose-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300 cursor-pointer"
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-transparent text-slate-400 transition hover:border-rose-400/30 hover:bg-rose-500/15 hover:text-rose-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300 cursor-pointer"
                 >
                   <LogOut size={16} />
                 </button>
@@ -285,8 +442,8 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
              ═══════════════════════════════════════════════════════════════ */
           <div className="w-full flex flex-col flex-1 min-h-0 items-center">
             {/* Header: Centered Brand Mark */}
-            <div className="flex items-center justify-center border-b border-white/10 pb-3.5 pt-1 w-full">
-              <NivaraLogo variant="compact" theme="dark" size="sm" />
+            <div className={`flex items-center justify-center border-b ${activeTheme.borderClasses} pb-3.5 pt-1 w-full`}>
+              <NivaraLogo variant="compact" theme={activeTheme.headerTheme} size="sm" />
             </div>
 
             {/* Navigation: Centered Icon Rail with Senior UX Hover Tooltips */}
@@ -295,7 +452,7 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
                 .filter((group) => group.id !== 'configuration')
                 .map((group, groupIdx) => (
                   <React.Fragment key={group.id}>
-                    {groupIdx > 0 && <div className="w-8 border-t border-white/10 my-1.5 shrink-0" />}
+                    {groupIdx > 0 && <div className={`w-8 border-t ${activeTheme.borderClasses} my-1.5 shrink-0`} />}
                     {group.items.map((item) => (
                       <NavLink
                         key={item.to}
@@ -303,9 +460,7 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
                         onClick={handleLinkClick}
                         className={({ isActive }) =>
                           `group relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all ${
-                            isActive
-                              ? 'bg-[#287C75] text-white shadow-sm ring-1 ring-white/20 font-semibold'
-                              : 'text-slate-300 hover:bg-white/10 hover:text-white'
+                            isActive ? activeTheme.railItemActive : activeTheme.railItemInactive
                           }`
                         }
                         aria-label={item.label}
@@ -316,17 +471,17 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
                             <item.icon
                               size={18}
                               className={`shrink-0 transition-transform group-hover:scale-110 ${
-                                isActive ? 'text-white' : 'text-slate-300 group-hover:text-white'
+                                isActive ? activeTheme.navIconActive : activeTheme.navIconInactive
                               }`}
                             />
                             {isActive && (
                               <span
-                                className="absolute right-1 top-1 h-2 w-2 rounded-full bg-[#C9A45C] shadow-[0_0_6px_#C9A45C]"
+                                className={`absolute right-1 top-1 h-2 w-2 rounded-full ${activeTheme.accentDot}`}
                                 aria-hidden="true"
                               />
                             )}
                             {/* Senior UX Floating Tooltip */}
-                            <span className="pointer-events-none absolute left-full ml-3 z-50 hidden md:group-hover:flex items-center rounded-lg bg-[#0D2929] border border-white/15 px-2.5 py-1 text-xs font-semibold text-white whitespace-nowrap shadow-2xl">
+                            <span className={`pointer-events-none absolute left-full ml-3 z-50 hidden md:group-hover:flex items-center rounded-lg ${activeTheme.tooltipBg} border px-2.5 py-1 text-xs font-semibold whitespace-nowrap shadow-2xl`}>
                               {item.label}
                             </span>
                           </>
@@ -338,7 +493,7 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
             </nav>
 
             {/* Doctor Profile Footer: Centered Avatar Circle, Settings & Logout (Matching Reference) */}
-            <div className="mt-auto pt-2.5 border-t border-white/10 w-full flex flex-col items-center gap-1.5 pb-1">
+            <div className={`mt-auto pt-2.5 border-t ${activeTheme.borderClasses} w-full flex flex-col items-center gap-1.5 pb-1`}>
               <Link
                 to="/profile"
                 onClick={handleLinkClick}
@@ -347,7 +502,7 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
                 title={displayName}
               >
                 <span>{initials}</span>
-                <span className="pointer-events-none absolute left-full ml-3 z-50 hidden md:group-hover:flex items-center rounded-lg bg-[#0D2929] border border-white/15 px-2.5 py-1 text-xs font-semibold text-white whitespace-nowrap shadow-2xl">
+                <span className={`pointer-events-none absolute left-full ml-3 z-50 hidden md:group-hover:flex items-center rounded-lg ${activeTheme.tooltipBg} border px-2.5 py-1 text-xs font-semibold whitespace-nowrap shadow-2xl`}>
                   {displayName} ({roleLabel})
                 </span>
               </Link>
@@ -358,16 +513,14 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
                 onClick={handleLinkClick}
                 className={({ isActive }) =>
                   `group relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-all ${
-                    isActive
-                      ? 'bg-[#287C75] text-white shadow-sm ring-1 ring-white/20'
-                      : 'text-slate-300 hover:bg-white/10 hover:text-white'
+                    isActive ? activeTheme.railItemActive : activeTheme.railItemInactive
                   }`
                 }
                 aria-label="Settings & Calibration"
                 title="Settings & Calibration"
               >
                 <Settings size={18} />
-                <span className="pointer-events-none absolute left-full ml-3 z-50 hidden md:group-hover:flex items-center rounded-lg bg-[#0D2929] border border-white/15 px-2.5 py-1 text-xs font-semibold text-white whitespace-nowrap shadow-2xl">
+                <span className={`pointer-events-none absolute left-full ml-3 z-50 hidden md:group-hover:flex items-center rounded-lg ${activeTheme.tooltipBg} border px-2.5 py-1 text-xs font-semibold whitespace-nowrap shadow-2xl`}>
                   Settings & Calibration
                 </span>
               </NavLink>
@@ -378,10 +531,10 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
                 onClick={logout}
                 title="Logout"
                 aria-label="Logout"
-                className="group relative flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-rose-300 hover:bg-rose-500/20 hover:text-rose-200 transition cursor-pointer"
+                className="group relative flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-rose-400 hover:bg-rose-500/20 transition cursor-pointer"
               >
                 <LogOut size={16} />
-                <span className="pointer-events-none absolute left-full ml-3 z-50 hidden md:group-hover:flex items-center rounded-lg bg-[#0D2929] border border-white/15 px-2.5 py-1 text-xs font-semibold text-rose-200 whitespace-nowrap shadow-2xl">
+                <span className={`pointer-events-none absolute left-full ml-3 z-50 hidden md:group-hover:flex items-center rounded-lg ${activeTheme.tooltipBg} border px-2.5 py-1 text-xs font-semibold text-rose-300 whitespace-nowrap shadow-2xl`}>
                   Logout
                 </span>
               </button>
