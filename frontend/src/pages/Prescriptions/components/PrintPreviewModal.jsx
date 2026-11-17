@@ -157,9 +157,21 @@ function PrintPreviewModal({
               <div className="preview-letterhead">
                 <div className="preview-letterhead-content">
                   <div className="preview-clinic-info">
-                    <h1 className="preview-clinic-name font-heading">{clinicName}</h1>
-                    <p className="preview-clinic-sub">{clinicSettings?.address || 'Medical Centre'}</p>
-                    <p className="preview-clinic-sub">Phone: {clinicSettings?.phone || 'N/A'}</p>
+                    {clinicSettings?.clinicLogo && (
+                      <img
+                        src={clinicSettings.clinicLogo}
+                        alt={clinicName}
+                        className="preview-clinic-logo"
+                      />
+                    )}
+                    <div>
+                      <h1 className="preview-clinic-name font-heading">{clinicName}</h1>
+                      {clinicSettings?.clinicTagline && (
+                        <p className="preview-clinic-tagline">{clinicSettings.clinicTagline}</p>
+                      )}
+                      <p className="preview-clinic-sub">{clinicSettings?.address || 'Medical Centre'}</p>
+                      <p className="preview-clinic-sub">Phone: {clinicSettings?.phone || 'N/A'}</p>
+                    </div>
                   </div>
                   <div className="preview-doctor-info">
                     <h2 className="preview-doctor-name font-heading">{doctorName}</h2>
@@ -171,6 +183,17 @@ function PrintPreviewModal({
                   </div>
                 </div>
                 <hr className="preview-letterhead-divider" />
+              </div>
+            )}
+
+            {/* Background Watermark if enabled */}
+            {clinicSettings?.watermarkEnabled && clinicSettings?.clinicLogo && (
+              <div
+                className="preview-watermark-overlay"
+                style={{ opacity: clinicSettings.watermarkOpacity || 0.06 }}
+                aria-hidden="true"
+              >
+                <img src={clinicSettings.clinicLogo} alt="" className="preview-watermark-img" />
               </div>
             )}
 

@@ -2005,6 +2005,51 @@
   gap: 24px;
 }
 
+.letterhead-clinic-brand {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.letterhead-clinic-logo {
+  max-height: 64px;
+  max-width: 140px;
+  object-fit: contain;
+  flex-shrink: 0;
+  border-radius: 6px;
+}
+
+.letterhead-clinic-tagline {
+  font-size: 12px;
+  font-weight: 600;
+  color: #287C75;
+  margin: 0 0 3px 0;
+}
+
+/* Watermark Overlay */
+.prescription-watermark-overlay {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 340px;
+  max-width: 80%;
+}
+
+.prescription-watermark-img {
+  width: 100%;
+  height: auto;
+  max-height: 340px;
+  object-fit: contain;
+  filter: grayscale(100%);
+}
+
 .letterhead-clinic-name {
   font-size: 22px;
   font-weight: 800;
@@ -2120,6 +2165,11 @@
   .prescription-page.digital-mode .prescription-content,
   [data-pad-mode="false"] .prescription-content {
     padding-top: var(--print-top-margin, 12mm) !important;
+  }
+
+  /* Watermark in print */
+  .prescription-watermark-overlay {
+    display: flex !important;
   }
 
   /* Section Spacing for print */

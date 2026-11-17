@@ -1220,12 +1220,24 @@ function PrescriptionPage() {
         {/* Digital Letterhead Header (Rendered on plain paper when padMode is false) */}
         <div className="digital-letterhead">
           <div className="letterhead-header">
-            <div>
-              <h1 className="letterhead-clinic-name font-heading">
-                {clinicSettings.clinicName || 'Nivara Clinic & Health Centre'}
-              </h1>
-              <p className="letterhead-clinic-details">{clinicSettings.address}</p>
-              <p className="letterhead-clinic-details">Phone: {clinicSettings.phone}</p>
+            <div className="letterhead-clinic-brand">
+              {clinicSettings.clinicLogo && (
+                <img
+                  src={clinicSettings.clinicLogo}
+                  alt={clinicSettings.clinicName || 'Clinic Logo'}
+                  className="letterhead-clinic-logo"
+                />
+              )}
+              <div>
+                <h1 className="letterhead-clinic-name font-heading">
+                  {clinicSettings.clinicName || 'Nivara Clinic & Health Centre'}
+                </h1>
+                {clinicSettings.clinicTagline && (
+                  <p className="letterhead-clinic-tagline">{clinicSettings.clinicTagline}</p>
+                )}
+                <p className="letterhead-clinic-details">{clinicSettings.address}</p>
+                <p className="letterhead-clinic-details">Phone: {clinicSettings.phone}</p>
+              </div>
             </div>
             <div className="letterhead-doctor-info">
               <h2 className="letterhead-doctor-name font-heading">
@@ -1239,6 +1251,17 @@ function PrescriptionPage() {
             </div>
           </div>
         </div>
+
+        {/* Subtle Background Clinic Watermark if configured */}
+        {clinicSettings.watermarkEnabled && clinicSettings.clinicLogo && (
+          <div
+            className="prescription-watermark-overlay"
+            style={{ opacity: clinicSettings.watermarkOpacity || 0.06 }}
+            aria-hidden="true"
+          >
+            <img src={clinicSettings.clinicLogo} alt="" className="prescription-watermark-img" />
+          </div>
+        )}
 
         {/* 1. Patient Identity Banner */}
         <section className="prescription-section patient-info-section">

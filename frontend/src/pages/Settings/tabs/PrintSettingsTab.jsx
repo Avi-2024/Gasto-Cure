@@ -7,6 +7,10 @@ import {
   CheckCircle,
   RotateCcw,
   Ruler,
+  Image as ImageIcon,
+  Upload,
+  Trash2,
+  Sparkles,
 } from 'lucide-react';
 import { localSettings } from '../../../services/localStore';
 import {
@@ -20,12 +24,51 @@ export function PrintSettingsTab() {
   const [settings, setSettings] = useState(() => localSettings.get());
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [showTestSheet, setShowTestSheet] = useState(false);
+  const [logoError, setLogoError] = useState('');
 
   // Demographics form fields
   const handleClinicChange = (field, value) => {
     setSettings((prev) => ({
       ...prev,
       [field]: value,
+    }));
+    setSavedSuccess(false);
+  };
+
+  // Logo upload handler (reads image file to base64 data URL)
+  const handleLogoUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setLogoError('Please select a valid image file (PNG, JPG, SVG, WebP).');
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      setLogoError('Image size exceeds 2MB limit for local browser storage.');
+      return;
+    }
+
+    setLogoError('');
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result;
+      setSettings((prev) => ({
+        ...prev,
+        clinicLogo: dataUrl,
+      }));
+      setSavedSuccess(false);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveLogo = () => {
+    setLogoError('');
+    setSettings((prev) => ({
+      ...prev,
+      clinicLogo: '',
+      watermarkEnabled: false,
     }));
     setSavedSuccess(false);
   };
@@ -54,10 +97,15 @@ export function PrintSettingsTab() {
     const sanitizedPrint = sanitizePrintSettings(settings.print);
     const updated = localSettings.update({
       clinicName: settings.clinicName,
+      clinicTagline: settings.clinicTagline,
+      clinicLogo: settings.clinicLogo,
+      watermarkEnabled: Boolean(settings.watermarkEnabled),
+      watermarkOpacity: Number(settings.watermarkOpacity || 0.06),
       doctorName: settings.doctorName,
       qualification: settings.qualification,
       regNumber: settings.regNumber,
       phone: settings.phone,
+      email: settings.email,
       address: settings.address,
       timing: settings.timing,
       print: sanitizedPrint,
@@ -376,18 +424,140 @@ export function PrintSettingsTab() {
           </div>
 
           {/* Section 3: Clinic & Doctor Demographics */}
-          <div className="bg-white p-6 rounded-2xl border border-[#D9E6E2] shadow-nivara-xs space-y-5">
-            <div className="flex items-center gap-2.5">
-              <span className="p-2 rounded-xl bg-teal-50 text-[#287C75] border border-teal-100/80">
-                <Building2 size={18} />
+          <div className="bg-white p-6 rounded-2xl border border-[#D9E6E2] shadow-nivara-xs space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <span className="p-2 rounded-xl bg-teal-50 text-[#287C75] border border-teal-100/80">
+                  <Building2 size={18} />
+                </span>
+                <div>
+                  <h3 className="font-heading text-base font-bold text-[#10201F]">
+                    Clinic Branding, Logo & Header Information
+                  </h3>
+                  <p className="text-xs text-[#4E6460]">
+                    Customize your clinic logo, header layout, and address printed in "Digital Header" mode.
+                  </p>
+                </div>
+              </div>
+              <span className="text-[11px] font-semibold text-[#287C75] bg-[#E8F3F1] px-2.5 py-0.5 rounded-full border border-[#287C75]/20">
+                Digital Header Mode
               </span>
-              <div>
-                <h3 className="font-heading text-base font-bold text-[#10201F]">Clinic & Doctor Information</h3>
-                <p className="text-xs text-[#4E6460]">Used when printing plain paper letterhead, receipts, and consultation reports.</p>
+            </div>
+
+            {/* Clinic Logo Upload & Preview Zone */}
+            <div className="space-y-3 p-4 rounded-xl border border-[#D9E6E2] bg-[#F7FAF8]/70">
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="font-heading text-xs font-bold text-[#10201F] block">
+                    Clinic Logo (Header & Watermark)
+                  </label>
+                  <p className="text-[11px] text-[#4E6460] mt-0.5">
+                    Upload clinic crest, emblem or logo to print on plain paper prescriptions.
+                  </p>
+                </div>
+                {settings.clinicLogo && (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#2E7D5B] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                    <CheckCircle size={12} />
+                    Active
+                  </span>
+                )}
+              </div>
+
+              {logoError && (
+                <div className="p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-xs font-medium text-rose-800">
+                  {logoError}
+                </div>
+              )}
+
+              {settings.clinicLogo ? (
+                <div className="flex items-center gap-4 p-3 bg-white rounded-xl border border-[#B5D8D0] shadow-nivara-xs">
+                  <div className="flex h-18 w-32 items-center justify-center rounded-lg border border-[#D9E6E2] bg-slate-50/50 p-1.5 overflow-hidden">
+                    <img
+                      src={settings.clinicLogo}
+                      alt="Clinic Logo Preview"
+                      className="max-h-full max-w-full object-contain"
+                    />
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <p className="text-xs font-bold text-[#10201F]">Clinic Logo Configured</p>
+                    <p className="text-[11px] text-[#4E6460]">
+                      Appears in the header and optionally as a subtle background watermark on Digital Header prints.
+                    </p>
+                    <div className="flex items-center gap-2 pt-1">
+                      <label className="btn-secondary inline-flex items-center gap-1.5 text-xs py-1 px-2.5 rounded-lg border border-[#D9E6E2] cursor-pointer hover:bg-slate-50 font-semibold text-[#287C75]">
+                        <Upload size={12} />
+                        <span>Change Logo</span>
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                          onChange={handleLogoUpload}
+                          className="hidden"
+                          aria-label="Change Clinic Logo"
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        onClick={handleRemoveLogo}
+                        className="inline-flex items-center gap-1.5 text-xs py-1 px-2.5 rounded-lg border border-rose-200 text-rose-700 hover:bg-rose-50 font-semibold"
+                        aria-label="Remove Clinic Logo"
+                      >
+                        <Trash2 size={12} />
+                        <span>Remove</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-[#CFE2DC] rounded-xl hover:border-[#287C75] bg-white hover:bg-teal-50/20 cursor-pointer transition text-center group shadow-nivara-xs">
+                  <span className="p-3 rounded-full bg-teal-50 text-[#287C75] border border-teal-100 group-hover:scale-105 transition">
+                    <Upload size={20} />
+                  </span>
+                  <span className="mt-2 text-sm font-bold text-[#10201F]">
+                    Click to Upload Clinic Logo
+                  </span>
+                  <span className="text-xs text-[#7D908C] mt-0.5">
+                    PNG, JPG, WebP, or SVG (Recommended max height: 120px, under 2MB)
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                    onChange={handleLogoUpload}
+                    className="hidden"
+                    aria-label="Upload Clinic Logo"
+                  />
+                </label>
+              )}
+
+              {/* Watermark Toggle */}
+              <div className="pt-2">
+                <label className="flex items-start gap-3 p-3 rounded-xl border border-[#D9E6E2] bg-white hover:bg-[#F7FAF8] cursor-pointer transition shadow-nivara-xs">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(settings.watermarkEnabled)}
+                    onChange={(e) => {
+                      setSettings((prev) => ({
+                        ...prev,
+                        watermarkEnabled: e.target.checked,
+                      }));
+                      setSavedSuccess(false);
+                    }}
+                    className="mt-0.5 h-4 w-4 rounded border-[#D9E6E2] text-[#287C75] focus:ring-[#287C75] accent-[#287C75]"
+                    aria-label="Enable subtle clinic logo watermark on print"
+                  />
+                  <div className="flex-1 text-xs">
+                    <span className="font-bold text-[#10201F] block">
+                      Print Clinic Logo as Subtle Watermark
+                    </span>
+                    <span className="text-[#4E6460] mt-0.5 block">
+                      Renders a transparent watermark (~6% opacity) in the center of the printed prescription sheet for a certified clinical look.
+                    </span>
+                  </div>
+                </label>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Clinic and Doctor Demographics Fields */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
               <div>
                 <label className="field-label">Clinic Name</label>
                 <input
@@ -396,6 +566,19 @@ export function PrintSettingsTab() {
                   onChange={(e) => handleClinicChange('clinicName', e.target.value)}
                   placeholder="ClinicRx Gastro Centre"
                   className="w-full px-3.5 py-2.5 text-sm border border-[#D9E6E2] rounded-xl focus:border-[#287C75] focus:ring-2 focus:ring-[#287C75]/20 bg-white outline-none transition"
+                  aria-label="Clinic Name"
+                />
+              </div>
+
+              <div>
+                <label className="field-label">Clinic Tagline / Specialty</label>
+                <input
+                  type="text"
+                  value={settings.clinicTagline || ''}
+                  onChange={(e) => handleClinicChange('clinicTagline', e.target.value)}
+                  placeholder="Digestive, Liver & Advanced Endoscopy Centre"
+                  className="w-full px-3.5 py-2.5 text-sm border border-[#D9E6E2] rounded-xl focus:border-[#287C75] focus:ring-2 focus:ring-[#287C75]/20 bg-white outline-none transition"
+                  aria-label="Clinic Tagline"
                 />
               </div>
 
@@ -407,6 +590,7 @@ export function PrintSettingsTab() {
                   onChange={(e) => handleClinicChange('doctorName', e.target.value)}
                   placeholder="Dr. Aarav Sharma"
                   className="w-full px-3.5 py-2.5 text-sm border border-[#D9E6E2] rounded-xl focus:border-[#287C75] focus:ring-2 focus:ring-[#287C75]/20 bg-white outline-none transition"
+                  aria-label="Doctor Name"
                 />
               </div>
 
@@ -416,8 +600,9 @@ export function PrintSettingsTab() {
                   type="text"
                   value={settings.qualification || ''}
                   onChange={(e) => handleClinicChange('qualification', e.target.value)}
-                  placeholder="MBBS, MD"
+                  placeholder="MBBS, MD (Medicine), DM (Gastroenterology)"
                   className="w-full px-3.5 py-2.5 text-sm border border-[#D9E6E2] rounded-xl focus:border-[#287C75] focus:ring-2 focus:ring-[#287C75]/20 bg-white outline-none transition"
+                  aria-label="Qualifications"
                 />
               </div>
 
@@ -427,19 +612,33 @@ export function PrintSettingsTab() {
                   type="text"
                   value={settings.regNumber || ''}
                   onChange={(e) => handleClinicChange('regNumber', e.target.value)}
-                  placeholder="MCI-12345"
+                  placeholder="MCI-12345/2012"
                   className="w-full px-3.5 py-2.5 text-sm border border-[#D9E6E2] rounded-xl focus:border-[#287C75] focus:ring-2 focus:ring-[#287C75]/20 bg-white outline-none transition"
+                  aria-label="Registration Number"
                 />
               </div>
 
               <div>
-                <label className="field-label">Contact Phone</label>
+                <label className="field-label">Contact Phone / Helpline</label>
                 <input
                   type="text"
                   value={settings.phone || ''}
                   onChange={(e) => handleClinicChange('phone', e.target.value)}
                   placeholder="9876543210"
                   className="w-full px-3.5 py-2.5 text-sm border border-[#D9E6E2] rounded-xl focus:border-[#287C75] focus:ring-2 focus:ring-[#287C75]/20 bg-white outline-none transition"
+                  aria-label="Contact Phone"
+                />
+              </div>
+
+              <div>
+                <label className="field-label">Contact Email (Optional)</label>
+                <input
+                  type="email"
+                  value={settings.email || ''}
+                  onChange={(e) => handleClinicChange('email', e.target.value)}
+                  placeholder="info@gastrocure.com"
+                  className="w-full px-3.5 py-2.5 text-sm border border-[#D9E6E2] rounded-xl focus:border-[#287C75] focus:ring-2 focus:ring-[#287C75]/20 bg-white outline-none transition"
+                  aria-label="Contact Email"
                 />
               </div>
 
@@ -451,17 +650,19 @@ export function PrintSettingsTab() {
                   onChange={(e) => handleClinicChange('timing', e.target.value)}
                   placeholder="10:00 AM - 02:00 PM, 06:00 PM - 09:00 PM"
                   className="w-full px-3.5 py-2.5 text-sm border border-[#D9E6E2] rounded-xl focus:border-[#287C75] focus:ring-2 focus:ring-[#287C75]/20 bg-white outline-none transition"
+                  aria-label="Consulting Hours"
                 />
               </div>
 
               <div className="sm:col-span-2">
-                <label className="field-label">Clinic Address</label>
-                <input
-                  type="text"
+                <label className="field-label">Custom Clinic Address</label>
+                <textarea
+                  rows={2}
                   value={settings.address || ''}
                   onChange={(e) => handleClinicChange('address', e.target.value)}
-                  placeholder="Shop 4, Ground Floor, Health Plaza, New Delhi"
-                  className="w-full px-3.5 py-2.5 text-sm border border-[#D9E6E2] rounded-xl focus:border-[#287C75] focus:ring-2 focus:ring-[#287C75]/20 bg-white outline-none transition"
+                  placeholder="Shop 4, Ground Floor, Health Plaza, Metro Pillar 142, Main Ring Road, New Delhi 110024"
+                  className="w-full px-3.5 py-2 text-sm border border-[#D9E6E2] rounded-xl focus:border-[#287C75] focus:ring-2 focus:ring-[#287C75]/20 bg-white outline-none transition resize-none"
+                  aria-label="Custom Clinic Address"
                 />
               </div>
             </div>
@@ -511,24 +712,52 @@ export function PrintSettingsTab() {
                   ) : (
                     <div
                       className="absolute top-0 left-0 right-0 border-b border-[#D9E6E2] bg-teal-50/40 p-2 flex justify-between items-start"
-                      style={{ height: '55px' }}
+                      style={{ height: '58px' }}
                     >
-                      <div className="text-left">
-                        <div className="text-[10px] font-extrabold text-[#10201F] truncate max-w-[130px]">
-                          {settings.clinicName || 'ClinicRx Centre'}
-                        </div>
-                        <div className="text-[8px] text-[#4E6460] truncate max-w-[130px]">
-                          {settings.address || 'Clinic Address'}
+                      <div className="flex items-start gap-1.5 text-left">
+                        {settings.clinicLogo && (
+                          <img
+                            src={settings.clinicLogo}
+                            alt=""
+                            className="h-7 w-auto object-contain max-w-[36px] flex-shrink-0 rounded bg-white p-0.5 border border-[#D9E6E2]"
+                          />
+                        )}
+                        <div>
+                          <div className="text-[10px] font-extrabold text-[#10201F] truncate max-w-[110px]">
+                            {settings.clinicName || 'ClinicRx Centre'}
+                          </div>
+                          {settings.clinicTagline && (
+                            <div className="text-[7px] font-semibold text-[#287C75] truncate max-w-[110px]">
+                              {settings.clinicTagline}
+                            </div>
+                          )}
+                          <div className="text-[7.5px] text-[#4E6460] truncate max-w-[110px]">
+                            {settings.address || 'Clinic Address'}
+                          </div>
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-[9px] font-bold text-[#10201F] truncate max-w-[100px]">
+                        <div className="text-[9px] font-bold text-[#10201F] truncate max-w-[85px]">
                           {settings.doctorName || 'Dr. Aarav Sharma'}
                         </div>
                         <div className="text-[7.5px] text-[#4E6460]">
                           {settings.qualification || 'MBBS'}
                         </div>
+                        <div className="text-[7px] text-[#7D908C]">
+                          {settings.regNumber || 'MCI-12345'}
+                        </div>
                       </div>
+                    </div>
+                  )}
+
+                  {/* Subtle Clinic Logo Watermark in diagram if enabled */}
+                  {settings.watermarkEnabled && settings.clinicLogo && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+                      <img
+                        src={settings.clinicLogo}
+                        alt=""
+                        className="w-24 h-24 object-contain opacity-10 grayscale"
+                      />
                     </div>
                   )}
 
