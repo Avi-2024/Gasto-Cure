@@ -15,6 +15,8 @@ import {
   X,
   PanelLeftClose,
   PanelLeftOpen,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import NivaraLogo from '../common/NivaraLogo';
 import { useAuth } from '../../contexts/AuthContext';
@@ -154,24 +156,13 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
 
       {/* Main Sidebar Shell (Collapsible between Expanded 268px and Mini Icon Rail 72px) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex shrink-0 flex-col bg-[#123A3A] text-slate-100 shadow-2xl transition-all duration-300 ease-in-out md:sticky md:top-0 md:h-screen md:shadow-none ${
+        className={`fixed inset-y-0 left-0 z-50 flex shrink-0 flex-col bg-[#123A3A] text-slate-100 shadow-2xl transition-all duration-300 ease-in-out md:sticky md:top-0 md:h-screen md:shadow-none overflow-hidden ${
           isOpen
-            ? 'w-[268px] p-4 translate-x-0 opacity-100 pointer-events-auto overflow-hidden'
-            : 'w-0 p-0 -translate-x-full md:w-[72px] md:p-3 md:translate-x-0 md:opacity-100 md:pointer-events-auto overflow-visible'
+            ? 'w-[268px] p-4 translate-x-0 opacity-100 pointer-events-auto'
+            : 'w-0 p-0 -translate-x-full md:w-[72px] md:p-3 md:translate-x-0 md:opacity-100 md:pointer-events-auto'
         }`}
         aria-label="Main Navigation"
       >
-        {/* Senior UX Edge Seam Toggle Button (Border handle) */}
-        <button
-          type="button"
-          onClick={onToggle}
-          className="hidden md:flex absolute top-5 -right-3 z-50 h-6 w-6 items-center justify-center rounded-full border border-white/20 bg-[#123A3A] text-slate-300 shadow-md hover:bg-[#287C75] hover:text-white hover:scale-110 transition cursor-pointer"
-          title={isOpen ? "Collapse sidebar (Ctrl+B)" : "Expand sidebar (Ctrl+B)"}
-          aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
-        >
-          {isOpen ? <PanelLeftClose size={12} /> : <PanelLeftOpen size={12} />}
-        </button>
-
         {isOpen ? (
           /* ═══════════════════════════════════════════════════════════════
              1. EXPANDED SIDEBAR CONTENT (268px)
@@ -182,12 +173,12 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
               <NivaraLogo theme="dark" size="md" />
               <button
                 type="button"
-                className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/15 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer"
+                className="flex h-7 w-7 items-center justify-center rounded-full border border-white/20 bg-white/10 text-slate-300 hover:bg-[#287C75] hover:text-white hover:border-[#287C75] transition-all cursor-pointer shadow-xs group"
                 aria-label="Close menu"
                 title="Collapse sidebar (Ctrl+B)"
                 onClick={onToggle || onClose}
               >
-                <PanelLeftClose size={16} />
+                <ChevronLeft size={13} className="transition-transform group-hover:-translate-x-0.5" />
               </button>
             </div>
 
@@ -274,74 +265,79 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
           </div>
         ) : (
           /* ═══════════════════════════════════════════════════════════════
-             2. COLLAPSED MINI ICON RAIL (72px) - Senior UX
+             2. COLLAPSED MINI ICON RAIL (72px) - Matching Reference
              ═══════════════════════════════════════════════════════════════ */
           <div className="w-full flex flex-col flex-1 min-h-0 items-center">
-            {/* Header: Centered Expand Button */}
-            <div className="flex items-center justify-center border-b border-white/10 pb-4 pt-1 w-full">
+            {/* Header: Brand Mark + Circular Toggle Button like Reference */}
+            <div className="flex items-center justify-between border-b border-white/10 pb-3 pt-1 w-full px-0.5">
+              <div className="h-8 w-8 shrink-0 flex items-center justify-center">
+                <NivaraLogo variant="compact" theme="dark" size="sm" />
+              </div>
               <button
                 type="button"
-                className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-white/5 text-teal-200 hover:bg-[#287C75] hover:text-white transition cursor-pointer group shadow-sm"
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-slate-200 hover:bg-[#287C75] hover:text-white hover:border-[#287C75] transition-all cursor-pointer shadow-xs group"
                 aria-label="Open menu"
                 title="Expand sidebar (Ctrl+B)"
                 onClick={onToggle}
               >
-                <PanelLeftOpen size={18} className="transition-transform group-hover:scale-110" />
+                <ChevronRight size={13} className="transition-transform group-hover:translate-x-0.5" />
               </button>
             </div>
 
             {/* Navigation: Centered Icon Rail with Senior UX Hover Tooltips */}
-            <nav className="mt-4 flex-1 space-y-2 overflow-y-auto w-full flex flex-col items-center pr-0.5" aria-label="Sidebar icons">
-              {filteredGroups.map((group, groupIdx) => (
-                <React.Fragment key={group.id}>
-                  {groupIdx > 0 && <div className="w-8 border-t border-white/10 my-2 shrink-0" />}
-                  {group.items.map((item) => (
-                    <NavLink
-                      key={item.to}
-                      to={item.to}
-                      onClick={handleLinkClick}
-                      className={({ isActive }) =>
-                        `group relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all ${
-                          isActive
-                            ? 'bg-[#287C75] text-white shadow-sm ring-1 ring-white/20'
-                            : 'text-slate-300 hover:bg-white/10 hover:text-white'
-                        }`
-                      }
-                      aria-label={item.label}
-                      title={item.label}
-                    >
-                      {({ isActive }) => (
-                        <>
-                          <item.icon
-                            size={18}
-                            className={`shrink-0 transition-transform group-hover:scale-110 ${
-                              isActive ? 'text-white' : 'text-slate-300 group-hover:text-white'
-                            }`}
-                          />
-                          {isActive && (
-                            <span
-                              className="absolute right-1 top-1 h-2 w-2 rounded-full bg-[#C9A45C] shadow-[0_0_6px_#C9A45C]"
-                              aria-hidden="true"
+            <nav className="mt-3 flex-1 space-y-1.5 overflow-y-auto w-full flex flex-col items-center pr-0.5" aria-label="Sidebar icons">
+              {filteredGroups
+                .filter((group) => group.id !== 'configuration')
+                .map((group, groupIdx) => (
+                  <React.Fragment key={group.id}>
+                    {groupIdx > 0 && <div className="w-8 border-t border-white/10 my-1.5 shrink-0" />}
+                    {group.items.map((item) => (
+                      <NavLink
+                        key={item.to}
+                        to={item.to}
+                        onClick={handleLinkClick}
+                        className={({ isActive }) =>
+                          `group relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all ${
+                            isActive
+                              ? 'bg-[#287C75] text-white shadow-sm ring-1 ring-white/20 font-semibold'
+                              : 'text-slate-300 hover:bg-white/10 hover:text-white'
+                          }`
+                        }
+                        aria-label={item.label}
+                        title={item.label}
+                      >
+                        {({ isActive }) => (
+                          <>
+                            <item.icon
+                              size={18}
+                              className={`shrink-0 transition-transform group-hover:scale-110 ${
+                                isActive ? 'text-white' : 'text-slate-300 group-hover:text-white'
+                              }`}
                             />
-                          )}
-                          {/* Senior UX Floating Tooltip */}
-                          <span className="pointer-events-none absolute left-full ml-3 z-50 hidden md:group-hover:flex items-center rounded-lg bg-[#0D2929] border border-white/15 px-2.5 py-1 text-xs font-semibold text-white whitespace-nowrap shadow-2xl">
-                            {item.label}
-                          </span>
-                        </>
-                      )}
-                    </NavLink>
-                  ))}
-                </React.Fragment>
-              ))}
+                            {isActive && (
+                              <span
+                                className="absolute right-1 top-1 h-2 w-2 rounded-full bg-[#C9A45C] shadow-[0_0_6px_#C9A45C]"
+                                aria-hidden="true"
+                              />
+                            )}
+                            {/* Senior UX Floating Tooltip */}
+                            <span className="pointer-events-none absolute left-full ml-3 z-50 hidden md:group-hover:flex items-center rounded-lg bg-[#0D2929] border border-white/15 px-2.5 py-1 text-xs font-semibold text-white whitespace-nowrap shadow-2xl">
+                              {item.label}
+                            </span>
+                          </>
+                        )}
+                      </NavLink>
+                    ))}
+                  </React.Fragment>
+                ))}
             </nav>
 
-            {/* Doctor Profile Footer: Centered Avatar & Logout */}
-            <div className="mt-auto pt-3 border-t border-white/10 w-full flex flex-col items-center">
+            {/* Doctor Profile Footer: Centered Avatar Circle, Settings & Logout (Matching Reference) */}
+            <div className="mt-auto pt-2.5 border-t border-white/10 w-full flex flex-col items-center gap-1.5 pb-1">
               <Link
                 to="/profile"
                 onClick={handleLinkClick}
-                className="group relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#287C75] text-xs font-bold text-white shadow-sm ring-1 ring-white/20 hover:ring-[#C9A45C]/50 transition cursor-pointer"
+                className="group relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#287C75] text-xs font-bold text-white shadow-sm ring-1 ring-white/20 hover:ring-[#C9A45C]/50 transition cursor-pointer"
                 aria-label={displayName}
                 title={displayName}
               >
@@ -351,12 +347,33 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
                 </span>
               </Link>
 
+              {/* Settings Gear Icon */}
+              <NavLink
+                to="/settings"
+                onClick={handleLinkClick}
+                className={({ isActive }) =>
+                  `group relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-all ${
+                    isActive
+                      ? 'bg-[#287C75] text-white shadow-sm ring-1 ring-white/20'
+                      : 'text-slate-300 hover:bg-white/10 hover:text-white'
+                  }`
+                }
+                aria-label="Settings & Calibration"
+                title="Settings & Calibration"
+              >
+                <Settings size={18} />
+                <span className="pointer-events-none absolute left-full ml-3 z-50 hidden md:group-hover:flex items-center rounded-lg bg-[#0D2929] border border-white/15 px-2.5 py-1 text-xs font-semibold text-white whitespace-nowrap shadow-2xl">
+                  Settings & Calibration
+                </span>
+              </NavLink>
+
+              {/* Red/Rose Logout Button */}
               <button
                 type="button"
                 onClick={logout}
                 title="Logout"
                 aria-label="Logout"
-                className="group relative flex h-8 w-8 mt-2 shrink-0 items-center justify-center rounded-xl text-slate-300 hover:bg-rose-500/20 hover:text-rose-200 transition cursor-pointer"
+                className="group relative flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-rose-300 hover:bg-rose-500/20 hover:text-rose-200 transition cursor-pointer"
               >
                 <LogOut size={16} />
                 <span className="pointer-events-none absolute left-full ml-3 z-50 hidden md:group-hover:flex items-center rounded-lg bg-[#0D2929] border border-white/15 px-2.5 py-1 text-xs font-semibold text-rose-200 whitespace-nowrap shadow-2xl">

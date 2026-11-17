@@ -140,7 +140,7 @@ export default function AppHeader({ onMenuClick, sidebarOpen, navigate: customNa
         <div ref={searchContainerRef} className="relative flex items-center gap-3">
           <button
             type="button"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#D9E6E2] bg-white text-[#4E6460] shadow-nivara-xs hover:border-[#287C75]/50 hover:bg-[#F7FAF8] hover:text-[#287C75] transition cursor-pointer"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#D9E6E2] bg-white text-[#4E6460] shadow-nivara-xs hover:border-[#287C75]/50 hover:bg-[#F7FAF8] hover:text-[#287C75] transition cursor-pointer md:hidden"
             aria-label="Open menu"
             title={sidebarOpen ? "Close sidebar (Ctrl+B)" : "Open sidebar (Ctrl+B)"}
             onClick={onMenuClick}
