@@ -584,6 +584,23 @@ function PrescriptionPage() {
     window.open(waUrl, '_blank', 'noopener,noreferrer');
   };
 
+  // Global Keyboard Shortcuts (Senior Clinical UX):
+  // Ctrl+S / Cmd+S => Quick Save Draft
+  // Ctrl+P / Cmd+P => Print & Finalize Prescription
+  useEffect(() => {
+    const handleKeyShortcuts = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        handleSavePrescription('SAVED', false);
+      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
+        e.preventDefault();
+        handlePrint();
+      }
+    };
+    window.addEventListener('keydown', handleKeyShortcuts);
+    return () => window.removeEventListener('keydown', handleKeyShortcuts);
+  }, [patient, medicines, vitals, symptoms, diagnosis, advice, notes, followUpOption, followUpCustomDays, followUpCustomDate, printSettings]);
+
   const handleSignatureFileUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -1136,10 +1153,23 @@ function PrescriptionPage() {
               <span className="hidden sm:inline">{outletContext.sidebarOpen ? 'Hide Menu' : 'Menu'}</span>
             </button>
           )}
-          <button type="button" className="btn-secondary btn-header-back" onClick={() => navigate(-1)} title="Go back to previous page">
+          <button type="button" className="btn-secondary btn-header-back" onClick={() => navigate(-1)} title="Go back to previous page (Esc)">
             <ArrowLeft size={14} />
             <span>Back</span>
           </button>
+
+          {/* Active Context Chip */}
+          <div className="hidden lg:flex items-center gap-2 pl-1.5 text-xs">
+            <span className="h-4 w-[1px] bg-[#D6E4DF]" />
+            <span className="flex items-center gap-1.5 font-semibold text-[#123A3A] bg-[#E8F3F1] px-2.5 py-1 rounded-lg border border-[#CFE2DC]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#287C75] animate-pulse" />
+              {patient?.name || 'Patient'}
+              {patient?.id && <span className="font-mono text-[10.5px] opacity-75">({patient.id})</span>}
+            </span>
+            <span className="text-[#5D7570] text-[11px] font-medium hidden xl:inline">
+              {clinicSettings.clinicName || 'Gastro Cure'}
+            </span>
+          </div>
         </div>
 
         {/* Quick Print Alignment Bar */}
@@ -1223,7 +1253,7 @@ function PrescriptionPage() {
             type="button"
             className="btn-secondary btn-header-save"
             onClick={() => handleSavePrescription('SAVED', false)}
-            title="Save prescription record to database"
+            title="Save prescription record to database (Ctrl+S)"
           >
             <Save size={14} />
             <span>Save</span>
@@ -1233,7 +1263,7 @@ function PrescriptionPage() {
             type="button"
             className="btn-primary btn-header-print"
             onClick={handlePrint}
-            title="Save and print prescription"
+            title="Save and print prescription (Ctrl+P)"
           >
             <Printer size={14} />
             <span>Print Prescription</span>
