@@ -54,13 +54,13 @@ export default function NivaraLogo({
     ? 'text-current'
     : isDark
     ? 'text-white'
-    : 'text-[#123A3A]';
+    : 'text-[#0F2942]';
 
   const subtitleColor = isMonochrome
     ? 'text-current opacity-70'
     : isDark
-    ? 'text-[#C9A45C]'
-    : 'text-[#4E6460]';
+    ? 'text-[#38BDF8]'
+    : 'text-[#475569]';
 
   return (
     <div
@@ -69,7 +69,13 @@ export default function NivaraLogo({
       {...props}
     >
       {/* Gastro Cure Medical Logo Image */}
-      <div className={`relative shrink-0 flex items-center justify-center ${currentSize.outer}`}>
+      <div
+        className={`relative shrink-0 flex items-center justify-center transition-all duration-200 ${currentSize.outer} ${
+          isDark
+            ? 'bg-white rounded-xl p-1 shadow-sm ring-1 ring-white/20'
+            : 'rounded-xl p-0.5'
+        }`}
+      >
         <img
           src={imageSrc || gastroCureLogo}
           alt={brandName}
@@ -131,7 +137,7 @@ export default function NivaraLogo({
               {brandName}
             </span>
             <span className={`sr-only ${titleColor}`}>Nivara</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-[#C9A45C]" aria-hidden="true" />
+            <span className="h-1.5 w-1.5 rounded-full bg-[#76C015]" aria-hidden="true" />
           </div>
           {showSubtitle && (
             <span className={`mt-1 font-heading text-[10px] font-semibold uppercase tracking-[0.16em] ${subtitleColor}`}>
