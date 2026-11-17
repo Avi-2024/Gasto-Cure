@@ -154,47 +154,45 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
         />
       )}
 
-      {/* Main Sidebar Shell (Collapsible between Expanded 268px and Mini Icon Rail 72px) */}
+      {/* Main Sidebar Shell (Collapsible between Expanded 268px and Mini Icon Rail) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex shrink-0 flex-col bg-[#123A3A] text-slate-100 shadow-2xl transition-all duration-300 ease-in-out md:sticky md:top-0 md:h-screen md:shadow-none relative md:overflow-visible ${
+        className={`fixed inset-y-0 left-0 z-50 flex shrink-0 flex-col bg-[#123A3A] text-slate-100 shadow-2xl transition-all duration-300 ease-in-out md:sticky md:top-0 md:h-screen md:shadow-none overflow-hidden ${
           isOpen
             ? 'w-[268px] p-4 translate-x-0 opacity-100 pointer-events-auto'
-            : 'w-0 p-0 -translate-x-full md:w-[72px] md:p-3 md:translate-x-0 md:opacity-100 md:pointer-events-auto'
+            : 'w-0 p-0 -translate-x-full md:w-[76px] md:px-2 md:py-3.5 md:translate-x-0 md:opacity-100 md:pointer-events-auto'
         }`}
         aria-label="Main Navigation"
       >
-        {/* Border Center Toggle Button (Centered at vertical middle of sidebar right border) */}
-        <button
-          type="button"
-          onClick={onToggle}
-          className="hidden md:flex absolute top-1/2 -right-3.5 -translate-y-1/2 z-50 h-7 w-7 items-center justify-center rounded-full border border-white/20 bg-[#123A3A] text-slate-200 shadow-md hover:bg-[#287C75] hover:text-white hover:border-[#287C75] hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer group"
-          title={isOpen ? "Collapse sidebar (Ctrl+B)" : "Expand sidebar (Ctrl+B)"}
-          aria-label={isOpen ? "Close menu" : "Open menu"}
-        >
-          {isOpen ? (
-            <ChevronLeft size={14} className="transition-transform group-hover:-translate-x-0.5" />
-          ) : (
-            <ChevronRight size={14} className="transition-transform group-hover:translate-x-0.5" />
-          )}
-        </button>
-
         {isOpen ? (
           /* ═══════════════════════════════════════════════════════════════
              1. EXPANDED SIDEBAR CONTENT (268px)
              ═══════════════════════════════════════════════════════════════ */
           <div className="w-[236px] flex flex-col flex-1 min-h-0">
-            {/* Brand Header */}
-            <div className="flex items-center justify-between border-b border-white/10 pb-4 pt-1">
+            {/* Brand Header with Top Collapse Button */}
+            <div className="flex items-center justify-between border-b border-white/10 pb-4 pt-1 w-full">
               <NivaraLogo theme="dark" size="md" />
-              <button
-                type="button"
-                className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/15 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer md:hidden"
-                aria-label="Close mobile menu"
-                title="Close menu drawer"
-                onClick={onClose}
-              >
-                <X size={16} />
-              </button>
+              <div className="flex items-center gap-1.5">
+                {/* Desktop circular collapse button */}
+                <button
+                  type="button"
+                  className="hidden md:flex h-7 w-7 items-center justify-center rounded-full border border-white/20 bg-white/10 text-slate-300 hover:bg-[#287C75] hover:text-white hover:border-[#287C75] transition-all cursor-pointer shadow-xs group"
+                  aria-label="Close menu"
+                  title="Collapse sidebar (Ctrl+B)"
+                  onClick={onToggle || onClose}
+                >
+                  <ChevronLeft size={14} className="transition-transform group-hover:-translate-x-0.5" />
+                </button>
+                {/* Mobile drawer close button */}
+                <button
+                  type="button"
+                  className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/15 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer md:hidden"
+                  aria-label="Close mobile menu"
+                  title="Close menu drawer"
+                  onClick={onClose}
+                >
+                  <X size={16} />
+                </button>
+              </div>
             </div>
 
             {/* Grouped Navigation */}
@@ -283,9 +281,20 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
              2. COLLAPSED MINI ICON RAIL (72px) - Matching Reference
              ═══════════════════════════════════════════════════════════════ */
           <div className="w-full flex flex-col flex-1 min-h-0 items-center">
-            {/* Header: Centered Brand Mark */}
-            <div className="flex items-center justify-center border-b border-white/10 pb-3.5 pt-1 w-full">
-              <NivaraLogo variant="compact" theme="dark" size="sm" />
+            {/* Header: Brand Mark + Circular Toggle Button (Top Layout matching reference) */}
+            <div className="flex items-center justify-between border-b border-white/10 pb-3 pt-0.5 w-full px-1">
+              <div className="h-7 w-7 shrink-0 flex items-center justify-center">
+                <NivaraLogo variant="compact" theme="dark" size="sm" />
+              </div>
+              <button
+                type="button"
+                className="flex h-6.5 w-6.5 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-slate-200 hover:bg-[#287C75] hover:text-white hover:border-[#287C75] transition-all cursor-pointer shadow-xs group"
+                aria-label="Open menu"
+                title="Expand sidebar (Ctrl+B)"
+                onClick={onToggle}
+              >
+                <ChevronRight size={13} className="transition-transform group-hover:translate-x-0.5" />
+              </button>
             </div>
 
             {/* Navigation: Centered Icon Rail with Senior UX Hover Tooltips */}
