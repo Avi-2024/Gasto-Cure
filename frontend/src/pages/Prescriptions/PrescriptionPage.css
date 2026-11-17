@@ -24,13 +24,13 @@
 /* Toast Notification */
 .prescription-toast-notification {
   position: fixed;
-  top: 24px;
+  top: 70px;
   right: 24px;
   display: flex;
   align-items: center;
   background: #ffffff;
   border: 1px solid #D9E6E2;
-  border-left: 4px solid #2E7D5B;
+  border-left: 4px solid #287C75;
   border-radius: 12px;
   padding: 12px 18px;
   z-index: 10001;
@@ -369,17 +369,17 @@
 .patient-avatar-badge {
   width: 52px;
   height: 52px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #123A3A 0%, #1A4F4F 100%);
-  color: #ffffff;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #10201F;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(18, 58, 58, 0.16);
-  border: 2px solid #ffffff;
+  box-shadow: 0 2px 8px rgba(18, 58, 58, 0.08);
+  border: 2px solid #D9E6E2;
 }
 
 .patient-avatar-initials {
@@ -720,17 +720,17 @@
   background: #ffffff;
   border: 1px solid #D9E6E2;
   border-radius: 12px;
-  padding: 9px 12px;
+  padding: 10px 14px;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
   transition: all 0.15s ease;
   box-shadow: 0 1px 3px rgba(18, 58, 58, 0.03);
 }
 
 .vital-item:hover {
   border-color: #B5D8D0;
-  box-shadow: 0 2px 6px rgba(18, 58, 58, 0.05);
+  box-shadow: 0 2px 8px rgba(18, 58, 58, 0.06);
 }
 
 .vital-item:focus-within {
@@ -752,7 +752,7 @@
 }
 
 .vital-item label {
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 700;
   color: #123A3A;
   white-space: nowrap;
@@ -762,29 +762,31 @@
   font-size: 10.5px;
   font-weight: 600;
   color: #7D908C;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 .vital-input {
   width: 100%;
-  padding: 6px 8px;
-  border: 1px solid #D9E6E2;
-  border-radius: 6px;
-  font-size: 13.5px;
+  padding: 2px 0;
+  border: none;
+  border-radius: 0;
+  font-size: 16px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 700;
   color: #10201F;
-  background: #ffffff;
+  background: transparent;
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
   transition: all 0.15s ease;
 }
 
 .vital-input::placeholder {
-  color: #94a3b8;
+  color: #cbd5e1;
   font-weight: 400;
 }
 
 .vital-input:focus {
   outline: none;
-  border-color: #287C75;
+  border-color: transparent;
   box-shadow: none;
 }
 
@@ -1870,7 +1872,7 @@
 }
 
 /* ═════════════════════════════════════════════════════════════
-   BOTTOM ACTION DOCK (Sticky / Floating)
+   BOTTOM ACTION DOCK
    ═════════════════════════════════════════════════════════════ */
 
 .prescription-action-dock {
@@ -1878,10 +1880,10 @@
   max-width: 1400px;
   margin: 32px auto 0;
   background: #ffffff;
-  border: 1px solid #D9E6E2;
+  border: 1px solid #D6E4DF;
   border-radius: 16px;
   padding: 14px 24px;
-  box-shadow: var(--shadow-nivara-xs, 0 2px 8px rgba(18, 58, 58, 0.04));
+  box-shadow: 0 2px 10px rgba(18, 58, 58, 0.04);
 }
 
 .dock-inner {

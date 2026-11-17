@@ -1130,6 +1130,12 @@ function PrescriptionPage() {
             <ArrowLeft size={14} />
             <span>Back</span>
           </button>
+          <div className="hidden lg:flex items-center gap-2 pl-2 border-l border-[#D9E6E2]">
+            <span className="text-xs font-bold text-[#10201F] tracking-tight">Prescription Studio</span>
+            <span className="text-[10px] font-semibold text-[#287C75] bg-[#E8F3F1] border border-[#287C75]/20 px-2 py-0.5 rounded-full">
+              Consultation Mode
+            </span>
+          </div>
         </div>
 
         {/* Quick Print Alignment Bar */}
@@ -1287,7 +1293,7 @@ function PrescriptionPage() {
                 <PatientAvatar
                   gender={patient.gender}
                   name={patient.name}
-                  className="w-11 h-11 rounded-full shrink-0 shadow-xs"
+                  className="w-12 h-12 rounded-full shrink-0 shadow-2xs"
                 />
                 <span className="patient-avatar-subicon">
                   <Stethoscope size={10} />
@@ -1721,6 +1727,20 @@ function PrescriptionPage() {
             onUpdateMedicineFull={updateMedicineFull}
             onRemove={removeMedicineRow}
           />
+
+          <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#EBF1EE] no-print">
+            <button
+              type="button"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-dashed border-[#287C75] text-[#287C75] hover:bg-[#E8F3F1] text-xs font-semibold transition cursor-pointer"
+              onClick={addMedicineRow}
+            >
+              <Plus size={13} />
+              <span>Add Another Medicine</span>
+            </button>
+            <span className="text-xs font-semibold text-[#7D908C]">
+              {medicines.filter((m) => m.name).length} {medicines.filter((m) => m.name).length === 1 ? 'Formulation' : 'Formulations'} Prescribed
+            </span>
+          </div>
         </section>
 
         {/* 6. Advice / Dietary Instructions */}
@@ -1855,8 +1875,12 @@ function PrescriptionPage() {
           </div>
 
           <p className="followup-reassurance-note no-print">
-            <MessageCircle size={13} className="text-emerald-600 inline mr-1.5" />
-            Patient <strong>{patient.name}</strong> will receive an automated WhatsApp appointment reminder 2 days before this follow-up date.
+            <MessageCircle size={13} className="text-emerald-600 inline mr-1.5 shrink-0" />
+            <span>
+              Patient{' '}
+              <strong className="text-[#10201F] font-bold">{patient.name}</strong>{' '}
+              will receive an automated WhatsApp appointment reminder 2 days before this follow-up date.
+            </span>
           </p>
         </section>
 
