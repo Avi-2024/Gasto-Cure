@@ -163,11 +163,11 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
         }`}
         aria-label="Main Navigation"
       >
-        {/* Border Toggle Button - High-Visibility Brand Teal Circle (Aligned with Logo Header) */}
+        {/* Border Toggle Button - Premium Elevated Light Pill (Shifted Right, High-Class Design) */}
         <button
           type="button"
           onClick={onToggle}
-          className="hidden md:flex absolute top-[24px] -right-4 z-50 h-8 w-8 items-center justify-center rounded-full border border-white/40 bg-[#287C75] text-white shadow-[0_2px_10px_rgba(18,58,58,0.3)] hover:bg-[#1E5650] hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer group"
+          className="hidden md:flex absolute top-[24px] -right-5 z-50 h-8 w-8 items-center justify-center rounded-full border border-slate-300/90 bg-white text-slate-800 shadow-[0_4px_14px_rgba(0,0,0,0.14),0_1px_3px_rgba(0,0,0,0.08)] hover:bg-slate-50 hover:text-[#123A3A] hover:border-slate-400 hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer group"
           title={isOpen ? "Collapse sidebar (Ctrl+B)" : "Expand sidebar (Ctrl+B)"}
           aria-label={isOpen ? "Close menu" : "Open menu"}
         >
