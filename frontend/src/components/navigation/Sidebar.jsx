@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import {
   Activity,
@@ -117,7 +117,7 @@ export const SIDEBAR_THEMES = {
     sectionTitle: 'text-teal-200/50',
     navInactive: 'text-slate-200/80 hover:bg-white/5 hover:text-white',
     navActive: 'bg-[#287C75] text-white shadow-sm font-semibold',
-    accentDot: 'bg-[#C9A45C] shadow-[0_0_8px_#C9A45C]',
+    accentDot: 'bg-[#76C015] shadow-[0_0_8px_#76C015]',
     navIconInactive: 'text-slate-300 group-hover:text-white',
     navIconActive: 'text-white',
     profileBox: 'border-white/10 bg-white/5 text-white',
@@ -137,7 +137,7 @@ export const SIDEBAR_THEMES = {
     sectionTitle: 'text-slate-400 font-semibold tracking-wider',
     navInactive: 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
     navActive: 'bg-[#287C75] text-white shadow-sm font-semibold ring-1 ring-[#287C75]/20',
-    accentDot: 'bg-[#C9A45C] shadow-[0_0_8px_#C9A45C]',
+    accentDot: 'bg-[#76C015] shadow-[0_0_8px_#76C015]',
     navIconInactive: 'text-slate-400 group-hover:text-slate-700',
     navIconActive: 'text-white',
     profileBox: 'border-slate-200/90 bg-slate-50/80 text-slate-800',
@@ -235,25 +235,8 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
   const { user, logout } = useAuth();
   const role = user?.role || 'DOCTOR';
 
-  // Sidebar theme selection with persistent storage
-  const [currentTheme, setCurrentTheme] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('nivara_sidebar_theme');
-      if (saved === 'obsidian') return 'navy';
-      if (saved === 'sage') return 'pearl';
-      if (saved && SIDEBAR_THEMES[saved]) return saved;
-    }
-    return 'classic';
-  });
-
-  const activeTheme = SIDEBAR_THEMES[currentTheme] || SIDEBAR_THEMES.classic;
-
-  const handleThemeChange = (newTheme) => {
-    setCurrentTheme(newTheme);
-    try {
-      localStorage.setItem('nivara_sidebar_theme', newTheme);
-    } catch {}
-  };
+  // Finalized Spruce Teal Theme (Gastro Cure Official)
+  const activeTheme = SIDEBAR_THEMES.classic;
 
   // Compute user name and initials without redundant "Dr." prefixes
   const rawName = user?.name || (user?.email ? user.email.split('@')[0].replace(/[._-]/g, ' ') : 'Doctor');
@@ -343,65 +326,8 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
               </button>
             </div>
 
-            {/* Interactive Theme Preview Switcher Strip */}
-            <div className={`mt-3 mb-1 px-2.5 py-1.5 rounded-xl border ${activeTheme.borderClasses} flex items-center justify-between text-xs`}>
-              <span className={`text-[9.5px] font-bold uppercase tracking-wider ${activeTheme.sectionTitle}`}>
-                Theme Style
-              </span>
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => handleThemeChange('light')}
-                  title="Option 1: Modern Light Luxury (Travigo Style)"
-                  className={`h-5 px-1.5 rounded-md text-[9.5px] font-bold transition cursor-pointer ${
-                    currentTheme === 'light'
-                      ? 'bg-slate-900 text-white shadow-xs'
-                      : 'hover:bg-black/5 text-slate-500'
-                  }`}
-                >
-                  1: Light
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleThemeChange('navy')}
-                  title="Option 2: Gastro Cure Royal Navy & Cyan (Signature Brand)"
-                  className={`h-5 px-1.5 rounded-md text-[9.5px] font-bold transition cursor-pointer ${
-                    currentTheme === 'navy' || currentTheme === 'obsidian'
-                      ? 'bg-[#0096C7] text-white shadow-xs'
-                      : 'hover:bg-white/10 text-slate-400'
-                  }`}
-                >
-                  2: Navy
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleThemeChange('pearl')}
-                  title="Option 3: Warm Pearl Luxe (Boutique Private Clinic)"
-                  className={`h-5 px-1.5 rounded-md text-[9.5px] font-bold transition cursor-pointer ${
-                    currentTheme === 'pearl' || currentTheme === 'sage'
-                      ? 'bg-[#142A4A] text-white shadow-xs'
-                      : 'hover:bg-black/5 text-slate-500'
-                  }`}
-                >
-                  3: Pearl
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleThemeChange('classic')}
-                  title="Original Spruce Teal"
-                  className={`h-5 px-1 rounded-md text-[9px] font-bold transition cursor-pointer ${
-                    currentTheme === 'classic'
-                      ? 'bg-[#287C75] text-white shadow-xs'
-                      : 'hover:bg-white/10 text-slate-400'
-                  }`}
-                >
-                  Teal
-                </button>
-              </div>
-            </div>
-
             {/* Grouped Navigation */}
-            <nav className="mt-3 flex-1 space-y-4 overflow-y-auto pr-1" aria-label="Sidebar">
+            <nav className="mt-4 flex-1 space-y-4 overflow-y-auto pr-1" aria-label="Sidebar">
               {filteredGroups.map((group) => (
                 <div key={group.id} className="space-y-1">
                   <p className={`px-3 text-[11px] font-bold uppercase tracking-[0.16em] ${activeTheme.sectionTitle}`}>
