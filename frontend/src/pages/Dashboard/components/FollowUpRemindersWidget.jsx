@@ -8,11 +8,11 @@ import {
   Stethoscope,
   Send,
   Zap,
-  Info,
   X,
+  Sparkles,
 } from 'lucide-react';
 import { localPatients, localVisits, localSettings } from '../../../services/localStore';
-import { generateFollowUpReminderWhatsAppLink, generateExactHindiFollowUpMessage } from '../../../utils/whatsappHelper';
+import { generateFollowUpReminderWhatsAppLink } from '../../../utils/whatsappHelper';
 import { automatedRemindersService } from '../../../services/automatedRemindersService';
 
 /**
@@ -46,6 +46,13 @@ const formatDisplayDate = (dateStr) => {
   } catch {
     return dateStr;
   }
+};
+
+const getInitials = (name) => {
+  if (!name) return 'PT';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 };
 
 export default function FollowUpRemindersWidget() {
@@ -251,50 +258,58 @@ export default function FollowUpRemindersWidget() {
     if (daysLeft < 0) {
       return {
         label: 'Overdue',
-        className: 'bg-[#FDECEB] text-[#C05646] border-[#F5C2BE] font-bold',
+        className: 'bg-rose-50 text-rose-700 border-rose-200/90 font-bold',
+        dot: 'bg-rose-500',
       };
     }
     if (daysLeft === 0) {
       return {
         label: 'Today',
-        className: 'bg-[#FEF5E7] text-[#B5671B] border-[#FAD7A0] font-bold',
+        className: 'bg-amber-50 text-amber-800 border-amber-300 font-bold',
+        dot: 'bg-amber-500 animate-pulse',
       };
     }
     if (daysLeft === 1) {
       return {
         label: 'Tomorrow',
-        className: 'bg-[#EAF3EF] text-[#126857] border-[#C2DDD3] font-bold',
+        className: 'bg-emerald-50 text-emerald-800 border-emerald-300 font-bold',
+        dot: 'bg-emerald-500',
       };
     }
     if (daysLeft === 2) {
       return {
         label: 'In 2 Days',
-        className: 'bg-[#EBF2F4] text-[#1D6072] border-[#C3DDE6] font-bold',
+        className: 'bg-cyan-50 text-cyan-800 border-cyan-200 font-bold',
+        dot: 'bg-cyan-500',
       };
     }
     return {
       label: `In ${daysLeft} Days`,
-      className: 'bg-[#F7FAF8] text-[#4E6460] border-[#D9E6E2]',
+      className: 'bg-slate-50 text-slate-700 border-slate-200 font-semibold',
+      dot: 'bg-slate-400',
     };
   };
 
   return (
     <article className="app-card p-6 flex flex-col justify-between border border-[#D9E6E2] bg-white rounded-2xl shadow-nivara-xs">
       <div>
+        {/* Card Header */}
         <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-[#B7791F] border border-amber-200">
-              <CalendarClock size={20} />
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-50 text-amber-600 border border-amber-200/60 shadow-2xs">
+              <CalendarClock size={22} />
             </div>
             <div>
-              <h2 className="text-lg font-heading font-bold text-[#10201F]">Follow-Up Reminders</h2>
+              <h2 className="text-lg font-heading font-bold text-[#10201F] tracking-tight">
+                Follow-Up Reminders
+              </h2>
               <p className="text-xs text-[#4E6460]">Upcoming consultations within 48 hours & overdue</p>
             </div>
           </div>
           <span
-            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+            className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-bold transition-colors ${
               followUps.length > 0
-                ? 'bg-amber-100 text-amber-800'
+                ? 'bg-amber-100 text-amber-900 border border-amber-200/80 shadow-2xs'
                 : 'bg-[#F7FAF8] text-[#4E6460] border border-[#D9E6E2]'
             }`}
           >
@@ -302,60 +317,59 @@ export default function FollowUpRemindersWidget() {
           </span>
         </div>
 
-        {/* Automated WhatsApp Reminder Banner (24-48 hours window) */}
-        <div className="mt-4 rounded-xl border border-teal-200 bg-teal-50/60 p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-start gap-2.5">
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-teal-600 text-white shadow-2xs mt-0.5">
-              <Zap size={14} />
-            </span>
-            <div>
-              <div className="flex items-center gap-2">
+        {/* Automated WhatsApp Reminder Smart Banner (24-48 hours window) */}
+        <div className="mt-4 rounded-2xl border border-teal-200/80 bg-gradient-to-r from-teal-50/90 via-emerald-50/40 to-teal-50/70 p-3.5 shadow-2xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div className="flex items-center gap-2.5">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#287C75] text-white shadow-2xs">
+                <Zap size={15} />
+              </span>
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xs font-heading font-bold text-[#10201F]">
                   Automated WhatsApp Reminders
                 </span>
-                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-teal-800 bg-teal-100/80 px-2 py-0.5 rounded-full border border-teal-200">
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-teal-900 bg-teal-100/90 px-2.5 py-0.5 rounded-full border border-teal-200 shadow-2xs">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   24–48h Active
                 </span>
               </div>
-              <p className="text-[11px] text-[#4E6460] mt-0.5">
-                Auto-template: &ldquo;Hi MR/MS [Patient], I would like to know if you would be coming for your follow up appointment Tomorrow... * Tap &apos;Yes&apos; to confirm. * Tap &apos;No&apos; if you are not coming.&rdquo;
-              </p>
             </div>
-          </div>
 
-          <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
               onClick={handleAutoSendAll}
               disabled={pendingDueCount === 0}
-              className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold shadow-sm transition active:scale-95 cursor-pointer ${
+              className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold shadow-2xs transition-all active:scale-95 cursor-pointer shrink-0 self-start sm:self-auto ${
                 pendingDueCount > 0
-                  ? 'bg-[#287C75] text-white hover:bg-[#20635e] border border-teal-700'
-                  : 'bg-white text-[#7D908C] border border-[#D9E6E2] cursor-not-allowed opacity-70'
+                  ? 'bg-[#287C75] text-white hover:bg-[#20635e] border border-teal-700 shadow-teal-900/10'
+                  : 'bg-white text-[#7D908C] border border-[#D9E6E2] cursor-not-allowed opacity-60'
               }`}
               title="Automatically send WhatsApp reminder to all patients due in 24-48 hours"
             >
-              <Send size={13} />
+              <Send size={12} />
               <span>Auto-Send Reminders ({pendingDueCount})</span>
             </button>
+          </div>
+
+          <div className="mt-2.5 pt-2 border-t border-teal-200/60 text-[11px] text-[#4E6460] leading-relaxed">
+            <span className="font-semibold text-teal-950">Auto-template:</span> &ldquo;Hi MR/MS [Patient], I would like to know if you would be coming for your follow up appointment Tomorrow... * Tap &apos;Yes&apos; to confirm. * Tap &apos;No&apos; if you are not coming.&rdquo;
           </div>
         </div>
 
         {/* Live Auto-Dispatch Toast Alert */}
         {autoAlert && (
-          <div className="mt-3 rounded-xl border border-emerald-300 bg-emerald-50 p-3 flex items-start justify-between gap-2 text-xs text-emerald-900 animate-in fade-in duration-150">
+          <div className="mt-3 rounded-xl border border-emerald-300 bg-emerald-50/90 p-3 flex items-start justify-between gap-2 text-xs text-emerald-900 shadow-2xs animate-in fade-in duration-150">
             <div className="flex items-start gap-2">
               <CheckCircle2 size={16} className="text-emerald-700 shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold text-emerald-950">{autoAlert.title}</p>
-                <p className="text-[11px] text-emerald-800 mt-0.5">{autoAlert.message}</p>
+                <p className="font-bold text-emerald-950">{autoAlert.title}</p>
+                <p className="text-[11px] text-emerald-800 mt-0.5 leading-relaxed">{autoAlert.message}</p>
               </div>
             </div>
             <button
               type="button"
               onClick={() => setAutoAlert(null)}
-              className="text-emerald-700 hover:text-emerald-950 p-1 rounded-lg"
+              className="text-emerald-700 hover:text-emerald-950 p-1 rounded-lg transition-colors cursor-pointer"
               aria-label="Dismiss alert"
             >
               <X size={14} />
@@ -363,6 +377,7 @@ export default function FollowUpRemindersWidget() {
           </div>
         )}
 
+        {/* Patient Reminders List */}
         {followUps.length === 0 ? (
           <div className="mt-5 rounded-2xl border border-dashed border-[#D9E6E2] bg-[#F7FAF8] p-8 text-center">
             <CheckCircle2 size={36} className="mx-auto text-[#2E7D5B]" />
@@ -372,132 +387,144 @@ export default function FollowUpRemindersWidget() {
             </p>
           </div>
         ) : (
-          <ul className="mt-4 space-y-3">
+          <ul className="mt-4 space-y-3.5 max-h-[500px] overflow-y-auto pr-1">
             {followUps.map((item) => {
               const badge = getBadgeConfig(item.daysLeft);
               const isReminded = remindedIds.includes(item.key);
+              const initials = getInitials(item.name);
 
               return (
                 <li
                   key={item.key}
-                  className={`rounded-2xl border p-4 transition ${
+                  className={`rounded-2xl border p-4 transition-all duration-200 ${
                     isReminded
-                      ? 'border-emerald-200 bg-emerald-50/40'
-                      : 'border-[#D9E6E2] bg-[#F7FAF8]/70 hover:bg-white hover:border-[#287C75]/40 hover:shadow-nivara-xs'
+                      ? 'border-emerald-200 bg-emerald-50/30 shadow-2xs'
+                      : 'border-[#D9E6E2] bg-white hover:border-[#287C75]/40 hover:shadow-nivara-xs hover:bg-[#F7FAF8]/50'
                   }`}
                 >
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    {/* Patient Info */}
-                    <div className="space-y-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm font-heading font-bold text-[#10201F]">{item.name}</span>
-                        {(item.age || item.gender) && (
-                          <span className="text-xs text-[#4E6460] font-medium">
-                            ({item.age ? `${item.age} Y` : ''}
-                            {item.age && item.gender ? ' / ' : ''}
-                            {item.gender})
-                          </span>
-                        )}
-                        <span
-                          className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${badge.className}`}
-                        >
-                          {badge.label}
-                        </span>
-                        {autoSentKeys.includes(item.key) && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-800 bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-full">
-                            <CheckCircle2 size={11} className="text-emerald-700" />
-                            Auto-Sent 24–48h
-                          </span>
-                        )}
+                  {/* Row 1: Patient Identity + Badges */}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      {/* Initials Avatar */}
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-50 border border-teal-200/70 text-teal-800 font-heading font-bold text-xs shadow-2xs">
+                        {initials}
                       </div>
+                      
+                      {/* Name & Demographics */}
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-sm font-heading font-bold text-[#10201F] truncate">
+                            {item.name}
+                          </span>
+                          {(item.age || item.gender) && (
+                            <span className="text-xs text-[#4E6460] font-medium">
+                              ({item.age ? `${item.age} Y` : ''}
+                              {item.age && item.gender ? ' / ' : ''}
+                              {item.gender})
+                            </span>
+                          )}
+                        </div>
 
-                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[#4E6460]">
-                        {item.contact && (
-                          <span className="inline-flex items-center gap-1 font-mono">
-                            <Phone size={12} className="text-[#7D908C]" />
-                            {item.contact}
-                          </span>
-                        )}
-                        <span className="inline-flex items-center gap-1 text-[#4E6460]">
-                          <Clock size={12} className="text-[#7D908C]" />
-                          {formatDisplayDate(item.followUpDate)}
-                        </span>
+                        {/* Clinical Diagnosis Tag */}
                         {item.diagnosis && (
-                          <span className="inline-flex items-center gap-1 text-[#287C75] font-medium">
-                            <Stethoscope size={12} />
-                            {item.diagnosis}
-                          </span>
+                          <div className="flex items-center gap-1.5 text-xs text-[#287C75] font-medium mt-0.5">
+                            <Stethoscope size={12} className="shrink-0 text-teal-600" />
+                            <span className="truncate">{item.diagnosis}</span>
+                          </div>
                         )}
                       </div>
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex flex-wrap items-center gap-2 pt-2 sm:pt-0 shrink-0">
-                      {/* Patient Response Status Badge or Quick Reply Buttons */}
+                    {/* Status Pill Badges */}
+                    <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
+                      <span
+                        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs ${badge.className} shadow-2xs`}
+                      >
+                        <span className={`h-1.5 w-1.5 rounded-full ${badge.dot}`} />
+                        {badge.label}
+                      </span>
+
+                      {autoSentKeys.includes(item.key) && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-full shadow-2xs">
+                          <CheckCircle2 size={11} className="text-emerald-700" />
+                          Auto-Sent 24–48h
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Row 2: Metadata Strip (Phone & Scheduled Date) */}
+                  <div className="flex flex-wrap items-center gap-2 mt-3 pt-2.5 border-t border-[#E8F0EC] text-xs">
+                    {item.contact && (
+                      <span className="inline-flex items-center gap-1.5 font-mono text-[#10201F] bg-[#F7FAF8] border border-[#D9E6E2] px-2.5 py-1 rounded-lg">
+                        <Phone size={12} className="text-[#7D908C]" />
+                        {item.contact}
+                      </span>
+                    )}
+                    <span className="inline-flex items-center gap-1.5 text-[#4E6460] bg-[#F7FAF8] border border-[#D9E6E2] px-2.5 py-1 rounded-lg">
+                      <Clock size={12} className="text-[#7D908C]" />
+                      {formatDisplayDate(item.followUpDate)}
+                    </span>
+                  </div>
+
+                  {/* Row 3: Ergonomic Actions Dock */}
+                  <div className="flex flex-wrap items-center justify-between gap-2 mt-3 pt-2.5 border-t border-[#E8F0EC]">
+                    {/* Left: Patient Response Simulator Status or Quick Actions */}
+                    <div className="flex items-center">
                       {patientResponses[item.key] ? (
                         <span
-                          className={`inline-flex items-center gap-1 rounded-xl px-2.5 py-1 text-xs font-semibold border ${
+                          className={`inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-xs font-bold border shadow-2xs ${
                             patientResponses[item.key].status === 'CONFIRMED'
-                              ? 'border-emerald-300 bg-emerald-100 text-emerald-800'
-                              : 'border-rose-300 bg-rose-100 text-rose-800'
+                              ? 'border-emerald-300 bg-emerald-50 text-emerald-800'
+                              : 'border-rose-300 bg-rose-50 text-rose-800'
                           }`}
                           title={`Replied: "${patientResponses[item.key].replyMessage}"`}
                         >
                           {patientResponses[item.key].status === 'CONFIRMED' ? (
                             <>
-                              <CheckCircle2 size={13} className="text-emerald-700" />
+                              <CheckCircle2 size={13} className="text-emerald-600" />
                               Confirmed (Yes)
                             </>
                           ) : (
                             <>
-                              <X size={13} className="text-rose-700" />
+                              <X size={13} className="text-rose-600" />
                               Declined (No)
                             </>
                           )}
                         </span>
                       ) : (
-                        <div className="inline-flex items-center gap-1 bg-white border border-[#D9E6E2] rounded-xl p-0.5 text-xs">
-                          <span className="text-[10px] text-[#7D908C] px-1 font-medium">Reply:</span>
+                        <div className="inline-flex items-center gap-1 bg-slate-50 border border-slate-200/80 rounded-xl p-1 text-xs shadow-2xs">
+                          <span className="text-[10px] text-[#7D908C] px-1 font-semibold">Reply:</span>
                           <button
                             type="button"
                             onClick={() => handleRecordResponse(item, 'YES')}
-                            className="inline-flex items-center gap-0.5 rounded-lg px-2 py-0.5 text-[11px] font-semibold text-emerald-700 hover:bg-emerald-50 active:scale-95 transition cursor-pointer"
+                            className="inline-flex items-center gap-1 rounded-lg px-2 py-0.5 text-[11px] font-bold text-emerald-700 bg-white hover:bg-emerald-50 active:scale-95 border border-emerald-200/70 shadow-2xs transition cursor-pointer"
                             title="Simulate patient tapping 'Yes' (Confirm)"
                           >
                             + Yes
                           </button>
-                          <span className="text-[#D9E6E2]">|</span>
                           <button
                             type="button"
                             onClick={() => handleRecordResponse(item, 'NO')}
-                            className="inline-flex items-center gap-0.5 rounded-lg px-2 py-0.5 text-[11px] font-semibold text-rose-700 hover:bg-rose-50 active:scale-95 transition cursor-pointer"
+                            className="inline-flex items-center gap-1 rounded-lg px-2 py-0.5 text-[11px] font-bold text-rose-700 bg-white hover:bg-rose-50 active:scale-95 border border-rose-200/70 shadow-2xs transition cursor-pointer"
                             title="Simulate patient tapping 'No' (Reschedule)"
                           >
                             - No
                           </button>
                         </div>
                       )}
+                    </div>
 
-                      {/* WhatsApp Reminder Button */}
-                      <button
-                        type="button"
-                        onClick={() => handleSendWhatsApp(item)}
-                        aria-label="WhatsApp Reminder"
-                        className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-[#2E7D5B] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-[#25664a] transition active:scale-95"
-                        title="Send WhatsApp Reminder"
-                      >
-                        <MessageCircle size={14} />
-                        WhatsApp Reminder
-                      </button>
-
+                    {/* Right: Operational Buttons */}
+                    <div className="flex items-center gap-2">
                       {/* Mark Reminded Toggle */}
                       <button
                         type="button"
                         onClick={() => toggleReminded(item.key)}
-                        className={`inline-flex items-center gap-1 rounded-xl px-2.5 py-1.5 text-xs font-semibold border transition ${
+                        className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold border transition-all active:scale-95 cursor-pointer ${
                           isReminded
-                            ? 'border-emerald-300 bg-emerald-100 text-emerald-800'
-                            : 'border-[#D9E6E2] bg-white text-[#4E6460] hover:bg-[#F7FAF8] hover:text-[#10201F]'
+                            ? 'border-emerald-300 bg-emerald-100 text-emerald-800 shadow-2xs'
+                            : 'border-[#D9E6E2] bg-white text-[#4E6460] hover:bg-[#F7FAF8] hover:text-[#10201F] hover:border-slate-300 shadow-2xs'
                         }`}
                         title={isReminded ? 'Mark as Not Reminded' : 'Mark as Reminded'}
                       >
@@ -509,6 +536,18 @@ export default function FollowUpRemindersWidget() {
                         ) : (
                           'Mark Reminded'
                         )}
+                      </button>
+
+                      {/* WhatsApp Reminder Button */}
+                      <button
+                        type="button"
+                        onClick={() => handleSendWhatsApp(item)}
+                        aria-label="WhatsApp Reminder"
+                        className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-600/20 bg-[#2E7D5B] hover:bg-[#25664a] px-3.5 py-1.5 text-xs font-bold text-white shadow-2xs transition-all active:scale-95 cursor-pointer"
+                        title="Send WhatsApp Reminder"
+                      >
+                        <MessageCircle size={14} className="fill-white/10" />
+                        <span>WhatsApp Reminder</span>
                       </button>
                     </div>
                   </div>
