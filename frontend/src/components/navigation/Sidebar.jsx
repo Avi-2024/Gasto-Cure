@@ -148,45 +148,86 @@ export const SIDEBAR_THEMES = {
     tooltipBg: 'bg-slate-900 border-slate-700 text-white',
     toggleBtn: 'bg-white text-slate-800 border-slate-300 shadow-[0_4px_14px_rgba(0,0,0,0.12)] hover:border-slate-400',
   },
-  obsidian: {
-    id: 'obsidian',
-    label: 'Midnight & Gold',
-    asideClasses: 'bg-[#0A1012] text-slate-100 border-r border-white/5 shadow-2xl',
+  navy: {
+    id: 'navy',
+    label: 'Royal Navy & Cyan',
+    asideClasses: 'bg-[#071E33] text-slate-100 border-r border-[#00B4D8]/15 shadow-2xl',
     borderClasses: 'border-white/10',
     headerTheme: 'dark',
-    sectionTitle: 'text-[#C9A45C]/70 font-bold tracking-widest',
-    navInactive: 'text-slate-400 hover:bg-white/5 hover:text-white',
-    navActive: 'bg-gradient-to-r from-[#172D2B] to-[#122422] text-[#F5E6BE] border border-[#C9A45C]/40 shadow-sm font-semibold',
-    accentDot: 'bg-[#C9A45C] shadow-[0_0_10px_#C9A45C]',
-    navIconInactive: 'text-slate-400 group-hover:text-slate-200',
-    navIconActive: 'text-[#E5C77A]',
-    profileBox: 'border-[#C9A45C]/20 bg-[#121A1C] text-white',
-    profileSubtext: 'text-[#C9A45C]/80',
-    profileHover: 'group-hover:text-[#E5C77A]',
-    railItemInactive: 'text-slate-400 hover:bg-white/5 hover:text-white',
-    railItemActive: 'bg-[#172D2B] text-[#F5E6BE] border border-[#C9A45C]/40 font-semibold',
-    tooltipBg: 'bg-[#080E10] border-[#C9A45C]/30 text-white',
-    toggleBtn: 'bg-[#0E1A1C] text-[#C9A45C] border-[#C9A45C]/50 shadow-[0_4px_14px_rgba(0,0,0,0.4)] hover:border-[#C9A45C]',
+    sectionTitle: 'text-[#38BDF8]/80 font-bold tracking-widest text-[10px]',
+    navInactive: 'text-slate-300 hover:bg-white/10 hover:text-white',
+    navActive: 'bg-gradient-to-r from-[#0077B6] to-[#0096C7] text-white shadow-[0_4px_16px_rgba(0,180,216,0.25)] font-semibold ring-1 ring-cyan-400/40',
+    accentDot: 'bg-[#76C015] shadow-[0_0_10px_#76C015]',
+    navIconInactive: 'text-cyan-200/60 group-hover:text-cyan-200',
+    navIconActive: 'text-white drop-shadow-[0_0_6px_rgba(255,255,255,0.4)]',
+    profileBox: 'border-cyan-500/20 bg-[#0B253D] text-white',
+    profileSubtext: 'text-cyan-300/80',
+    profileHover: 'group-hover:text-cyan-200',
+    railItemInactive: 'text-slate-300 hover:bg-white/10 hover:text-white',
+    railItemActive: 'bg-gradient-to-r from-[#0077B6] to-[#0096C7] text-white shadow-md ring-1 ring-cyan-400/50 font-semibold',
+    tooltipBg: 'bg-[#061828] border-cyan-500/30 text-white',
+    toggleBtn: 'bg-[#0B253D] text-cyan-300 border-cyan-500/40 shadow-md hover:bg-[#0E2E4B]',
+  },
+  pearl: {
+    id: 'pearl',
+    label: 'Warm Pearl Luxe',
+    asideClasses: 'bg-[#FAF9F6] text-stone-800 border-r border-stone-200/80 shadow-[4px_0_24px_rgba(0,0,0,0.03)]',
+    borderClasses: 'border-stone-200/70',
+    headerTheme: 'light',
+    sectionTitle: 'text-stone-400 font-bold tracking-wider text-[10px]',
+    navInactive: 'text-stone-600 hover:bg-stone-200/50 hover:text-stone-900',
+    navActive: 'bg-[#142A4A] text-white shadow-sm font-semibold ring-1 ring-[#142A4A]/20',
+    accentDot: 'bg-[#76C015] shadow-[0_0_8px_#76C015]',
+    navIconInactive: 'text-stone-400 group-hover:text-stone-700',
+    navIconActive: 'text-white',
+    profileBox: 'border-stone-200 bg-stone-100/80 text-stone-800',
+    profileSubtext: 'text-stone-500',
+    profileHover: 'group-hover:text-[#142A4A]',
+    railItemInactive: 'text-stone-500 hover:bg-stone-200/60 hover:text-stone-800',
+    railItemActive: 'bg-[#142A4A] text-white shadow-sm ring-1 ring-[#142A4A]/20 font-semibold',
+    tooltipBg: 'bg-stone-900 border-stone-700 text-white',
+    toggleBtn: 'bg-white text-stone-800 border-stone-300 shadow-[0_4px_14px_rgba(0,0,0,0.1)] hover:border-stone-400',
+  },
+  // Aliases for legacy state compatibility
+  obsidian: {
+    id: 'obsidian',
+    label: 'Royal Navy & Cyan',
+    asideClasses: 'bg-[#071E33] text-slate-100 border-r border-[#00B4D8]/15 shadow-2xl',
+    borderClasses: 'border-white/10',
+    headerTheme: 'dark',
+    sectionTitle: 'text-[#38BDF8]/80 font-bold tracking-widest text-[10px]',
+    navInactive: 'text-slate-300 hover:bg-white/10 hover:text-white',
+    navActive: 'bg-gradient-to-r from-[#0077B6] to-[#0096C7] text-white shadow-[0_4px_16px_rgba(0,180,216,0.25)] font-semibold ring-1 ring-cyan-400/40',
+    accentDot: 'bg-[#76C015] shadow-[0_0_10px_#76C015]',
+    navIconInactive: 'text-cyan-200/60 group-hover:text-cyan-200',
+    navIconActive: 'text-white drop-shadow-[0_0_6px_rgba(255,255,255,0.4)]',
+    profileBox: 'border-cyan-500/20 bg-[#0B253D] text-white',
+    profileSubtext: 'text-cyan-300/80',
+    profileHover: 'group-hover:text-cyan-200',
+    railItemInactive: 'text-slate-300 hover:bg-white/10 hover:text-white',
+    railItemActive: 'bg-gradient-to-r from-[#0077B6] to-[#0096C7] text-white shadow-md ring-1 ring-cyan-400/50 font-semibold',
+    tooltipBg: 'bg-[#061828] border-cyan-500/30 text-white',
+    toggleBtn: 'bg-[#0B253D] text-cyan-300 border-cyan-500/40 shadow-md hover:bg-[#0E2E4B]',
   },
   sage: {
     id: 'sage',
-    label: 'Minimalist Slate',
-    asideClasses: 'bg-[#1E293B] text-slate-100 border-r border-slate-700/60 shadow-xl',
-    borderClasses: 'border-slate-700/60',
-    headerTheme: 'dark',
-    sectionTitle: 'text-slate-400 font-semibold tracking-wider',
-    navInactive: 'text-slate-300 hover:bg-slate-700/40 hover:text-white',
-    navActive: 'bg-[#287C75] text-white shadow-sm font-semibold',
-    accentDot: 'bg-[#C9A45C] shadow-[0_0_8px_#C9A45C]',
-    navIconInactive: 'text-slate-400 group-hover:text-white',
+    label: 'Warm Pearl Luxe',
+    asideClasses: 'bg-[#FAF9F6] text-stone-800 border-r border-stone-200/80 shadow-[4px_0_24px_rgba(0,0,0,0.03)]',
+    borderClasses: 'border-stone-200/70',
+    headerTheme: 'light',
+    sectionTitle: 'text-stone-400 font-bold tracking-wider text-[10px]',
+    navInactive: 'text-stone-600 hover:bg-stone-200/50 hover:text-stone-900',
+    navActive: 'bg-[#142A4A] text-white shadow-sm font-semibold ring-1 ring-[#142A4A]/20',
+    accentDot: 'bg-[#76C015] shadow-[0_0_8px_#76C015]',
+    navIconInactive: 'text-stone-400 group-hover:text-stone-700',
     navIconActive: 'text-white',
-    profileBox: 'border-slate-700 bg-slate-800/80 text-white',
-    profileSubtext: 'text-slate-400',
-    profileHover: 'group-hover:text-teal-300',
-    railItemInactive: 'text-slate-300 hover:bg-slate-700/50 hover:text-white',
-    railItemActive: 'bg-[#287C75] text-white shadow-sm ring-1 ring-white/20 font-semibold',
-    tooltipBg: 'bg-slate-900 border-slate-700 text-white',
-    toggleBtn: 'bg-slate-800 text-white border-slate-600 shadow-md hover:bg-slate-700',
+    profileBox: 'border-stone-200 bg-stone-100/80 text-stone-800',
+    profileSubtext: 'text-stone-500',
+    profileHover: 'group-hover:text-[#142A4A]',
+    railItemInactive: 'text-stone-500 hover:bg-stone-200/60 hover:text-stone-800',
+    railItemActive: 'bg-[#142A4A] text-white shadow-sm ring-1 ring-[#142A4A]/20 font-semibold',
+    tooltipBg: 'bg-stone-900 border-stone-700 text-white',
+    toggleBtn: 'bg-white text-stone-800 border-stone-300 shadow-[0_4px_14px_rgba(0,0,0,0.1)] hover:border-stone-400',
   },
 };
 
@@ -198,6 +239,8 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
   const [currentTheme, setCurrentTheme] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('nivara_sidebar_theme');
+      if (saved === 'obsidian') return 'navy';
+      if (saved === 'sage') return 'pearl';
       if (saved && SIDEBAR_THEMES[saved]) return saved;
     }
     return 'classic';
@@ -320,27 +363,27 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleThemeChange('obsidian')}
-                  title="Option 2: Midnight Obsidian & Champagne Gold"
+                  onClick={() => handleThemeChange('navy')}
+                  title="Option 2: Gastro Cure Royal Navy & Cyan (Signature Brand)"
                   className={`h-5 px-1.5 rounded-md text-[9.5px] font-bold transition cursor-pointer ${
-                    currentTheme === 'obsidian'
-                      ? 'bg-[#C9A45C] text-[#0A1012] shadow-xs'
+                    currentTheme === 'navy' || currentTheme === 'obsidian'
+                      ? 'bg-[#0096C7] text-white shadow-xs'
                       : 'hover:bg-white/10 text-slate-400'
                   }`}
                 >
-                  2: Obsidian
+                  2: Navy
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleThemeChange('sage')}
-                  title="Option 3: Refined Minimalist Slate"
+                  onClick={() => handleThemeChange('pearl')}
+                  title="Option 3: Warm Pearl Luxe (Boutique Private Clinic)"
                   className={`h-5 px-1.5 rounded-md text-[9.5px] font-bold transition cursor-pointer ${
-                    currentTheme === 'sage'
-                      ? 'bg-slate-700 text-white shadow-xs'
-                      : 'hover:bg-white/10 text-slate-400'
+                    currentTheme === 'pearl' || currentTheme === 'sage'
+                      ? 'bg-[#142A4A] text-white shadow-xs'
+                      : 'hover:bg-black/5 text-slate-500'
                   }`}
                 >
-                  3: Slate
+                  3: Pearl
                 </button>
                 <button
                   type="button"
