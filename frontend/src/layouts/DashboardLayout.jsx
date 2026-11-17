@@ -88,13 +88,13 @@ export default function DashboardLayout() {
             isChatRoute
               ? 'overflow-y-hidden flex flex-col min-h-0 px-3 py-2 sm:px-5 sm:py-3 lg:px-7 lg:py-3'
               : isPrescriptionEditor
-              ? 'overflow-y-auto px-2 pt-2 pb-32 sm:px-4 sm:pt-2.5 lg:px-6 lg:pt-3'
+              ? 'overflow-y-auto px-2 pt-2 pb-4 sm:px-4 sm:pt-2.5 lg:px-6 lg:pt-3'
               : 'overflow-y-auto px-3 py-3 sm:px-5 sm:py-4 lg:px-7 lg:py-5'
           }`}
         >
           <div
             className={`mx-auto w-full max-w-[1600px] ${
-              isChatRoute ? 'h-full flex-1 flex flex-col min-h-0' : isPrescriptionEditor ? 'pb-24' : 'pb-36'
+              isChatRoute ? 'h-full flex-1 flex flex-col min-h-0' : isPrescriptionEditor ? 'pb-0' : 'pb-36'
             }`}
           >
             <AnimatePresence mode="wait">

@@ -4,9 +4,9 @@
    ═══════════════════════════════════════════════════════════════ */
 
 .prescription-page {
-  min-height: 100vh;
+  min-height: auto;
   background: var(--nivara-canvas, #F7FAF8);
-  padding: 6px 14px 20px 14px;
+  padding: 6px 14px 12px 14px;
   position: relative;
 }
 

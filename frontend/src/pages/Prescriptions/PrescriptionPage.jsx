@@ -637,7 +637,7 @@ function PrescriptionPage() {
   // If no patient selected yet, show clinical intake suite
   if (!patient) {
     return (
-      <div className="prescription-page bg-[#F7FAF8] min-h-screen pb-20">
+      <div className="prescription-page bg-[#F7FAF8] pb-4">
         <div className="max-w-6xl mx-auto space-y-6">
           {/* Top Header & Quick Actions Bar */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white p-6 rounded-2xl border border-[#D9E6E2] shadow-nivara-xs">
