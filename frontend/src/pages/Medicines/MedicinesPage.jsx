@@ -20,6 +20,7 @@ import StatusBadge from '../../components/ui/StatusBadge';
 import usePagination from '../../hooks/usePagination';
 import { localMedicines } from '../../services/localStore';
 import AddEditMedicineModal from './components/AddEditMedicineModal';
+import DosageFormIcon, { getDosageFormIconSrc } from '../../components/common/DosageFormIcon';
 
 const formFilterOptions = [
   'All',
@@ -390,11 +391,11 @@ function MedicinesPage() {
                     {/* Medicine Name & Category */}
                     <td className="px-4 py-3.5">
                       <div className="flex items-center gap-3">
-                        <span
-                          className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-xs font-bold border ${badgeStyle}`}
-                        >
-                          {med.form ? med.form.slice(0, 3) : 'Tab'}
-                        </span>
+                        <DosageFormIcon
+                          form={med.form}
+                          className="h-9 w-9 rounded-xl border border-[#D9E6E2] bg-white shadow-2xs group-hover:scale-105 transition-transform"
+                          imgClassName="h-6 w-6 object-contain"
+                        />
                         <div>
                           <p className="font-semibold text-[#10201F]">{med.name}</p>
                           <p className="text-xs text-[#7D908C]">
@@ -414,8 +415,13 @@ function MedicinesPage() {
                     {/* Form Pill */}
                     <td className="px-4 py-3.5">
                       <span
-                        className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${badgeStyle}`}
+                        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${badgeStyle}`}
                       >
+                        <img
+                          src={getDosageFormIconSrc(med.form)}
+                          alt=""
+                          className="h-3.5 w-3.5 object-contain inline-block select-none"
+                        />
                         {med.form || 'Tablet'}
                       </span>
                     </td>

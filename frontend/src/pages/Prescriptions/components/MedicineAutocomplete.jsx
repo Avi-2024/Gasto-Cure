@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useId, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { localMedicines } from '../../../services/localStore';
+import { getDosageFormIconSrc } from '../../../components/common/DosageFormIcon';
 
 /**
  * MedicineAutocomplete
@@ -241,7 +242,12 @@ export default function MedicineAutocomplete({
                         </span>
                       )}
                       {item.form && (
-                        <span className={`med-badge med-badge-${String(item.form).toLowerCase()}`}>
+                        <span className={`med-badge med-badge-${String(item.form).toLowerCase()} inline-flex items-center gap-1`}>
+                          <img
+                            src={getDosageFormIconSrc(item.form)}
+                            alt=""
+                            className="h-3 w-3 object-contain inline-block select-none"
+                          />
                           {item.form}
                         </span>
                       )}

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Pill, X, ChevronDown, ChevronUp, SlidersHorizontal } from 'lucide-react';
+import DosageFormIcon from '../../../components/common/DosageFormIcon';
 
 const formOptions = [
   'Tablet',
@@ -188,19 +189,26 @@ function AddEditMedicineModal({ isOpen, onClose, onSave, initialData }) {
               <label className="block text-xs font-semibold text-[#123A3A] mb-1" htmlFor="med-form">
                 Dosage Form (Type)
               </label>
-              <select
-                id="med-form"
-                aria-label="Dosage Form"
-                value={form.form}
-                onChange={(e) => setForm((prev) => ({ ...prev, form: e.target.value }))}
-                className="w-full rounded-xl border border-[#D9E6E2] bg-white px-3 py-2 text-sm font-medium text-[#10201F] focus:border-[#287C75] focus:ring-2 focus:ring-[#287C75]/20 focus:outline-none transition cursor-pointer"
-              >
-                {formOptions.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </select>
+              <div className="flex items-center gap-2">
+                <DosageFormIcon
+                  form={form.form}
+                  className="h-9 w-9 shrink-0 rounded-xl border border-[#D9E6E2] bg-[#F7FAF8]"
+                  imgClassName="h-6 w-6 object-contain"
+                />
+                <select
+                  id="med-form"
+                  aria-label="Dosage Form"
+                  value={form.form}
+                  onChange={(e) => setForm((prev) => ({ ...prev, form: e.target.value }))}
+                  className="w-full flex-1 rounded-xl border border-[#D9E6E2] bg-white px-3 py-2 text-sm font-medium text-[#10201F] focus:border-[#287C75] focus:ring-2 focus:ring-[#287C75]/20 focus:outline-none transition cursor-pointer"
+                >
+                  {formOptions.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             <div>

@@ -4,6 +4,7 @@ import { Bell, Menu, Search, UserPlus, FileText, Pill, User, X, Plus, ChevronRig
 import { useAuth } from '../../contexts/AuthContext';
 import { localPatients, localVisits, localMedicines } from '../../services/localStore';
 import { notificationsService } from '../../services/notificationsService';
+import { getDosageFormIconSrc } from '../common/DosageFormIcon';
 
 /**
  * AppHeader Component
@@ -324,7 +325,14 @@ export default function AppHeader({ onMenuClick, sidebarOpen, navigate: customNa
                                 )}
                               </div>
                               {med.form && (
-                                <span className="text-[10px] text-[#7D908C] uppercase font-bold">{med.form}</span>
+                                <span className="inline-flex items-center gap-1 text-[10px] text-[#7D908C] uppercase font-bold">
+                                  <img
+                                    src={getDosageFormIconSrc(med.form)}
+                                    alt=""
+                                    className="h-3.5 w-3.5 object-contain inline-block select-none"
+                                  />
+                                  {med.form}
+                                </span>
                               )}
                             </li>
                           ))}
