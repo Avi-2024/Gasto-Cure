@@ -163,18 +163,18 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
         }`}
         aria-label="Main Navigation"
       >
-        {/* Right Border Center Toggle Button (Centered at vertical middle of sidebar right border) */}
+        {/* Border Toggle Button - Top-Right Border Seam Aligned with Brand Header (Matching Reference Image 2) */}
         <button
           type="button"
           onClick={onToggle}
-          className="hidden md:flex absolute top-1/2 -right-3.5 -translate-y-1/2 z-50 h-7 w-7 items-center justify-center rounded-full border border-white/20 bg-[#123A3A] text-slate-200 shadow-md hover:bg-[#287C75] hover:text-white hover:border-[#287C75] hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer group"
+          className="hidden md:flex absolute top-[26px] -right-3.5 z-50 h-7 w-7 items-center justify-center rounded-full border border-slate-200/90 bg-white text-slate-600 shadow-[0_2px_6px_rgba(0,0,0,0.12)] hover:bg-slate-50 hover:text-[#123A3A] hover:border-[#287C75] hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer group"
           title={isOpen ? "Collapse sidebar (Ctrl+B)" : "Expand sidebar (Ctrl+B)"}
           aria-label={isOpen ? "Close menu" : "Open menu"}
         >
           {isOpen ? (
-            <ChevronLeft size={14} className="transition-transform group-hover:-translate-x-0.5" />
+            <ChevronLeft size={13} className="transition-transform group-hover:-translate-x-0.5" />
           ) : (
-            <ChevronRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+            <ChevronRight size={13} className="transition-transform group-hover:translate-x-0.5" />
           )}
         </button>
 
