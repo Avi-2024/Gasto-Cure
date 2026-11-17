@@ -96,7 +96,7 @@ const navigationGroups = [
         label: 'Settings & Calibration',
         to: '/settings',
         icon: Settings,
-        roles: ['CLINIC_OWNER'],
+        roles: ['CLINIC_OWNER', 'DOCTOR'],
       },
     ],
   },

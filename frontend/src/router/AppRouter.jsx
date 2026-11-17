@@ -69,8 +69,8 @@ function AppRouter() {
         </Route>
       </Route>
 
-      {/* Clinic Owner Configuration Only */}
-      <Route element={<ProtectedRoute allowedRoles={['CLINIC_OWNER']} />}>
+      {/* Clinic Owner & Doctor Configuration */}
+      <Route element={<ProtectedRoute allowedRoles={['CLINIC_OWNER', 'DOCTOR']} />}>
         <Route element={<DashboardLayout />}>
           <Route path="/settings" element={<SettingsPage />} />
         </Route>

@@ -1181,6 +1181,17 @@ function PrescriptionPage() {
               </span>
             </div>
           )}
+
+          <button
+            type="button"
+            className="btn-secondary btn-header-back"
+            onClick={() => navigate('/settings')}
+            title="Configure Clinic Logo, Custom Address, and Stationery Settings"
+            aria-label="Clinic Settings"
+          >
+            <SlidersHorizontal size={13} />
+            <span className="hidden sm:inline">Settings</span>
+          </button>
         </div>
 
         {/* Top Action Buttons */}

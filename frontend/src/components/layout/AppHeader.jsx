@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Menu, Search, UserPlus, FileText, Pill, User, X, Plus, ChevronRight, Stethoscope, CheckCheck } from 'lucide-react';
+import { Bell, Menu, Search, UserPlus, FileText, Pill, User, X, Plus, ChevronRight, Stethoscope, CheckCheck, Settings } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { localPatients, localVisits, localMedicines } from '../../services/localStore';
 import { notificationsService } from '../../services/notificationsService';
@@ -496,6 +496,19 @@ export default function AppHeader({ onMenuClick, navigate: customNavigate }) {
               </div>
             )}
           </div>
+
+          {/* Settings Shortcut Button */}
+          {(user?.role === 'CLINIC_OWNER' || user?.role === 'DOCTOR') && (
+            <button
+              type="button"
+              onClick={() => navigate('/settings')}
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#D9E6E2] bg-white text-[#4E6460] shadow-nivara-xs hover:border-[#287C75]/50 hover:bg-[#F7FAF8] hover:text-[#287C75] transition cursor-pointer"
+              title="Clinic Logo, Header & Print Settings"
+              aria-label="Clinic Settings"
+            >
+              <Settings size={16} />
+            </button>
+          )}
 
           {/* Doctor Avatar Badge */}
           <button

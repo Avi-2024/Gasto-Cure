@@ -108,9 +108,9 @@ describe('Task 2: Global Navigation Shell & Brand Identity', () => {
       expect(screen.queryByText('New Prescription')).toBeNull();
       expect(screen.queryByText('Consultation')).toBeNull();
 
-      // Configuration should not appear for DOCTOR
-      expect(screen.queryByText('Configuration')).toBeNull();
-      expect(screen.queryByText('Settings & Calibration')).toBeNull();
+      // Configuration & Settings should appear for DOCTOR so they can configure stationery & clinic logo
+      expect(screen.getByText('Configuration')).toBeDefined();
+      expect(screen.getByText('Settings & Calibration')).toBeDefined();
     });
 
     it('shows Configuration section when role is CLINIC_OWNER', () => {
