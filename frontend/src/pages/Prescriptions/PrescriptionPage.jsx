@@ -1130,12 +1130,6 @@ function PrescriptionPage() {
             <ArrowLeft size={14} />
             <span>Back</span>
           </button>
-          <div className="hidden lg:flex items-center gap-2 pl-2 border-l border-[#D9E6E2]">
-            <span className="text-xs font-bold text-[#10201F] tracking-tight">Prescription Studio</span>
-            <span className="text-[10px] font-semibold text-[#287C75] bg-[#E8F3F1] border border-[#287C75]/20 px-2 py-0.5 rounded-full">
-              Consultation Mode
-            </span>
-          </div>
         </div>
 
         {/* Quick Print Alignment Bar */}
@@ -1920,69 +1914,6 @@ function PrescriptionPage() {
                 className="hidden"
               />
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 8. Bottom Action Completion Dock */}
-      <div className="prescription-action-dock no-print shadow-nivara-sm">
-        <div className="dock-inner">
-          <div className="dock-left">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#2E7D5B] animate-pulse"></span>
-              <span className="text-xs font-semibold text-[#10201F]">
-                {patient.name}
-              </span>
-              {currentRxId && (
-                <span className="text-xs font-mono text-[#7D908C]">({currentRxId})</span>
-              )}
-              <span className="text-xs text-[#7D908C] hidden sm:inline">•</span>
-              <span className="text-xs text-[#4E6460] hidden sm:inline">
-                {medicines.filter((m) => m.name).length} {medicines.filter((m) => m.name).length === 1 ? 'medicine' : 'medicines'} prescribed
-              </span>
-            </div>
-          </div>
-
-          <div className="dock-right">
-            <button
-              type="button"
-              className="btn-dock-preview"
-              onClick={() => setIsPreviewOpen(true)}
-              title="Preview how prescription will look when printed"
-            >
-              <Eye size={15} />
-              <span>Print Preview</span>
-            </button>
-
-            <button
-              type="button"
-              className="btn-dock-whatsapp"
-              onClick={handleShareWhatsApp}
-              title="Save and share prescription via WhatsApp"
-            >
-              <MessageCircle size={15} />
-              <span>WhatsApp Share</span>
-            </button>
-
-            <button
-              type="button"
-              className="btn-dock-save"
-              onClick={() => handleSavePrescription('SAVED', false)}
-              title="Save prescription visit to permanent store"
-            >
-              <Save size={15} />
-              <span>Save Visit</span>
-            </button>
-
-            <button
-              type="button"
-              className="btn-dock-print"
-              onClick={handlePrint}
-              title="Save and print prescription immediately"
-            >
-              <Printer size={15} />
-              <span>Direct Print</span>
-            </button>
           </div>
         </div>
       </div>
