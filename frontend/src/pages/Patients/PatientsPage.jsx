@@ -17,6 +17,8 @@ import {
   MoreVertical,
   User,
   Edit3,
+  UserPlus,
+  AlertCircle,
 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import StatCard from '../../components/ui/StatCard';
@@ -26,6 +28,9 @@ import { localAppointments, localPatients } from '../../services/localStore';
 import { cleanPhoneNumber } from '../../utils/whatsappHelper';
 import EditPatientModal from './components/EditPatientModal';
 import PatientProfileDrawer from './components/PatientProfileDrawer';
+import PatientAvatar from '../../components/common/PatientAvatar';
+
+const BLOOD_GROUPS = ['', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
 const statusVariantMap = {
   Active: 'success',
@@ -34,7 +39,17 @@ const statusVariantMap = {
   Critical: 'danger',
 };
 
-const emptyForm = { name: '', age: '', gender: 'Male', contact: '', address: '' };
+const emptyForm = {
+  name: '',
+  age: '',
+  gender: 'Male',
+  contact: '',
+  address: '',
+  bloodGroup: '',
+  allergies: '',
+  notes: '',
+  status: 'Active',
+};
 
 const formatDisplayDate = (dateStr) => {
   if (!dateStr) return '';
@@ -311,11 +326,23 @@ function PatientsPage() {
   }, [search, ageFilter, statusFilter, goToPage]);
 
   const handleAddPatient = () => {
-    if (!form.name.trim() || !form.age || !form.contact.trim()) {
+    if (!form.name.trim() || !form.age.toString().trim() || !form.contact.trim()) {
       setFormError('Name, Age, and Contact are required.');
       return;
     }
-    const patient = localPatients.add({ ...form, age: Number(form.age) });
+    const payload = {
+      ...form,
+      name: form.name.trim(),
+      age: Number(form.age),
+      contact: form.contact.trim(),
+      mobile: form.contact.trim(),
+      address: form.address.trim(),
+      bloodGroup: form.bloodGroup,
+      allergies: form.allergies.trim(),
+      notes: form.notes.trim(),
+      status: form.status || 'Active',
+    };
+    const patient = localPatients.add(payload);
     setPatients(localPatients.getAll());
     closeModal();
     // Automatically add to waiting queue
@@ -517,9 +544,11 @@ function PatientsPage() {
                   >
                     <td className="px-4 py-3.5 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-[#287C75] font-heading font-semibold text-xs border border-teal-100 shadow-nivara-xs">
-                          {getInitials(patient.name)}
-                        </span>
+                        <PatientAvatar
+                          gender={patient.gender}
+                          name={patient.name}
+                          className="h-10 w-10 rounded-full shrink-0 shadow-2xs"
+                        />
                         <div>
                           <div className="flex items-center gap-2">
                             <p
@@ -830,16 +859,24 @@ function PatientsPage() {
               aria-labelledby="add-patient-title"
             >
           <div
-            className="w-full max-w-md rounded-2xl bg-white border border-[#D9E6E2] shadow-nivara-lg p-6 animate-in fade-in zoom-in-95 duration-150"
+            className="w-full max-w-lg rounded-2xl bg-white border border-[#D9E6E2] shadow-nivara-lg p-6 animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-[#D9E6E2] pb-3.5">
-              <h2 id="add-patient-title" className="font-heading text-lg font-bold text-[#10201F]">
-                Add New Patient
-              </h2>
+              <div className="flex items-center gap-2.5">
+                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-50 text-[#287C75] border border-teal-100 shadow-2xs">
+                  <UserPlus size={16} />
+                </span>
+                <div>
+                  <h2 id="add-patient-title" className="font-heading text-lg font-bold text-[#10201F]">
+                    Add New Patient
+                  </h2>
+                  <p className="text-xs text-[#4E6460]">Enter clinical and demographic details</p>
+                </div>
+              </div>
               <button
                 type="button"
-                className="rounded-xl p-1.5 text-[#7D908C] hover:bg-slate-100 hover:text-[#10201F] transition"
+                className="rounded-xl p-1.5 text-[#7D908C] hover:bg-slate-100 hover:text-[#10201F] transition cursor-pointer"
                 onClick={closeModal}
                 aria-label="Close add patient modal"
               >
@@ -848,31 +885,35 @@ function PatientsPage() {
             </div>
 
             <div className="mt-4 space-y-3.5">
+              {/* Full Name */}
               <div>
                 <label className="field-label" htmlFor="pt-name">
                   Patient Name *
                 </label>
                 <input
                   id="pt-name"
-                  placeholder="Full name"
+                  placeholder="Full name (e.g. Rajesh Kumar)"
                   value={form.name}
                   onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+                  required
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              {/* Age, Gender, Blood Group */}
+              <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="field-label" htmlFor="pt-age">
-                    Age *
+                    Age (Yrs) *
                   </label>
                   <input
                     id="pt-age"
                     type="number"
                     min="0"
                     max="130"
-                    placeholder="Age in years"
+                    placeholder="Age"
                     value={form.age}
                     onChange={(e) => setForm((p) => ({ ...p, age: e.target.value }))}
+                    required
                   />
                 </div>
                 <div>
@@ -889,30 +930,97 @@ function PatientsPage() {
                     <option value="Other">Other</option>
                   </select>
                 </div>
+                <div>
+                  <label className="field-label" htmlFor="pt-blood">
+                    Blood Group
+                  </label>
+                  <select
+                    id="pt-blood"
+                    value={form.bloodGroup}
+                    onChange={(e) => setForm((p) => ({ ...p, bloodGroup: e.target.value }))}
+                  >
+                    <option value="">Select</option>
+                    {BLOOD_GROUPS.filter(Boolean).map((bg) => (
+                      <option key={bg} value={bg}>
+                        {bg}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
-              <div>
-                <label className="field-label" htmlFor="pt-contact">
-                  Mobile Number *
-                </label>
-                <input
-                  id="pt-contact"
-                  type="tel"
-                  placeholder="10 digit number"
-                  value={form.contact}
-                  onChange={(e) => setForm((p) => ({ ...p, contact: e.target.value }))}
-                />
+              {/* Mobile Number & Status */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="field-label" htmlFor="pt-contact">
+                    Mobile Number *
+                  </label>
+                  <input
+                    id="pt-contact"
+                    type="tel"
+                    placeholder="10 digit mobile"
+                    value={form.contact}
+                    onChange={(e) => setForm((p) => ({ ...p, contact: e.target.value }))}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="field-label" htmlFor="pt-status">
+                    Patient Status
+                  </label>
+                  <select
+                    id="pt-status"
+                    value={form.status}
+                    onChange={(e) => setForm((p) => ({ ...p, status: e.target.value }))}
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Follow-up">Follow-up</option>
+                    <option value="Stable">Stable</option>
+                    <option value="Critical">Critical</option>
+                  </select>
+                </div>
               </div>
 
+              {/* Address */}
               <div>
                 <label className="field-label" htmlFor="pt-address">
                   Address
                 </label>
                 <input
                   id="pt-address"
-                  placeholder="Home address (optional)"
+                  placeholder="City, locality or complete address (optional)"
                   value={form.address}
                   onChange={(e) => setForm((p) => ({ ...p, address: e.target.value }))}
+                />
+              </div>
+
+              {/* Drug Allergies Alert */}
+              <div>
+                <label className="field-label text-[#B94A48] flex items-center gap-1.5" htmlFor="pt-allergies">
+                  <AlertCircle size={13} />
+                  Drug Allergies / Contraindications
+                </label>
+                <input
+                  id="pt-allergies"
+                  placeholder="e.g. Penicillin, Sulfa, Aspirin (or None)"
+                  value={form.allergies}
+                  onChange={(e) => setForm((p) => ({ ...p, allergies: e.target.value }))}
+                  className="border-rose-200 focus:border-[#B94A48] focus:ring-[#B94A48]/20"
+                />
+              </div>
+
+              {/* Important Clinical Notes */}
+              <div>
+                <label className="field-label" htmlFor="pt-notes">
+                  Important Clinical Notes
+                </label>
+                <textarea
+                  id="pt-notes"
+                  rows={2}
+                  placeholder="Past medical history, chronic conditions, regular medications..."
+                  value={form.notes}
+                  onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))}
+                  className="min-h-[70px]"
                 />
               </div>
 
@@ -924,12 +1032,12 @@ function PatientsPage() {
             </div>
 
             <div className="mt-6 flex gap-3 pt-3 border-t border-[#D9E6E2]">
-              <button type="button" className="btn-primary flex-1" onClick={handleAddPatient}>
+              <button type="button" className="btn-primary flex-1 cursor-pointer" onClick={handleAddPatient}>
                 Save & Add to Queue
               </button>
               <button
                 type="button"
-                className="btn-secondary"
+                className="btn-secondary cursor-pointer"
                 onClick={closeModal}
               >
                 Cancel

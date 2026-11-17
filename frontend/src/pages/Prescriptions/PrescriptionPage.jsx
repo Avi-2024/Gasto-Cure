@@ -48,6 +48,7 @@ import { quickChipsService, DEFAULT_QUICK_CHIPS } from '../../services/quickChip
 import { rxProtocolsService } from '../../services/rxProtocolsService';
 import { applyPrintSettings } from '../../utils/printStyles';
 import { generatePrescriptionWhatsAppLink } from '../../utils/whatsappHelper';
+import PatientAvatar from '../../components/common/PatientAvatar';
 import './PrescriptionPage.css';
 
 const getInitials = (name = '') => {
@@ -731,9 +732,11 @@ function PrescriptionPage() {
                           onClick={() => handleSelectPatientFromList(displayPt)}
                         >
                           <div className="flex items-center gap-3">
-                            <span className="w-9 h-9 rounded-xl bg-teal-50 border border-teal-200 text-[#287C75] flex items-center justify-center font-heading font-bold text-xs shrink-0">
-                              {getInitials(displayPt.name)}
-                            </span>
+                            <PatientAvatar
+                              gender={displayPt.gender}
+                              name={displayPt.name}
+                              className="w-9 h-9 rounded-full shrink-0 shadow-2xs"
+                            />
                             <div>
                               <p className="text-xs font-bold text-[#10201F] group-hover:text-[#287C75] transition">
                                 {displayPt.name}
@@ -878,9 +881,11 @@ function PrescriptionPage() {
                       className="py-3.5 px-3 hover:bg-[#F7FAF8] rounded-xl cursor-pointer flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 transition border border-transparent hover:border-[#D9E6E2]"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-[#123A3A] text-white flex items-center justify-center text-xs font-bold font-heading shrink-0 shadow-xs">
-                          {getInitials(p.name)}
-                        </div>
+                        <PatientAvatar
+                          gender={p.gender}
+                          name={p.name}
+                          className="w-10 h-10 rounded-full shrink-0 shadow-xs"
+                        />
                         <div className="space-y-0.5">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-sm font-bold text-[#10201F]">
@@ -1278,8 +1283,12 @@ function PrescriptionPage() {
         <section className="prescription-section patient-info-section">
           <div className="patient-banner-container">
             <div className="patient-banner-left">
-              <div className="patient-avatar-badge no-print">
-                <span className="patient-avatar-initials">{getInitials(patient.name)}</span>
+              <div className="patient-avatar-badge no-print relative">
+                <PatientAvatar
+                  gender={patient.gender}
+                  name={patient.name}
+                  className="w-11 h-11 rounded-full shrink-0 shadow-xs"
+                />
                 <span className="patient-avatar-subicon">
                   <Stethoscope size={10} />
                 </span>

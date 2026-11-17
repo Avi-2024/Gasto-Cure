@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { localVisits, localSettings } from '../../../services/localStore';
 import { cleanPhoneNumber, generatePrescriptionWhatsAppLink } from '../../../utils/whatsappHelper';
+import PatientAvatar from '../../../components/common/PatientAvatar';
 
 const formatDisplayDate = (dateStr) => {
   if (!dateStr) return '';
@@ -114,9 +115,11 @@ function PatientProfileDrawer({ isOpen, patient, onClose, onEdit, clinicSettings
         {/* Drawer Header Bar */}
         <div className="flex items-center justify-between border-b border-[#D9E6E2] px-6 py-4 bg-[#F7FAF8] shrink-0">
           <div className="flex items-center gap-3.5">
-            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-50 text-[#287C75] font-heading font-bold text-base border border-teal-100 shadow-nivara-xs">
-              {getInitials(patient.name)}
-            </span>
+            <PatientAvatar
+              gender={patient.gender}
+              name={patient.name}
+              className="h-12 w-12 rounded-full shrink-0 shadow-nivara-xs"
+            />
             <div>
               <h2 id="patient-profile-title" className="font-heading text-lg font-bold text-[#10201F] leading-tight">
                 {patient.name}

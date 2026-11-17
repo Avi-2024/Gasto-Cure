@@ -19,6 +19,7 @@ import {
 import { chatService } from '../../services/chatService';
 import { localPatients, localSettings } from '../../services/localStore';
 import { formatDisplayDate } from '../../services/automatedRemindersService';
+import PatientAvatar from '../../components/common/PatientAvatar';
 
 const QUICK_TEMPLATES = [
   {
@@ -175,9 +176,11 @@ export default function ChatPage() {
                         : 'hover:bg-[#F2F6F4] bg-transparent'
                     }`}
                   >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#0F3933] to-[#1E6F5C] text-xs font-bold text-white shadow-xs">
-                      {initials}
-                    </div>
+                    <PatientAvatar
+                      gender={c.gender}
+                      name={c.patientName}
+                      className="h-10 w-10 rounded-full shrink-0 shadow-xs"
+                    />
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-1">
@@ -220,9 +223,11 @@ export default function ChatPage() {
               {/* Chat Thread Header */}
               <div className="shrink-0 p-3 sm:p-3.5 border-b border-[#D9E6E2] bg-white flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-600 text-sm font-bold text-white shadow-2xs">
-                    {activePatient.name.charAt(0)}
-                  </div>
+                  <PatientAvatar
+                    gender={activePatient.gender}
+                    name={activePatient.name}
+                    className="h-10 w-10 rounded-full shrink-0 shadow-2xs"
+                  />
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <h2 className="text-sm font-heading font-bold text-[#10201F] truncate">

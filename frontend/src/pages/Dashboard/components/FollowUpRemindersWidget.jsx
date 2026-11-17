@@ -12,6 +12,7 @@ import {
 import { localPatients, localVisits, localSettings } from '../../../services/localStore';
 import { generateFollowUpReminderWhatsAppLink } from '../../../utils/whatsappHelper';
 import { automatedRemindersService } from '../../../services/automatedRemindersService';
+import PatientAvatar from '../../../components/common/PatientAvatar';
 
 /**
  * Calculate difference in whole calendar days between target date and today.
@@ -351,10 +352,12 @@ export default function FollowUpRemindersWidget() {
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     {/* Left: Avatar + Details */}
                     <div className="flex items-center gap-3 min-w-0">
-                      {/* Initials Avatar */}
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-50 border border-teal-200/70 text-teal-800 font-heading font-bold text-xs shadow-2xs">
-                        {initials}
-                      </div>
+                      {/* Gender-Aware Patient Avatar */}
+                      <PatientAvatar
+                        gender={item.gender}
+                        name={item.name}
+                        className="h-10 w-10 rounded-full shrink-0 shadow-2xs"
+                      />
 
                       {/* Name, Demographics, and Diagnosis */}
                       <div className="min-w-0 space-y-0.5">
