@@ -369,8 +369,6 @@ function MedicinesPage() {
             <thead className="bg-[#F7FAF8] text-xs font-bold uppercase tracking-[0.08em] text-[#4E6460] border-b border-[#D9E6E2]">
               <tr>
                 <th className="px-4 py-3.5">Medicine Name & Composition</th>
-                <th className="px-4 py-3.5">Strength</th>
-                <th className="px-4 py-3.5">Dosage Form</th>
                 <th className="px-4 py-3.5">Default Dosage</th>
                 <th className="px-4 py-3.5">Timing & Duration</th>
                 <th className="px-4 py-3.5">Instructions</th>
@@ -380,7 +378,6 @@ function MedicinesPage() {
             </thead>
             <tbody className="divide-y divide-[#D9E6E2]">
               {paginated.map((med) => {
-                const badgeStyle = getFormBadgeStyle(med.form || '');
                 return (
                   <tr
                     key={med.id}
@@ -403,27 +400,6 @@ function MedicinesPage() {
                           </p>
                         </div>
                       </div>
-                    </td>
-
-                    {/* Strength */}
-                    <td className="px-4 py-3.5">
-                      <span className="font-medium text-[#10201F]">
-                        {med.strength || '-'}
-                      </span>
-                    </td>
-
-                    {/* Form Pill */}
-                    <td className="px-4 py-3.5">
-                      <span
-                        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${badgeStyle}`}
-                      >
-                        <img
-                          src={getDosageFormIconSrc(med.form)}
-                          alt=""
-                          className="h-3.5 w-3.5 object-contain inline-block select-none"
-                        />
-                        {med.form || 'Tablet'}
-                      </span>
                     </td>
 
                     {/* Default Dosage (monospace chip) */}
@@ -507,7 +483,7 @@ function MedicinesPage() {
 
               {paginated.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-12 text-center text-sm text-[#4E6460]">
+                  <td colSpan={6} className="px-4 py-12 text-center text-sm text-[#4E6460]">
                     <div className="mx-auto flex max-w-sm flex-col items-center gap-3">
                       <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F7FAF8] text-[#7D908C] border border-[#D9E6E2]">
                         <AlertCircle size={24} />
