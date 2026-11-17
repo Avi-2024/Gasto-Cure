@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useOutletContext } from 'react-router-dom';
 import {
   Printer,
   Plus,
@@ -38,6 +38,7 @@ import {
   PenTool,
   History,
   Zap,
+  Menu,
 } from 'lucide-react';
 import MedicineTable from './components/MedicineTable';
 import AutoResizeTextarea from './components/AutoResizeTextarea';
@@ -77,6 +78,7 @@ const GASTRO_ADVICE = DEFAULT_QUICK_CHIPS.advice;
 function PrescriptionPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const outletContext = useOutletContext();
   const patientIdParam = searchParams.get('patientId');
   const visitIdParam = searchParams.get('visitId') || searchParams.get('rxId');
 
@@ -1120,11 +1122,21 @@ function PrescriptionPage() {
       {/* Screen Controls Header Bar */}
       <div className="prescription-controls no-print">
         <div className="controls-left">
+          {outletContext?.onMenuClick && (
+            <button
+              type="button"
+              className="md:hidden btn-secondary btn-header-back"
+              onClick={outletContext.onMenuClick}
+              title="Open navigation menu"
+              aria-label="Open navigation menu"
+            >
+              <Menu size={14} />
+            </button>
+          )}
           <button type="button" className="btn-secondary btn-header-back" onClick={() => navigate(-1)} title="Go back to previous page">
             <ArrowLeft size={14} />
             <span>Back</span>
           </button>
-        
         </div>
 
         {/* Quick Print Alignment Bar */}

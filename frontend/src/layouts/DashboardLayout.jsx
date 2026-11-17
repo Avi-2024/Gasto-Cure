@@ -22,6 +22,9 @@ export default function DashboardLayout() {
   }, [location.pathname]);
 
   const isChatRoute = location.pathname.startsWith('/chat');
+  const isPrescriptionEditor =
+    location.pathname === '/prescription' ||
+    location.pathname.startsWith('/prescription/');
 
   return (
     <div className="h-screen w-screen overflow-hidden flex bg-[#F7FAF8] text-[#10201F]">
@@ -30,22 +33,26 @@ export default function DashboardLayout() {
 
       {/* Main Content Column */}
       <div className="flex-1 h-screen flex flex-col min-w-0 overflow-hidden">
-        {/* Fixed/Sticky Top Header */}
-        <div className="shrink-0 relative z-[100] px-3 pt-3 sm:px-5 sm:pt-4 lg:px-7 lg:pt-5">
-          <AppHeader onMenuClick={() => setSidebarOpen(true)} />
-        </div>
+        {/* Fixed/Sticky Top Header (Omitted in Prescription Studio to eliminate double header and maximize vertical writing space) */}
+        {!isPrescriptionEditor && (
+          <div className="shrink-0 relative z-[100] px-3 pt-3 sm:px-5 sm:pt-4 lg:px-7 lg:pt-5">
+            <AppHeader onMenuClick={() => setSidebarOpen(true)} />
+          </div>
+        )}
 
         {/* Dedicated Workspace Content Container */}
         <main
           className={`flex-1 overflow-x-hidden ${
             isChatRoute
               ? 'overflow-y-hidden flex flex-col min-h-0 px-3 py-2 sm:px-5 sm:py-3 lg:px-7 lg:py-3'
+              : isPrescriptionEditor
+              ? 'overflow-y-auto px-2 pt-2 pb-32 sm:px-4 sm:pt-2.5 lg:px-6 lg:pt-3'
               : 'overflow-y-auto px-3 py-3 sm:px-5 sm:py-4 lg:px-7 lg:py-5'
           }`}
         >
           <div
             className={`mx-auto w-full max-w-[1600px] ${
-              isChatRoute ? 'h-full flex-1 flex flex-col min-h-0' : 'pb-36'
+              isChatRoute ? 'h-full flex-1 flex flex-col min-h-0' : isPrescriptionEditor ? 'pb-24' : 'pb-36'
             }`}
           >
             <AnimatePresence mode="wait">
@@ -57,7 +64,7 @@ export default function DashboardLayout() {
                 transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                 className={isChatRoute ? 'h-full flex-1 flex flex-col min-h-0' : undefined}
               >
-                <Outlet />
+                <Outlet context={{ onMenuClick: () => setSidebarOpen(true) }} />
               </motion.section>
             </AnimatePresence>
           </div>

@@ -305,5 +305,27 @@ describe('Task 2: Global Navigation Shell & Brand Identity', () => {
       expect(container.querySelector('aside')).toBeDefined();
       expect(container.querySelector('header')).toBeDefined();
     });
+
+    it('omits AppHeader when route is prescription editor to eliminate double header and maximize vertical writing space', () => {
+      const { container } = render(
+        <MemoryRouter initialEntries={['/prescription/new']}>
+          <DashboardLayout />
+        </MemoryRouter>
+      );
+
+      expect(container.querySelector('header')).toBeNull();
+      expect(container.querySelector('aside')).toBeDefined();
+    });
+
+    it('renders AppHeader on /prescriptions list history table', () => {
+      const { container } = render(
+        <MemoryRouter initialEntries={['/prescriptions']}>
+          <DashboardLayout />
+        </MemoryRouter>
+      );
+
+      expect(container.querySelector('header')).toBeDefined();
+      expect(container.querySelector('aside')).toBeDefined();
+    });
   });
 });
