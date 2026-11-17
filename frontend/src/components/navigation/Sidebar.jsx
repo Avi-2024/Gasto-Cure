@@ -284,25 +284,25 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
 
       {/* Main Sidebar Shell (Collapsible between Expanded 268px and Mini Icon Rail) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex shrink-0 flex-col ${activeTheme.asideClasses} shadow-2xl transition-all duration-300 ease-in-out md:sticky md:top-0 md:h-screen md:shadow-none relative md:overflow-visible ${
+        className={`fixed inset-y-0 left-0 z-50 md:z-[120] flex shrink-0 flex-col ${activeTheme.asideClasses} shadow-2xl transition-all duration-300 ease-in-out md:sticky md:top-0 md:h-screen md:shadow-none relative md:overflow-visible ${
           isOpen
             ? 'w-[268px] p-4 translate-x-0 opacity-100 pointer-events-auto'
             : 'w-0 p-0 -translate-x-full md:w-[76px] md:px-2 md:py-3.5 md:translate-x-0 md:opacity-100 md:pointer-events-auto'
         }`}
         aria-label="Main Navigation"
       >
-        {/* Border Toggle Button - Premium Elevated Light Pill (Shifted Right, High-Class Design) */}
+        {/* Border Toggle Button - Premium Elevated Light Pill with generous hit area and high z-index */}
         <button
           type="button"
           onClick={onToggle}
-          className="hidden md:flex absolute top-[24px] -right-5 z-50 h-8 w-8 items-center justify-center rounded-full border border-slate-300/90 bg-white text-slate-800 shadow-[0_4px_14px_rgba(0,0,0,0.14),0_1px_3px_rgba(0,0,0,0.08)] hover:bg-slate-50 hover:text-[#123A3A] hover:border-slate-400 hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer group"
+          className="hidden md:flex absolute top-[24px] -right-5 z-[130] h-8 w-8 items-center justify-center rounded-full border border-slate-300/90 bg-white text-slate-800 shadow-[0_4px_14px_rgba(0,0,0,0.14),0_1px_3px_rgba(0,0,0,0.08)] hover:bg-slate-50 hover:text-[#123A3A] hover:border-slate-400 hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer group before:absolute before:-inset-2.5 before:content-[''] before:rounded-full"
           title={isOpen ? "Collapse sidebar (Ctrl+B)" : "Expand sidebar (Ctrl+B)"}
           aria-label={isOpen ? "Close menu" : "Open menu"}
         >
           {isOpen ? (
-            <ChevronLeft size={16} strokeWidth={2.5} className="transition-transform group-hover:-translate-x-0.5" />
+            <ChevronLeft size={16} strokeWidth={2.5} className="transition-transform group-hover:-translate-x-0.5 pointer-events-none" />
           ) : (
-            <ChevronRight size={16} strokeWidth={2.5} className="transition-transform group-hover:translate-x-0.5" />
+            <ChevronRight size={16} strokeWidth={2.5} className="transition-transform group-hover:translate-x-0.5 pointer-events-none" />
           )}
         </button>
 
