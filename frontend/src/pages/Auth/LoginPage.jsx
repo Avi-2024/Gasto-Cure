@@ -287,8 +287,8 @@ export default function LoginPage() {
             </div>
 
             {/* Main Headline */}
-            <h1 className="mt-3 text-3xl sm:text-4xl xl:text-[44px] font-extrabold tracking-tight text-[#102A35] leading-[1.15]">
-              Specialized Care for <br className="hidden sm:inline" />
+            <h1 className="mt-3 text-3xl sm:text-4xl xl:text-[42px] font-extrabold tracking-tight text-[#102A35] leading-[1.15]">
+              Precision Clinical Care for <br className="hidden sm:inline" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#087F75] via-[#064E49] to-[#10B981]">
                 Digestive &amp; Liver Health.
               </span>
@@ -297,17 +297,17 @@ export default function LoginPage() {
 
             {/* Description */}
             <p className="mt-2 text-xs sm:text-sm text-[#647987] leading-relaxed max-w-lg font-medium">
-              Seamless clinical consultation, calibrated letterhead digital prescriptions, and automated WhatsApp appointment follow-ups.
+              Specialized outpatient consultations, calibrated letterhead digital prescriptions, automated WhatsApp follow-ups, and live patient queue triage.
             </p>
 
-            {/* Hero Composition: 2x2 Feature Cards + 3D Digestive System Illustration */}
-            <div className="mt-5 flex items-center gap-4 xl:gap-6">
+            {/* Human-Crafted Hero Composition: 2x2 Feature Cards + Layered 3D Digestive Anatomy Disc */}
+            <div className="mt-5 flex items-center gap-5 xl:gap-7">
               {/* 4 Feature Cards arranged in a clean 2x2 Grid */}
               <div className="grid grid-cols-2 gap-3 flex-1 max-w-[360px] xl:max-w-[380px]">
                 {/* 1. Calibrated RX Studio */}
-                <div className="rounded-xl border border-emerald-100/90 bg-white/95 p-3 shadow-[0_4px_16px_rgba(8,127,117,0.05)] backdrop-blur-xs transition hover:shadow-md hover:border-emerald-300">
+                <div className="rounded-xl border border-emerald-100/90 bg-white/95 p-3 shadow-[0_4px_16px_rgba(8,127,117,0.05)] backdrop-blur-xs transition hover:shadow-md hover:border-emerald-300 group">
                   <div className="flex items-center gap-2">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#E8F7F4] text-[#087F75] border border-emerald-200/80">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#E8F7F4] text-[#087F75] border border-emerald-200/80 group-hover:bg-[#087F75] group-hover:text-white transition">
                       <Printer size={14} />
                     </div>
                     <h4 className="text-xs font-bold text-[#102A35] leading-tight">
@@ -315,14 +315,14 @@ export default function LoginPage() {
                     </h4>
                   </div>
                   <p className="mt-1.5 text-[11px] text-[#647987] leading-snug">
-                    Pixel-perfect printing for custom letterheads &amp; digital headers.
+                    Letterhead pad mode &amp; digital header prescription printing.
                   </p>
                 </div>
 
                 {/* 2. Automated WhatsApp Reminders */}
-                <div className="rounded-xl border border-emerald-100/90 bg-white/95 p-3 shadow-[0_4px_16px_rgba(8,127,117,0.05)] backdrop-blur-xs transition hover:shadow-md hover:border-emerald-300">
+                <div className="rounded-xl border border-emerald-100/90 bg-white/95 p-3 shadow-[0_4px_16px_rgba(8,127,117,0.05)] backdrop-blur-xs transition hover:shadow-md hover:border-emerald-300 group">
                   <div className="flex items-center gap-2">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#E8F7F4] text-[#087F75] border border-emerald-200/80">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#E8F7F4] text-[#087F75] border border-emerald-200/80 group-hover:bg-[#087F75] group-hover:text-white transition">
                       <MessageCircle size={14} />
                     </div>
                     <h4 className="text-xs font-bold text-[#102A35] leading-tight">
@@ -330,14 +330,14 @@ export default function LoginPage() {
                     </h4>
                   </div>
                   <p className="mt-1.5 text-[11px] text-[#647987] leading-snug">
-                    Zero no-shows with proactive 24–48h follow-ups.
+                    Zero no-shows with proactive 24–48h follow-up alerts.
                   </p>
                 </div>
 
                 {/* 3. Role-Based Security */}
-                <div className="rounded-xl border border-emerald-100/90 bg-white/95 p-3 shadow-[0_4px_16px_rgba(8,127,117,0.05)] backdrop-blur-xs transition hover:shadow-md hover:border-emerald-300">
+                <div className="rounded-xl border border-emerald-100/90 bg-white/95 p-3 shadow-[0_4px_16px_rgba(8,127,117,0.05)] backdrop-blur-xs transition hover:shadow-md hover:border-emerald-300 group">
                   <div className="flex items-center gap-2">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#E8F7F4] text-[#087F75] border border-emerald-200/80">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#E8F7F4] text-[#087F75] border border-emerald-200/80 group-hover:bg-[#087F75] group-hover:text-white transition">
                       <ShieldCheck size={14} />
                     </div>
                     <h4 className="text-xs font-bold text-[#102A35] leading-tight">
@@ -350,9 +350,9 @@ export default function LoginPage() {
                 </div>
 
                 {/* 4. Outpatient Management */}
-                <div className="rounded-xl border border-emerald-100/90 bg-white/95 p-3 shadow-[0_4px_16px_rgba(8,127,117,0.05)] backdrop-blur-xs transition hover:shadow-md hover:border-emerald-300">
+                <div className="rounded-xl border border-emerald-100/90 bg-white/95 p-3 shadow-[0_4px_16px_rgba(8,127,117,0.05)] backdrop-blur-xs transition hover:shadow-md hover:border-emerald-300 group">
                   <div className="flex items-center gap-2">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#E8F7F4] text-[#087F75] border border-emerald-200/80">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#E8F7F4] text-[#087F75] border border-emerald-200/80 group-hover:bg-[#087F75] group-hover:text-white transition">
                       <CalendarDays size={14} />
                     </div>
                     <h4 className="text-xs font-bold text-[#102A35] leading-tight">
@@ -365,15 +365,23 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              {/* 3D Digestive System Hero Visual */}
-              <div className="hidden xl:flex items-center justify-center relative shrink-0">
-                <div className="relative w-48 h-48 xl:w-56 xl:h-56 flex items-center justify-center">
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#087F75]/15 via-emerald-100/40 to-transparent blur-xl" />
-                  <img
-                    src={digestiveHero}
-                    alt="Digestive & Liver Anatomical System"
-                    className="w-full h-full object-contain drop-shadow-[0_12px_24px_rgba(8,127,117,0.18)] select-none pointer-events-none transition hover:scale-105 duration-300"
-                  />
+              {/* Human-Framed 3D Digestive Anatomy Visual Centerpiece */}
+              <div className="hidden xl:flex flex-col items-center justify-center relative shrink-0">
+                <div className="relative w-52 h-52 xl:w-56 xl:h-56 rounded-full p-2 bg-gradient-to-tr from-[#087F75]/25 via-emerald-100 to-white shadow-xl border border-emerald-200/80 flex items-center justify-center">
+                  <div className="w-full h-full rounded-full overflow-hidden bg-gradient-to-b from-[#E8F7F4]/90 via-[#D6F3EB]/70 to-[#C0ECE1]/80 flex items-center justify-center relative">
+                    <img
+                      src={digestiveHero}
+                      alt="Digestive & Liver Anatomical System"
+                      className="w-full h-full object-contain p-2 scale-110 drop-shadow-[0_10px_20px_rgba(8,127,117,0.22)] select-none pointer-events-none transition hover:scale-115 duration-300"
+                    />
+                  </div>
+                </div>
+                {/* Floating Human Touch Status Pill */}
+                <div className="absolute -bottom-2 bg-white/95 rounded-full px-3.5 py-1 shadow-md border border-emerald-200 flex items-center gap-1.5 backdrop-blur-xs">
+                  <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-[10px] font-bold text-[#064E49] tracking-wide uppercase">
+                    Liver &amp; GI Clinic Active
+                  </span>
                 </div>
               </div>
             </div>
@@ -410,8 +418,10 @@ export default function LoginPage() {
                       Work Email
                     </label>
                     {resolvedTarget && (
-                      <span className="text-[10px] font-semibold text-[#064E49] bg-[#E8F7F4] px-2 py-0.5 rounded-md border border-emerald-200">
-                        Auto: {resolvedTarget.shortTitle} ({resolvedTarget.destination})
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#064E49] bg-[#E8F7F4] px-2 py-0.5 rounded-md border border-emerald-200">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <span>Auto-Route: {resolvedTarget.shortTitle}</span>
+                        <span className="sr-only">({resolvedTarget.destination})</span>
                       </span>
                     )}
                   </div>
@@ -511,13 +521,13 @@ export default function LoginPage() {
                 </button>
               </form>
 
-              {/* Discrete Demo Quick Logins (Optional 1-Click Fill Helper) */}
+              {/* Discrete Demo Quick Fill Helpers */}
               <div className="relative my-3 flex items-center justify-center">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-slate-200" />
                 </div>
                 <span className="relative bg-white px-2.5 text-[10px] font-bold uppercase tracking-wider text-[#647987]">
-                  or quick login
+                  staff quick demo
                 </span>
               </div>
 
