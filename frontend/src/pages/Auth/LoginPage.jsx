@@ -370,22 +370,22 @@ export default function LoginPage() {
 
               {/* 3D Human Digestive System Anatomy Hero Illustration */}
               <div className="hidden xl:flex items-center justify-center relative shrink-0">
-                <div className="relative max-w-[145px]">
+                <div className="relative max-w-[195px] xl:max-w-[220px]">
                   <img
                     src={digestiveHero}
                     alt="Human Digestive System 3D Anatomy Illustration"
-                    className="w-full h-auto object-contain drop-shadow-[0_12px_24px_rgba(8,127,117,0.22)] select-none pointer-events-none"
+                    className="w-full h-auto object-contain drop-shadow-[0_15px_30px_rgba(8,127,117,0.25)] select-none pointer-events-none hover:scale-105 transition-transform duration-300"
                   />
                 </div>
               </div>
             </div>
 
             {/* Bottom-left Decorative Clinical Stethoscope */}
-            <div className="hidden xl:block mt-2 relative -ml-4 max-w-[170px] opacity-90 pointer-events-none">
+            <div className="hidden xl:block mt-1 relative -ml-3 max-w-[230px] xl:max-w-[260px] opacity-95 pointer-events-none">
               <img
                 src={stethoscopeHero}
                 alt="Clinical Stethoscope"
-                className="w-full h-auto object-contain drop-shadow-sm select-none"
+                className="w-full h-auto object-contain drop-shadow-[0_8px_20px_rgba(0,0,0,0.08)] select-none"
               />
             </div>
           </div>
