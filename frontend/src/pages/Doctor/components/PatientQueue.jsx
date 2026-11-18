@@ -18,7 +18,7 @@ const getStartTime = (item) => item?.startTime || item?.appointmentTime || '--:-
 
 export default function PatientQueue({ queue = [], selectedPatientId, onSelect }) {
   return (
-    <section className="rounded-3xl border border-[#D9E6E2] bg-white p-5 shadow-nivara-xs">
+    <section className="rounded-3xl border border-[#D9E6E2] bg-white p-5 shadow-clinixpulse-xs">
       <div className="flex items-center justify-between gap-3 border-b border-[#D9E6E2]/60 pb-3">
         <div>
           <h2 className="font-heading text-sm font-bold text-[#10201F]">

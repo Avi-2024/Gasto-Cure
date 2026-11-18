@@ -10,7 +10,7 @@ const formatVisitDate = (value) => {
 
 export default function PatientHistory({ history = [] }) {
   return (
-    <section className="rounded-3xl border border-[#D9E6E2] bg-white p-5 shadow-nivara-xs">
+    <section className="rounded-3xl border border-[#D9E6E2] bg-white p-5 shadow-clinixpulse-xs">
       <div className="flex items-center justify-between border-b border-[#D9E6E2]/60 pb-3">
         <div className="flex items-center gap-2">
           <History size={15} className="text-[#287C75]" />

@@ -1,20 +1,20 @@
-# Nivara UI/UX System Redesign Implementation Plan
+# ClinixPulse UI/UX System Redesign Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Transform the clinic prescription and patient management application into **Nivara**, a world-class, award-winning outpatient operations platform inspired by Linear and Stripe, while maintaining 100% functional parity and a 100% green test suite.
+**Goal:** Transform the clinic prescription and patient management application into **ClinixPulse**, a world-class, award-winning outpatient operations platform inspired by Linear and Stripe, while maintaining 100% functional parity and a 100% green test suite.
 
-**Architecture:** Implement the official Nivara Design System using a unified token architecture in Tailwind CSS and CSS custom properties (Deep Spruce `#123A3A`, Lush Pine `#287C75`, Warm Ochre `#C9A45C`, Pale Mint Canvas `#F7FAF8`, Manrope/Inter typography). Rebuild the navigation shell (`Sidebar`, `AppHeader`, `DashboardLayout`) and re-architect the 5 primary views (`Dashboard`, `Patients`, `Medicines`, `Prescription Studio`, and `Settings`) with Nivara's 3-stage outpatient lifecycle (*Entry → Consultation → Closure*), high-density data tables, and refined micro-interactions.
+**Architecture:** Implement the official ClinixPulse Design System using a unified token architecture in Tailwind CSS and CSS custom properties (Deep Spruce `#123A3A`, Lush Pine `#287C75`, Warm Ochre `#C9A45C`, Pale Mint Canvas `#F7FAF8`, Manrope/Inter typography). Rebuild the navigation shell (`Sidebar`, `AppHeader`, `DashboardLayout`) and re-architect the 5 primary views (`Dashboard`, `Patients`, `Medicines`, `Prescription Studio`, and `Settings`) with ClinixPulse's 3-stage outpatient lifecycle (*Entry → Consultation → Closure*), high-density data tables, and refined micro-interactions.
 
 **Tech Stack:** React 18, Vite 5, Tailwind CSS 3, Lucide React, Framer Motion, Vitest, Testing Library.
 
-**Spec:** [`docs/superpowers/specs/2026-11-10-nivara-ui-ux-redesign.md`](file:///D:/jurnary/Gasto%20Cure/docs/superpowers/specs/2026-11-10-nivara-ui-ux-redesign.md)
+**Spec:** [`docs/superpowers/specs/2026-11-10-clinixpulse-ui-ux-redesign.md`](file:///D:/jurnary/Gasto%20Cure/docs/superpowers/specs/2026-11-10-clinixpulse-ui-ux-redesign.md)
 
 ---
 
 ## Global Constraints
 
-- **Exact Nivara Palette:** Primary `#123A3A`, Secondary `#287C75`, Accent `#C9A45C`, Canvas `#F7FAF8`, Surface `#FFFFFF`, Border `#D9E6E2`, Text `#10201F`, `#4E6460`, `#7D908C`.
+- **Exact ClinixPulse Palette:** Primary `#123A3A`, Secondary `#287C75`, Accent `#C9A45C`, Canvas `#F7FAF8`, Surface `#FFFFFF`, Border `#D9E6E2`, Text `#10201F`, `#4E6460`, `#7D908C`.
 - **Exact Typography:** Headings `Manrope, sans-serif`, UI Body `Inter, sans-serif`, Numbers/Vitals `tabular-nums`.
 - **Data & Storage Immutability:** `localStore.js` schema, storage keys, visit IDs (`RX-YYYYMMDD-XXXX`), patient IDs (`PT-XXXXXX`), and API signatures remain 100% intact.
 - **Zero Test Regressions:** All 109 automated tests across all 8 existing test suites must pass without error at every task milestone.
@@ -32,7 +32,7 @@
 
 ---
 
-### Task 1: Nivara Design Token Architecture & Typography Foundation
+### Task 1: ClinixPulse Design Token Architecture & Typography Foundation
 
 **Files:**
 - Modify: `frontend/index.html`
@@ -42,14 +42,14 @@
 
 **Interfaces:**
 - Consumes: Google Fonts (`Manrope`, `Inter`).
-- Produces: Tailwind classes `bg-nivara-canvas`, `bg-nivara-primary`, `text-nivara-primary`, `border-nivara-border`, `shadow-nivara-sm`, and global utility classes (`.app-card`, `.btn-primary`, `.btn-secondary`, `.field-label`, `.tabular-nums`).
+- Produces: Tailwind classes `bg-clinixpulse-canvas`, `bg-clinixpulse-primary`, `text-clinixpulse-primary`, `border-clinixpulse-border`, `shadow-clinixpulse-sm`, and global utility classes (`.app-card`, `.btn-primary`, `.btn-secondary`, `.field-label`, `.tabular-nums`).
 
 - [ ] **Step 1: Write token verification test in `frontend/src/tests/designSystemTokens.test.js`**
   ```javascript
   import { describe, it, expect } from 'vitest';
 
-  describe('Nivara Design System Tokens', () => {
-    it('defines official Nivara color palette in root CSS variables', () => {
+  describe('ClinixPulse Design System Tokens', () => {
+    it('defines official ClinixPulse color palette in root CSS variables', () => {
       const style = getComputedStyle(document.documentElement);
       // Verify root tokens or css classes are defined
       expect(document.documentElement).toBeDefined();
@@ -61,26 +61,26 @@
   Run: `cd frontend; npx vitest run src/tests/designSystemTokens.test.js`
   Expected: PASS or initial baseline check.
 
-- [ ] **Step 3: Update `frontend/index.html` with Google Fonts and Nivara title**
+- [ ] **Step 3: Update `frontend/index.html` with Google Fonts and ClinixPulse title**
   - Add Google Fonts preconnect and stylesheet link: `https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap`.
-  - Update `<title>` to: `Nivara — Secure Outpatient Operations Platform`.
+  - Update `<title>` to: `ClinixPulse — Secure Outpatient Operations Platform`.
 
-- [ ] **Step 4: Update `frontend/tailwind.config.js` with Nivara design tokens**
+- [ ] **Step 4: Update `frontend/tailwind.config.js` with ClinixPulse design tokens**
   - Add fonts: `sans: ['Inter', 'sans-serif']`, `heading: ['Manrope', 'sans-serif']`.
   - Add colors:
-    - `nivara`: `{ primary: '#123A3A', secondary: '#287C75', accent: '#C9A45C', canvas: '#F7FAF8', surface: '#FFFFFF', border: '#D9E6E2', text: '#10201F', muted: '#4E6460', subtle: '#7D908C' }`
+    - `clinixpulse`: `{ primary: '#123A3A', secondary: '#287C75', accent: '#C9A45C', canvas: '#F7FAF8', surface: '#FFFFFF', border: '#D9E6E2', text: '#10201F', muted: '#4E6460', subtle: '#7D908C' }`
     - Retain alias mappings for backward compatibility: `medical.primary = #123A3A`, `medical.secondary = #287C75`, `medical.background = #F7FAF8`, `medical.border = #D9E6E2`.
-  - Add custom shadows: `nivara-xs`, `nivara-sm`, `nivara-md`, `nivara-lg`.
+  - Add custom shadows: `clinixpulse-xs`, `clinixpulse-sm`, `clinixpulse-md`, `clinixpulse-lg`.
 
 - [ ] **Step 5: Modernize `frontend/src/styles.css`**
   - Update `:root` variables:
-    - `--nivara-primary: #123A3A;`
-    - `--nivara-secondary: #287C75;`
-    - `--nivara-accent: #C9A45C;`
-    - `--nivara-canvas: #F7FAF8;`
-    - `--nivara-surface: #FFFFFF;`
-    - `--nivara-border: #D9E6E2;`
-    - `--nivara-text-primary: #10201F;`
+    - `--clinixpulse-primary: #123A3A;`
+    - `--clinixpulse-secondary: #287C75;`
+    - `--clinixpulse-accent: #C9A45C;`
+    - `--clinixpulse-canvas: #F7FAF8;`
+    - `--clinixpulse-surface: #FFFFFF;`
+    - `--clinixpulse-border: #D9E6E2;`
+    - `--clinixpulse-text-primary: #10201F;`
   - Re-craft `@layer components` (`.app-card`, `.btn-primary`, `.btn-secondary`, `.icon-button`, `.field-label`, `.page-title`, `.page-subtitle`) with refined borders, subtle elevation, and hover transitions.
   - Add `.font-heading { font-family: 'Manrope', sans-serif; }` and `.tabular-nums { font-variant-numeric: tabular-nums; }`.
 
@@ -91,7 +91,7 @@
 - [ ] **Step 7: Commit Task 1**
   ```bash
   git add frontend/index.html frontend/tailwind.config.js frontend/src/styles.css frontend/src/tests/designSystemTokens.test.js
-  git commit -m "feat(design): implement Nivara design token architecture and typography foundation"
+  git commit -m "feat(design): implement ClinixPulse design token architecture and typography foundation"
   ```
 
 ---
@@ -99,26 +99,26 @@
 ### Task 2: Global Navigation Shell & Brand Identity Components
 
 **Files:**
-- Create: `frontend/src/components/common/NivaraLogo.jsx`
+- Create: `frontend/src/components/common/ClinixPulseLogo.jsx`
 - Modify: `frontend/src/components/navigation/Sidebar.jsx`
 - Modify: `frontend/src/components/layout/AppHeader.jsx`
 - Modify: `frontend/src/layouts/DashboardLayout.jsx`
 
 **Interfaces:**
-- Consumes: Nivara tokens, `useAuth()`.
-- Produces: `<NivaraLogo />` component, modernized `<Sidebar />` with grouped navigation, and `<AppHeader />` with global search shortcut and clinic switcher.
+- Consumes: ClinixPulse tokens, `useAuth()`.
+- Produces: `<ClinixPulseLogo />` component, modernized `<Sidebar />` with grouped navigation, and `<AppHeader />` with global search shortcut and clinic switcher.
 
-- [ ] **Step 1: Create `frontend/src/components/common/NivaraLogo.jsx`**
-  - Implement the authentic Nivara brandmark:
+- [ ] **Step 1: Create `frontend/src/components/common/ClinixPulseLogo.jsx`**
+  - Implement the authentic ClinixPulse brandmark:
     - Hexagonal boundary with stroke `#287C75` / `#C9A45C`.
     - 3 circular stage nodes (Entry `#287C75`, Consultation `#123A3A`, Closure `#C9A45C`).
     - Smooth S-curve flow path connecting the nodes.
-    - Distinctive "Nivara" wordmark rendered in `Manrope` font with subtitle "Outpatient Platform".
+    - Distinctive "ClinixPulse" wordmark rendered in `Manrope` font with subtitle "Outpatient Platform".
     - Support variants: `default`, `compact` (icon only), and `monochrome`.
 
 - [ ] **Step 2: Redesign `frontend/src/components/navigation/Sidebar.jsx`**
   - Background: Deep Spruce Teal (`#123A3A`) with frosted separator borders (`border-white/10`).
-  - Top: `<NivaraLogo />` in white/gold contrast.
+  - Top: `<ClinixPulseLogo />` in white/gold contrast.
   - Nav Groups:
     - Operations: Dashboard (`/dashboard`), Patients (`/patients`), Prescriptions (`/prescriptions`), New Prescription (`/prescription/new`).
     - Clinical Masters: Medicines Formulary (`/medicines`).
@@ -127,7 +127,7 @@
   - Bottom: Doctor profile pill with initials avatar, "Dr. [Name]", and clean logout action.
 
 - [ ] **Step 3: Redesign `frontend/src/components/layout/AppHeader.jsx`**
-  - Floating frosted card style (`bg-white/85 backdrop-blur-md border border-[#D9E6E2] shadow-nivara-xs`).
+  - Floating frosted card style (`bg-white/85 backdrop-blur-md border border-[#D9E6E2] shadow-clinixpulse-xs`).
   - Left: Mobile hamburger menu toggle + Global search trigger with shortcut cue (`⌘K` / `Ctrl+K`).
   - Right: Contextual Clinic Selector pill with status indicator dot + Doctor avatar badge.
 
@@ -141,8 +141,8 @@
 
 - [ ] **Step 6: Commit Task 2**
   ```bash
-  git add frontend/src/components/common/NivaraLogo.jsx frontend/src/components/navigation/Sidebar.jsx frontend/src/components/layout/AppHeader.jsx frontend/src/layouts/DashboardLayout.jsx
-  git commit -m "feat(navigation): build Nivara brand identity shell, sidebar, and floating header"
+  git add frontend/src/components/common/ClinixPulseLogo.jsx frontend/src/components/navigation/Sidebar.jsx frontend/src/components/layout/AppHeader.jsx frontend/src/layouts/DashboardLayout.jsx
+  git commit -m "feat(navigation): build ClinixPulse brand identity shell, sidebar, and floating header"
   ```
 
 ---
@@ -158,14 +158,14 @@
 
 **Interfaces:**
 - Consumes: `localPatients`, `localAppointments`, `localVisits`, `whatsappHelper`.
-- Produces: Nivara 3-stage outpatient lifecycle cards, elevated quick search, and follow-up alerts widget.
+- Produces: ClinixPulse 3-stage outpatient lifecycle cards, elevated quick search, and follow-up alerts widget.
 
 - [ ] **Step 1: Modernize `frontend/src/components/ui/StatusBadge.jsx` & `StatCard.jsx`**
-  - Update badge variants with Nivara semantic tones (`success`, `warning`, `danger`, `info`).
+  - Update badge variants with ClinixPulse semantic tones (`success`, `warning`, `danger`, `info`).
   - Update `StatCard` with `Manrope` display figures, tabular numerals, and subtle border hover glow.
 
 - [ ] **Step 2: Redesign `frontend/src/pages/Dashboard/DashboardPage.jsx`**
-  - Replace generic stat row with Nivara's **3-Stage Outpatient Lifecycle Card**:
+  - Replace generic stat row with ClinixPulse's **3-Stage Outpatient Lifecycle Card**:
     - **Stage 1 (Entry):** Waiting Queue (`localAppointments.getQueue().length`) with "Patients Checked-in" pill.
     - **Stage 2 (Consultation):** Active consultations / Today's completed visits (`localVisits` filtered by today's date).
     - **Stage 3 (Closure):** Follow-ups Scheduled / Reminders due (`localVisits.getUpcomingFollowUps(2).length`).
@@ -189,7 +189,7 @@
 - [ ] **Step 6: Commit Task 3**
   ```bash
   git add frontend/src/pages/Dashboard/ frontend/src/components/ui/
-  git commit -m "feat(dashboard): redesign dashboard with Nivara 3-stage lifecycle and follow-up widgets"
+  git commit -m "feat(dashboard): redesign dashboard with ClinixPulse 3-stage lifecycle and follow-up widgets"
   ```
 
 ---
@@ -206,7 +206,7 @@
 - Produces: Modern patient directory table, slide-over clinical profile drawer, and edit modal.
 
 - [ ] **Step 1: Redesign `frontend/src/pages/Patients/PatientsPage.jsx`**
-  - Quick stats strip using Nivara modular cards (Total Patients, Active, Scheduled Follow-ups).
+  - Quick stats strip using ClinixPulse modular cards (Total Patients, Active, Scheduled Follow-ups).
   - High-clarity tabular directory with sticky header, soft hover states, tabular patient codes (`PT-XXXXXX`), age/gender chips, last visit, and next follow-up date.
   - Row action pills: 1-click WhatsApp chat, Edit patient modal, and Profile drawer button.
   - Retain URL query parameter handling: `?action=new` auto-opens modal, `?patientId=...` auto-opens drawer.
@@ -223,7 +223,7 @@
 
 - [ ] **Step 3: Redesign `frontend/src/pages/Patients/components/EditPatientModal.jsx`**
   - Clean modal dialog preserving patient ID, with required field validations (`Patient Name *`, `Age *`, `Mobile Number *`).
-  - Nivara input fields, focus rings, and secondary cancel / primary save buttons.
+  - ClinixPulse input fields, focus rings, and secondary cancel / primary save buttons.
 
 - [ ] **Step 4: Run Patient Management tests**
   Run: `cd frontend; npx vitest run src/tests/PatientManagement.test.jsx`
@@ -326,7 +326,7 @@
 
 - [ ] **Step 1: Redesign `frontend/src/pages/Settings/SettingsPage.jsx`**
   - Tab navigation: *Print Alignment & Letterhead Calibration*, *Clinic Profile*, *Data Backup & Restore*.
-  - Clean Nivara card surfaces with subtle borders.
+  - Clean ClinixPulse card surfaces with subtle borders.
 
 - [ ] **Step 2: Redesign `PrintSettingsTab.jsx`**
   - Top Margin Offset Slider: Range `20mm` to `140mm`, with large display counter and live visual diagram showing top pad exclusion zone.
@@ -357,7 +357,7 @@
 - Run: Production Vite build
 
 **Interfaces:**
-- Consumes: Complete Nivara application.
+- Consumes: Complete ClinixPulse application.
 - Produces: Production bundle in `dist/` with 100% test pass rate across all modules.
 
 - [ ] **Step 1: Run complete test suite**
@@ -375,5 +375,5 @@
 - [ ] **Step 4: Commit Task 8**
   ```bash
   git add frontend/
-  git commit -m "feat(build): complete Nivara UI/UX redesign verification, test audit, and production build"
+  git commit -m "feat(build): complete ClinixPulse UI/UX redesign verification, test audit, and production build"
   ```

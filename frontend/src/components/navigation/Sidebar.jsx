@@ -18,11 +18,11 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
-import NivaraLogo from '../common/NivaraLogo';
+import ClinixPulseLogo from '../common/ClinixPulseLogo';
 import { useAuth } from '../../contexts/AuthContext';
 
 /**
- * Grouped navigation structure for Nivara Outpatient Platform.
+ * Grouped navigation structure for ClinixPulse Outpatient Platform.
  * Supports Operations, Clinical Masters, Configuration, and Secondary Role Links.
  */
 const navigationGroups = [
@@ -313,7 +313,7 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
           <div className="w-[236px] flex flex-col flex-1 min-h-0">
             {/* Brand Header */}
             <div className={`flex items-center justify-between border-b ${activeTheme.borderClasses} pb-4 pt-1 w-full`}>
-              <NivaraLogo theme={activeTheme.headerTheme} size="md" />
+              <ClinixPulseLogo theme={activeTheme.headerTheme} size="md" />
               {/* Mobile drawer close button */}
               <button
                 type="button"
@@ -412,7 +412,7 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
           <div className="w-full flex flex-col flex-1 min-h-0 items-center">
             {/* Header: Centered Brand Mark */}
             <div className={`flex items-center justify-center border-b ${activeTheme.borderClasses} pb-3.5 pt-1 w-full`}>
-              <NivaraLogo variant="compact" theme={activeTheme.headerTheme} size="sm" />
+              <ClinixPulseLogo variant="compact" theme={activeTheme.headerTheme} size="sm" />
             </div>
 
             {/* Navigation: Centered Icon Rail with Senior UX Hover Tooltips */}

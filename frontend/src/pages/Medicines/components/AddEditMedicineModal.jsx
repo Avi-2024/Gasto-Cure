@@ -128,13 +128,13 @@ function AddEditMedicineModal({ isOpen, onClose, onSave, initialData }) {
       aria-labelledby="medicine-modal-title"
     >
       <div
-        className="relative w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-5 sm:p-6 shadow-nivara-lg border border-[#D9E6E2]"
+        className="relative w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-5 sm:p-6 shadow-clinixpulse-lg border border-[#D9E6E2]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#D9E6E2] pb-3.5">
           <div className="flex items-center gap-3">
-            <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-teal-50 text-[#287C75] border border-teal-100 shadow-nivara-xs">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-teal-50 text-[#287C75] border border-teal-100 shadow-clinixpulse-xs">
               <Pill size={20} />
             </span>
             <div>
@@ -426,7 +426,7 @@ function AddEditMedicineModal({ isOpen, onClose, onSave, initialData }) {
           <div className="flex items-center gap-3 border-t border-[#D9E6E2] pt-3.5">
             <button
               type="submit"
-              className="btn-primary flex-1 py-2 text-sm font-semibold text-white shadow-nivara-xs"
+              className="btn-primary flex-1 py-2 text-sm font-semibold text-white shadow-clinixpulse-xs"
             >
               {isEdit ? 'Update Medicine' : 'Save Medicine'}
             </button>

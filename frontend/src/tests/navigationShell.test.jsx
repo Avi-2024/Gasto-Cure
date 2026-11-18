@@ -2,7 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import NivaraLogo from '../components/common/NivaraLogo';
+import ClinixPulseLogo from '../components/common/ClinixPulseLogo';
 import Sidebar from '../components/navigation/Sidebar';
 import AppHeader from '../components/layout/AppHeader';
 import DashboardLayout from '../layouts/DashboardLayout';
@@ -18,7 +18,7 @@ describe('Task 2: Global Navigation Shell & Brand Identity', () => {
       user: {
         id: 'doc-1',
         name: 'Abebe Bikila',
-        email: 'dr.bikila@nivara.health',
+        email: 'dr.bikila@clinixpulse.com',
         role: 'DOCTOR',
         clinicIds: ['clinic-1', 'clinic-2'],
       },
@@ -28,11 +28,11 @@ describe('Task 2: Global Navigation Shell & Brand Identity', () => {
     });
   });
 
-  describe('NivaraLogo Component', () => {
+  describe('ClinixPulseLogo Component', () => {
     it('renders default brandmark with hexagonal mark, S-curve flow, nodes, and wordmark', () => {
-      const { container } = render(<NivaraLogo />);
+      const { container } = render(<ClinixPulseLogo />);
 
-      expect(screen.getByText('Nivara')).toBeDefined();
+      expect(screen.getByText('ClinixPulse')).toBeDefined();
       expect(screen.getByText('Outpatient Platform')).toBeDefined();
 
       const svg = container.querySelector('svg');
@@ -53,28 +53,28 @@ describe('Task 2: Global Navigation Shell & Brand Identity', () => {
     });
 
     it('renders compact variant containing only the icon without wordmark', () => {
-      const { container } = render(<NivaraLogo variant="compact" />);
-      expect(screen.queryByText('Nivara')).toBeNull();
+      const { container } = render(<ClinixPulseLogo variant="compact" />);
+      expect(screen.queryByText('ClinixPulse')).toBeNull();
       expect(screen.queryByText('Outpatient Platform')).toBeNull();
       expect(container.querySelector('svg')).toBeDefined();
     });
 
     it('renders monochrome variant with currentColor applied', () => {
-      const { container } = render(<NivaraLogo variant="monochrome" />);
-      expect(screen.getByText('Nivara')).toBeDefined();
+      const { container } = render(<ClinixPulseLogo variant="monochrome" />);
+      expect(screen.getByText('ClinixPulse')).toBeDefined();
       const polygon = container.querySelector('polygon');
       expect(polygon.getAttribute('stroke')).toBe('currentColor');
     });
 
     it('supports dark theme styling', () => {
-      render(<NivaraLogo theme="dark" />);
-      const wordmark = screen.getByText('Nivara');
+      render(<ClinixPulseLogo theme="dark" />);
+      const wordmark = screen.getByText('ClinixPulse');
       expect(wordmark.className).toContain('text-white');
     });
   });
 
   describe('Sidebar Component', () => {
-    it('renders deep spruce teal background and Nivara brand header', () => {
+    it('renders deep spruce teal background and ClinixPulse brand header', () => {
       const { container } = render(
         <MemoryRouter initialEntries={['/dashboard']}>
           <Sidebar isOpen={true} onClose={vi.fn()} />
@@ -83,7 +83,7 @@ describe('Task 2: Global Navigation Shell & Brand Identity', () => {
 
       const aside = container.querySelector('aside');
       expect(aside.className).toContain('bg-[#123A3A]');
-      expect(screen.getByText('Nivara')).toBeDefined();
+      expect(screen.getByText('ClinixPulse')).toBeDefined();
     });
 
     it('displays grouped navigation for Operations and Clinical Masters for DOCTOR', () => {
@@ -118,7 +118,7 @@ describe('Task 2: Global Navigation Shell & Brand Identity', () => {
         user: {
           id: 'owner-1',
           name: 'Clinic Owner',
-          email: 'owner@nivara.health',
+          email: 'owner@clinixpulse.com',
           role: 'CLINIC_OWNER',
           clinicIds: ['clinic-1'],
         },
@@ -174,7 +174,7 @@ describe('Task 2: Global Navigation Shell & Brand Identity', () => {
         user: {
           id: 'rec-1',
           name: 'Pooja Sharma',
-          email: 'pooja.sharma@nivara.health',
+          email: 'pooja.sharma@clinixpulse.com',
           role: 'RECEPTIONIST',
           clinicIds: ['clinic-1'],
         },
@@ -211,7 +211,7 @@ describe('Task 2: Global Navigation Shell & Brand Identity', () => {
       vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
         user: {
           id: 'doc-2',
-          email: 'dr.aarav.sharma@nivara.health',
+          email: 'dr.aarav.sharma@clinixpulse.com',
           role: 'DOCTOR',
           clinicIds: ['clinic-1'],
         },
@@ -233,13 +233,13 @@ describe('Task 2: Global Navigation Shell & Brand Identity', () => {
   });
 
   describe('AppHeader Component', () => {
-    it('renders floating frosted card with border-[#D9E6E2] and shadow-nivara-xs', () => {
+    it('renders floating frosted card with border-[#D9E6E2] and shadow-clinixpulse-xs', () => {
       const { container } = render(<AppHeader onMenuClick={vi.fn()} />);
       const header = container.querySelector('header');
       expect(header.className).toContain('bg-white/85');
       expect(header.className).toContain('backdrop-blur-md');
       expect(header.className).toContain('border-[#D9E6E2]');
-      expect(header.className).toContain('shadow-nivara-xs');
+      expect(header.className).toContain('shadow-clinixpulse-xs');
     });
 
     it('renders search input with ⌘K shortcut cue and focuses on ⌘K press', () => {

@@ -1,5 +1,5 @@
 /**
- * Automated Follow-Up Reminders Service for Nivara / Gastro Cure Clinic
+ * Automated Follow-Up Reminders Service for ClinixPulse / Gastro Cure Clinic
  *
  * Automatically monitors patient follow-up dates and dispatches WhatsApp
  * reminders when the appointment is within 24–48 hours (1 to 2 days ahead).

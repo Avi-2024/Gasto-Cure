@@ -108,13 +108,13 @@ function EditPatientModal({ isOpen, patient, onClose, onSave }) {
       aria-labelledby="edit-patient-title"
     >
       <div
-        className="w-full max-w-lg rounded-2xl bg-white border border-[#D9E6E2] shadow-nivara-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+        className="w-full max-w-lg rounded-2xl bg-white border border-[#D9E6E2] shadow-clinixpulse-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#D9E6E2] px-6 py-4 bg-[#F7FAF8]">
           <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-50 text-[#287C75] border border-teal-100 shadow-nivara-xs">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-50 text-[#287C75] border border-teal-100 shadow-clinixpulse-xs">
               <User size={18} />
             </span>
             <div>

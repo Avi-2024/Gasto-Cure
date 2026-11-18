@@ -66,7 +66,7 @@ const GASTRO_ADVICE = DEFAULT_QUICK_CHIPS.advice;
 /**
  * PrescriptionPage Component
  *
- * Nivara Prescription Studio & Fast Formulary Autocomplete (/prescription/new)
+ * ClinixPulse Prescription Studio & Fast Formulary Autocomplete (/prescription/new)
  * - Patient Identity Banner with Demographics & Quick Switcher
  * - 6-Point Vitals Strip with Tabular Nums & Units (BP, Weight, Blood Sugar, Temp, Pulse, SpO2)
  * - Auto-Expanding Clinical Findings (Symptoms, Diagnosis, Advice)
@@ -640,7 +640,7 @@ function PrescriptionPage() {
       <div className="prescription-page bg-[#F7FAF8] pb-4">
         <div className="max-w-6xl mx-auto space-y-6">
           {/* Top Header & Quick Actions Bar */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white p-6 rounded-2xl border border-[#D9E6E2] shadow-nivara-xs">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white p-6 rounded-2xl border border-[#D9E6E2] shadow-clinixpulse-xs">
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-[#287C75] bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200">
@@ -668,7 +668,7 @@ function PrescriptionPage() {
                   }));
                   setShowIntakeAddModal(true);
                 }}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#287C75] text-white text-xs font-semibold hover:bg-[#1f635d] shadow-nivara-xs transition cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#287C75] text-white text-xs font-semibold hover:bg-[#1f635d] shadow-clinixpulse-xs transition cursor-pointer"
               >
                 <UserPlus size={15} />
                 <span>+ Register New Patient</span>
@@ -700,7 +700,7 @@ function PrescriptionPage() {
             {/* Left Column (5/12 cols): Waiting Queue & Recent Prescriptions */}
             <div className="lg:col-span-5 space-y-6">
               {/* Card 1: Today's Waiting Queue */}
-              <div className="bg-white p-5 rounded-2xl border border-[#D9E6E2] shadow-nivara-xs">
+              <div className="bg-white p-5 rounded-2xl border border-[#D9E6E2] shadow-clinixpulse-xs">
                 <div className="flex items-center justify-between pb-3 border-b border-[#D9E6E2]">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#2E7D5B] animate-pulse" />
@@ -782,7 +782,7 @@ function PrescriptionPage() {
 
               {/* Card 2: Recent Consultations */}
               {recentVisits.length > 0 && (
-                <div className="bg-white p-5 rounded-2xl border border-[#D9E6E2] shadow-nivara-xs">
+                <div className="bg-white p-5 rounded-2xl border border-[#D9E6E2] shadow-clinixpulse-xs">
                   <div className="flex items-center justify-between pb-3 border-b border-[#D9E6E2]">
                     <div className="flex items-center gap-2">
                       <Clock3 size={15} className="text-[#C9A45C]" />
@@ -839,7 +839,7 @@ function PrescriptionPage() {
             </div>
 
             {/* Right Column (7/12 cols): Patient Directory & Search */}
-            <div className="lg:col-span-7 bg-white p-6 rounded-2xl border border-[#D9E6E2] shadow-nivara-xs space-y-4">
+            <div className="lg:col-span-7 bg-white p-6 rounded-2xl border border-[#D9E6E2] shadow-clinixpulse-xs space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <h2 className="text-sm font-heading font-bold text-[#10201F]">
                   Patient Directory Lookup
@@ -981,7 +981,7 @@ function PrescriptionPage() {
             aria-modal="true"
           >
             <div
-              className="w-full max-w-md rounded-2xl bg-white border border-[#D9E6E2] shadow-nivara-lg p-6 animate-in fade-in zoom-in-95 duration-150"
+              className="w-full max-w-md rounded-2xl bg-white border border-[#D9E6E2] shadow-clinixpulse-lg p-6 animate-in fade-in zoom-in-95 duration-150"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between border-b border-[#D9E6E2] pb-3.5">
@@ -1117,7 +1117,7 @@ function PrescriptionPage() {
     <div className={`prescription-page ${printSettings.padMode ? 'pad-mode' : 'digital-mode'}`}>
       {/* Toast Notification */}
       {saveFeedback && (
-        <div className="prescription-toast-notification no-print shadow-nivara-md">
+        <div className="prescription-toast-notification no-print shadow-clinixpulse-md">
           <Check size={16} className="text-[#2E7D5B] mr-2" />
           <span className="font-medium text-[#10201F] text-sm">{saveFeedback.message}</span>
         </div>
@@ -1232,7 +1232,7 @@ function PrescriptionPage() {
       </div>
 
       {/* Main Prescription Container */}
-      <div className="prescription-content shadow-nivara-sm">
+      <div className="prescription-content shadow-clinixpulse-sm">
         {/* Digital Letterhead Header (Rendered on plain paper when padMode is false) */}
         <div className="digital-letterhead">
           <div className="letterhead-header">
@@ -1246,7 +1246,7 @@ function PrescriptionPage() {
               )}
               <div>
                 <h1 className="letterhead-clinic-name font-heading">
-                  {clinicSettings.clinicName || 'Nivara Clinic & Health Centre'}
+                  {clinicSettings.clinicName || 'ClinixPulse Clinic & Health Centre'}
                 </h1>
                 {clinicSettings.clinicTagline && (
                   <p className="letterhead-clinic-tagline">{clinicSettings.clinicTagline}</p>
@@ -1376,7 +1376,7 @@ function PrescriptionPage() {
 
           {/* Quick Patient Switcher Dropdown (Screen Only) */}
           {showPatientSwitcher && (
-            <div className="patient-switcher-popover no-print app-card shadow-nivara-lg">
+            <div className="patient-switcher-popover no-print app-card shadow-clinixpulse-lg">
               <div className="flex items-center justify-between p-3 border-b border-[#D9E6E2]">
                 <span className="text-xs font-semibold text-[#10201F] uppercase tracking-wider">
                   Select Patient

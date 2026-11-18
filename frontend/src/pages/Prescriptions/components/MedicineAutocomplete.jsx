@@ -6,7 +6,7 @@ import { getDosageFormIconSrc } from '../../../components/common/DosageFormIcon'
 /**
  * MedicineAutocomplete
  *
- * Fast, keyboard-accessible autocomplete component for Nivara prescription studio.
+ * Fast, keyboard-accessible autocomplete component for ClinixPulse prescription studio.
  * Integrates directly with master formulary catalog (localMedicines).
  *
  * Keyboard Accessibility:
@@ -209,7 +209,7 @@ export default function MedicineAutocomplete({
             ref={dropdownRef}
             id={`med-autocomplete-listbox-${compId}`}
             role="listbox"
-            className="med-autocomplete-dropdown shadow-nivara-lg"
+            className="med-autocomplete-dropdown shadow-clinixpulse-lg"
             style={{
               position: 'fixed',
               top: `${dropdownCoords.top}px`,

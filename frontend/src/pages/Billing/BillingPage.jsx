@@ -176,7 +176,7 @@ export default function BillingPage() {
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <section className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-nivara-xs">
+      <section className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-clinixpulse-xs">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex items-center gap-2">
@@ -270,7 +270,7 @@ export default function BillingPage() {
       </section>
 
       {/* Main Table Card */}
-      <section className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-nivara-xs">
+      <section className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-clinixpulse-xs">
         {/* Filters Toolbar */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-[#D9E6E2]/60 pb-4">
           <div className="flex flex-1 items-center gap-3">

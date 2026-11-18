@@ -65,10 +65,10 @@ export function SettingsPage() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      {/* Settings Top Bar with Nivara Brand Icon */}
+      {/* Settings Top Bar with ClinixPulse Brand Icon */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-50 text-[#287C75] border border-teal-100 shadow-nivara-xs flex-shrink-0">
+          <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-50 text-[#287C75] border border-teal-100 shadow-clinixpulse-xs flex-shrink-0">
             <Sliders size={22} />
           </span>
           <div>
@@ -118,7 +118,7 @@ export function SettingsPage() {
       {activeTab === 'print' && <PrintSettingsTab />}
 
       {activeTab === 'backup' && (
-        <div className="bg-white p-6 sm:p-7 rounded-2xl border border-[#D9E6E2] shadow-nivara-xs space-y-6 max-w-3xl">
+        <div className="bg-white p-6 sm:p-7 rounded-2xl border border-[#D9E6E2] shadow-clinixpulse-xs space-y-6 max-w-3xl">
           <div>
             <h3 className="font-heading text-base font-bold text-[#10201F] flex items-center gap-2.5">
               <span className="p-2 rounded-xl bg-teal-50 text-[#287C75] border border-teal-100/80">
@@ -160,7 +160,7 @@ export function SettingsPage() {
               <button
                 type="button"
                 onClick={handleExportBackup}
-                className="btn-primary inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl shadow-nivara-xs"
+                className="btn-primary inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl shadow-clinixpulse-xs"
               >
                 <Download size={14} />
                 Download JSON Backup
@@ -175,7 +175,7 @@ export function SettingsPage() {
               <p className="text-xs text-[#4E6460] leading-relaxed">
                 Restore patients and prescription records from a previously exported JSON backup.
               </p>
-              <label className="btn-secondary inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl border border-[#D9E6E2] cursor-pointer shadow-nivara-xs">
+              <label className="btn-secondary inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl border border-[#D9E6E2] cursor-pointer shadow-clinixpulse-xs">
                 <Upload size={14} className="text-[#287C75]" />
                 Select Backup File
                 <input

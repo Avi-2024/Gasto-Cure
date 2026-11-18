@@ -111,7 +111,7 @@ export default function DoctorProfilePage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       {/* Top Banner Card */}
-      <div className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-nivara-xs">
+      <div className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-clinixpulse-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
             <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-[#123A3A] text-2xl font-heading font-bold text-white shadow-md ring-4 ring-teal-50">
@@ -211,14 +211,14 @@ export default function DoctorProfilePage() {
           <div>
             <p className="text-sm font-bold text-emerald-950">Profile Changes Saved Successfully!</p>
             <p className="text-xs text-emerald-800">
-              Doctor credentials, clinic demographics, and print margins have been updated across Nivara.
+              Doctor credentials, clinic demographics, and print margins have been updated across ClinixPulse.
             </p>
           </div>
         </div>
       )}
 
       {/* Main Profile Form Card */}
-      <form onSubmit={handleSave} className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-nivara-xs space-y-6">
+      <form onSubmit={handleSave} className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-clinixpulse-xs space-y-6">
         {activeTab === 'credentials' && (
           <div className="space-y-5">
             <div>

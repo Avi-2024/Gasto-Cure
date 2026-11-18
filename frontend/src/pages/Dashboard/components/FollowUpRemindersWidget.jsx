@@ -261,7 +261,7 @@ export default function FollowUpRemindersWidget() {
   };
 
   return (
-    <article className="app-card p-6 flex flex-col justify-between border border-[#D9E6E2] bg-white rounded-2xl shadow-nivara-xs">
+    <article className="app-card p-6 flex flex-col justify-between border border-[#D9E6E2] bg-white rounded-2xl shadow-clinixpulse-xs">
       <div>
         {/* Card Header */}
         <div className="flex items-center justify-between gap-4">
@@ -346,7 +346,7 @@ export default function FollowUpRemindersWidget() {
                   className={`rounded-2xl border p-3.5 transition-all duration-200 ${
                     isReminded
                       ? 'border-emerald-200 bg-emerald-50/30 shadow-2xs'
-                      : 'border-[#D9E6E2] bg-white hover:border-[#287C75]/40 hover:shadow-nivara-xs'
+                      : 'border-[#D9E6E2] bg-white hover:border-[#287C75]/40 hover:shadow-clinixpulse-xs'
                   }`}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">

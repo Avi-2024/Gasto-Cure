@@ -1,5 +1,5 @@
 /**
- * Notifications Service for Nivara / Gastro Cure Clinic
+ * Notifications Service for ClinixPulse / Gastro Cure Clinic
  *
  * Aggregates real-time notifications from:
  * 1. Follow-up reminders due in 24–48 hours (or today/overdue)

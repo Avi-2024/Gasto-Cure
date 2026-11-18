@@ -132,7 +132,7 @@ export default function ChatPage() {
       </div>
 
       {/* Main 2-Panel Chat Studio - Fixed Viewport Space like WhatsApp Web */}
-      <div className="mt-3 flex-1 min-h-0 flex flex-col md:flex-row bg-white rounded-2xl border border-[#D9E6E2] shadow-nivara-xs overflow-hidden">
+      <div className="mt-3 flex-1 min-h-0 flex flex-col md:flex-row bg-white rounded-2xl border border-[#D9E6E2] shadow-clinixpulse-xs overflow-hidden">
         {/* Left Column: Conversations List - Fixed Width & Independently Scrollable */}
         <div className="w-full md:w-[340px] lg:w-[380px] shrink-0 border-r border-[#D9E6E2] flex flex-col h-full bg-[#F7FAF8]/50 overflow-hidden">
           {/* Search Box */}

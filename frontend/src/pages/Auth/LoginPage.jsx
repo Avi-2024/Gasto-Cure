@@ -22,7 +22,7 @@ import {
   X,
   Zap,
 } from 'lucide-react';
-import NivaraLogo from '../../components/common/NivaraLogo';
+import ClinixPulseLogo from '../../components/common/ClinixPulseLogo';
 import { useAuth } from '../../contexts/AuthContext';
 import digestiveHero from '../../assets/digestive-system-hero.png';
 
@@ -32,8 +32,8 @@ export const ROLE_PRESETS = [
     title: 'Doctor Console',
     shortTitle: 'Doctor',
     badge: 'Clinical Workflows',
-    email: 'dr.sharma@nivara.health',
-    alternateEmails: ['doctor@gastrocure.com', 'dr.sharma@gastrocure.com'],
+    email: 'dr.sharma@clinixpulse.com',
+    alternateEmails: ['doctor@gastrocure.com', 'dr.sharma@gastrocure.com', 'dr.sharma@clinixpulse.com'],
     password: 'demo1234',
     destination: '/doctor',
     icon: Stethoscope,
@@ -44,8 +44,8 @@ export const ROLE_PRESETS = [
     title: 'Clinic Owner / Admin',
     shortTitle: 'Clinic',
     badge: 'Full Oversight',
-    email: 'owner@nivara.health',
-    alternateEmails: ['admin@gastrocure.com', 'admin@nivara.health', 'owner@gastrocure.com'],
+    email: 'owner@clinixpulse.com',
+    alternateEmails: ['admin@gastrocure.com', 'admin@clinixpulse.com', 'owner@gastrocure.com', 'owner@clinixpulse.com'],
     password: 'demo1234',
     destination: '/dashboard',
     icon: Building2,
@@ -56,8 +56,8 @@ export const ROLE_PRESETS = [
     title: 'Reception Desk',
     shortTitle: 'Reception',
     badge: 'Front Office',
-    email: 'reception@nivara.health',
-    alternateEmails: ['reception@gastrocure.com', 'staff@gastrocure.com'],
+    email: 'reception@clinixpulse.com',
+    alternateEmails: ['reception@gastrocure.com', 'staff@gastrocure.com', 'reception@clinixpulse.com'],
     password: 'demo1234',
     destination: '/reception',
     icon: Users,
@@ -145,7 +145,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
 
   const [selectedRole, setSelectedRole] = useState('DOCTOR');
-  const [email, setEmail] = useState('dr.sharma@nivara.health');
+  const [email, setEmail] = useState('dr.sharma@clinixpulse.com');
   const [password, setPassword] = useState('demo1234');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
@@ -257,7 +257,7 @@ export default function LoginPage() {
           ───────────────────────────────────────────────────────────── */}
       <header className="relative z-20 w-full max-w-7xl mx-auto px-3.5 sm:px-8 lg:px-12 pt-2.5 sm:pt-4 pb-1.5 sm:pb-2 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          <NivaraLogo theme="light" size="sm" />
+          <ClinixPulseLogo theme="light" size="sm" />
           <div className="hidden sm:block h-4 w-px bg-slate-200" />
           <div className="hidden md:inline-flex items-center gap-2 rounded-full border border-emerald-200/90 bg-white/90 px-3.5 py-1 text-[11px] font-semibold text-[#064E49] shadow-2xs backdrop-blur-xs">
             <Laptop size={13} className="text-[#087F75]" />
@@ -365,7 +365,7 @@ export default function LoginPage() {
             <div className="w-full max-w-[380px] sm:max-w-[420px] xl:max-w-[440px] rounded-2xl bg-white p-4 sm:p-6 lg:p-7 shadow-[0_16px_40px_-10px_rgba(6,78,73,0.12)] border border-emerald-100/90 relative">
               {/* Title & Subtitle (Clean Human Header) */}
               <h2 className="text-xl sm:text-2xl lg:text-[26px] font-extrabold tracking-tight text-[#102A35] leading-snug">
-                Sign In to ClinixPulse <span className="sr-only">Sign in to Nivara</span>
+                Sign In to ClinixPulse
               </h2>
               <p className="mt-0.5 sm:mt-1 text-[11px] sm:text-sm text-[#647987] leading-normal font-medium">
                 Enter your work email and password to access your authorized clinic workspace.
@@ -393,7 +393,7 @@ export default function LoginPage() {
                       required
                       value={email}
                       onChange={(e) => handleEmailChange(e.target.value)}
-                      placeholder="dr.sharma@nivara.health or your clinic email"
+                      placeholder="dr.sharma@clinixpulse.com or your clinic email"
                       className="h-10 sm:h-11 w-full rounded-xl border border-slate-200 bg-white pl-9 sm:pl-10 pr-3.5 text-xs sm:text-sm font-semibold text-[#102A35] placeholder-slate-400 focus:border-[#087F75] focus:outline-none focus:ring-2 focus:ring-[#087F75]/15 shadow-2xs transition"
                     />
                   </div>
@@ -531,7 +531,7 @@ export default function LoginPage() {
                 <Lock size={12} className="text-[#087F75] shrink-0" />
                 <span>Encrypted 256-bit clinic session &bull; Role-based access</span>
                 <span className="sr-only">
-                  Protected by Nivara Outpatient Tenant Boundary • Role-Based Access Control
+                  Protected by ClinixPulse Outpatient Tenant Boundary • Role-Based Access Control
                 </span>
               </div>
             </div>

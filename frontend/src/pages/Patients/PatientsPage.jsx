@@ -372,7 +372,7 @@ function PatientsPage() {
     <div className="space-y-4">
       {/* Toast Notification (Floating, zero layout shift) */}
       {queueMsg ? (
-        <div className="fixed top-20 right-6 z-50 flex items-center gap-2.5 bg-white border border-[#D9E6E2] border-l-4 border-l-[#2E7D5B] rounded-xl px-4 py-3 shadow-nivara-lg animate-in slide-in-from-top-2 duration-200">
+        <div className="fixed top-20 right-6 z-50 flex items-center gap-2.5 bg-white border border-[#D9E6E2] border-l-4 border-l-[#2E7D5B] rounded-xl px-4 py-3 shadow-clinixpulse-lg animate-in slide-in-from-top-2 duration-200">
           <CheckCircle2 size={16} className="text-[#2E7D5B] shrink-0" />
           <span className="text-xs font-semibold text-[#10201F]">{queueMsg}</span>
           <button
@@ -412,7 +412,7 @@ function PatientsPage() {
           tone="warning"
           trend={{ label: 'Upcoming', positive: true }}
         />
-        <div className="app-card rounded-2xl p-5 border border-[#D9E6E2] bg-white shadow-nivara-xs hover:shadow-nivara-sm transition duration-200 flex flex-col justify-between">
+        <div className="app-card rounded-2xl p-5 border border-[#D9E6E2] bg-white shadow-clinixpulse-xs hover:shadow-clinixpulse-sm transition duration-200 flex flex-col justify-between">
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm font-medium text-[#4E6460]">Waiting in Queue</p>
             <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-[#B7791F] border border-amber-100">
@@ -506,7 +506,7 @@ function PatientsPage() {
       </section>
 
       {/* Patients Table */}
-      <section className="app-card overflow-hidden border border-[#D9E6E2] shadow-nivara-xs">
+      <section className="app-card overflow-hidden border border-[#D9E6E2] shadow-clinixpulse-xs">
         <div className="overflow-x-auto">
           <table className="min-w-full border-collapse">
             <thead className="sticky top-0 z-10 bg-[#F7FAF8] border-b border-[#D9E6E2]">
@@ -719,7 +719,7 @@ function PatientsPage() {
               <ChevronLeft size={15} />
               Prev
             </button>
-            <span className="rounded-xl border border-[#D9E6E2] bg-white px-3 py-1.5 text-xs font-semibold text-[#10201F] tabular-nums shadow-nivara-xs">
+            <span className="rounded-xl border border-[#D9E6E2] bg-white px-3 py-1.5 text-xs font-semibold text-[#10201F] tabular-nums shadow-clinixpulse-xs">
               Page {page} of {totalPages}
             </span>
             <button
@@ -751,7 +751,7 @@ function PatientsPage() {
             onMouseLeave={handlePortalMouseLeave}
           >
             <div
-              className={`rounded-2xl bg-white border border-[#D9E6E2] shadow-nivara-lg p-2 text-left relative transition-all duration-150 ${
+              className={`rounded-2xl bg-white border border-[#D9E6E2] shadow-clinixpulse-lg p-2 text-left relative transition-all duration-150 ${
                 menuCoords.openUpward
                   ? "before:content-[''] before:absolute before:-bottom-4 before:left-0 before:right-0 before:h-4"
                   : "before:content-[''] before:absolute before:-top-4 before:left-0 before:right-0 before:h-4"
@@ -859,7 +859,7 @@ function PatientsPage() {
               aria-labelledby="add-patient-title"
             >
           <div
-            className="w-full max-w-lg rounded-2xl bg-white border border-[#D9E6E2] shadow-nivara-lg p-6 animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto"
+            className="w-full max-w-lg rounded-2xl bg-white border border-[#D9E6E2] shadow-clinixpulse-lg p-6 animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-[#D9E6E2] pb-3.5">

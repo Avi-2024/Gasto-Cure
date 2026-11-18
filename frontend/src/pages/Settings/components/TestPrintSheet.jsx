@@ -38,7 +38,7 @@ export function TestPrintSheet({ onClose, onPrint }) {
   const sheetContent = (
     <div className="test-print-modal-overlay fixed inset-0 z-[9999] bg-[#123A3A]/75 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
       <div
-        className="test-print-modal bg-white rounded-2xl shadow-nivara-lg max-w-4xl w-full border border-[#D9E6E2] overflow-hidden flex flex-col my-auto"
+        className="test-print-modal bg-white rounded-2xl shadow-clinixpulse-lg max-w-4xl w-full border border-[#D9E6E2] overflow-hidden flex flex-col my-auto"
         role="dialog"
         aria-modal="true"
         aria-labelledby="calibration-modal-title"
@@ -57,7 +57,7 @@ export function TestPrintSheet({ onClose, onPrint }) {
             <button
               type="button"
               onClick={handlePrint}
-              className="btn-primary inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl shadow-nivara-xs"
+              className="btn-primary inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl shadow-clinixpulse-xs"
             >
               <Printer size={15} />
               Print Calibration Sheet
@@ -78,7 +78,7 @@ export function TestPrintSheet({ onClose, onPrint }) {
         {/* Printable Calibration Sheet (A4 Dimensions: 210 × 297 mm) */}
         <div className="test-print-sheet-wrapper p-4 sm:p-6 bg-[#F7FAF8] flex justify-center overflow-auto max-h-[calc(90vh-80px)]">
           <div
-            className="test-print-sheet bg-white border border-[#D9E6E2] shadow-nivara-md relative text-[#10201F]"
+            className="test-print-sheet bg-white border border-[#D9E6E2] shadow-clinixpulse-md relative text-[#10201F]"
             id="calibration-sheet"
             style={{
               width: '210mm',

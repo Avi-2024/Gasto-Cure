@@ -181,7 +181,7 @@ export default function ConsultationPage() {
   return (
     <div className="space-y-6">
       {/* Top Header Card */}
-      <section className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-nivara-xs">
+      <section className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-clinixpulse-xs">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <Link

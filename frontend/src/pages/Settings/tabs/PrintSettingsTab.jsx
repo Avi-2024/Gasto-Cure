@@ -181,7 +181,7 @@ export function PrintSettingsTab() {
           <button
             type="button"
             onClick={() => setShowTestSheet(true)}
-            className="btn-secondary inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl shadow-nivara-xs"
+            className="btn-secondary inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl shadow-clinixpulse-xs"
           >
             <Ruler size={15} className="text-[#287C75]" />
             Test Print Alignment Sheet
@@ -190,7 +190,7 @@ export function PrintSettingsTab() {
           <button
             type="button"
             onClick={handleSave}
-            className="btn-primary inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl shadow-nivara-xs"
+            className="btn-primary inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl shadow-clinixpulse-xs"
           >
             <Printer size={15} />
             Save Settings
@@ -209,7 +209,7 @@ export function PrintSettingsTab() {
         {/* Left Column: Form Controls (7 cols) */}
         <div className="lg:col-span-7 space-y-7">
           {/* Section 1: Print Mode Toggle */}
-          <div className="bg-white p-6 rounded-2xl border border-[#D9E6E2] shadow-nivara-xs space-y-4">
+          <div className="bg-white p-6 rounded-2xl border border-[#D9E6E2] shadow-clinixpulse-xs space-y-4">
             <div className="flex items-center gap-2.5">
               <span className="p-2 rounded-xl bg-teal-50 text-[#287C75] border border-teal-100/80">
                 <Printer size={18} />
@@ -226,7 +226,7 @@ export function PrintSettingsTab() {
                 onClick={() => handlePrintChange('padMode', true)}
                 className={`p-4 text-left rounded-xl border-2 transition-all flex flex-col justify-between ${
                   isPadMode
-                    ? 'border-[#287C75] bg-teal-50/30 shadow-nivara-xs'
+                    ? 'border-[#287C75] bg-teal-50/30 shadow-clinixpulse-xs'
                     : 'border-[#D9E6E2] hover:border-slate-300 bg-white'
                 }`}
               >
@@ -249,7 +249,7 @@ export function PrintSettingsTab() {
                 onClick={() => handlePrintChange('padMode', false)}
                 className={`p-4 text-left rounded-xl border-2 transition-all flex flex-col justify-between ${
                   !isPadMode
-                    ? 'border-[#287C75] bg-teal-50/30 shadow-nivara-xs'
+                    ? 'border-[#287C75] bg-teal-50/30 shadow-clinixpulse-xs'
                     : 'border-[#D9E6E2] hover:border-slate-300 bg-white'
                 }`}
               >
@@ -270,7 +270,7 @@ export function PrintSettingsTab() {
           </div>
 
           {/* Section 2: Alignment Sliders */}
-          <div className="bg-white p-6 rounded-2xl border border-[#D9E6E2] shadow-nivara-xs space-y-6">
+          <div className="bg-white p-6 rounded-2xl border border-[#D9E6E2] shadow-clinixpulse-xs space-y-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <span className="p-2 rounded-xl bg-teal-50 text-[#287C75] border border-teal-100/80">
@@ -296,7 +296,7 @@ export function PrintSettingsTab() {
             <div
               className={`space-y-3 p-4 rounded-xl border transition-all ${
                 isPadMode
-                  ? 'bg-amber-50/40 border-amber-200/90 shadow-nivara-xs'
+                  ? 'bg-amber-50/40 border-amber-200/90 shadow-clinixpulse-xs'
                   : 'bg-slate-50/60 border-[#D9E6E2] opacity-60'
               }`}
             >
@@ -309,7 +309,7 @@ export function PrintSettingsTab() {
                     Height reserved for your doctor pre-printed header
                   </p>
                 </div>
-                <div className="flex items-center gap-2 bg-white px-2.5 py-1 rounded-lg border border-[#D9E6E2] shadow-nivara-xs">
+                <div className="flex items-center gap-2 bg-white px-2.5 py-1 rounded-lg border border-[#D9E6E2] shadow-clinixpulse-xs">
                   <input
                     type="number"
                     min="10"
@@ -351,7 +351,7 @@ export function PrintSettingsTab() {
                     disabled={!isPadMode}
                     className={`text-[11px] px-2.5 py-1 rounded-lg font-medium transition-all ${
                       topOffset === preset.val
-                        ? 'bg-[#287C75] text-white font-bold shadow-nivara-xs'
+                        ? 'bg-[#287C75] text-white font-bold shadow-clinixpulse-xs'
                         : 'bg-white border border-[#D9E6E2] text-[#4E6460] hover:bg-slate-50'
                     }`}
                   >
@@ -424,7 +424,7 @@ export function PrintSettingsTab() {
           </div>
 
           {/* Section 3: Clinic & Doctor Demographics */}
-          <div className="bg-white p-6 rounded-2xl border border-[#D9E6E2] shadow-nivara-xs space-y-6">
+          <div className="bg-white p-6 rounded-2xl border border-[#D9E6E2] shadow-clinixpulse-xs space-y-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <span className="p-2 rounded-xl bg-teal-50 text-[#287C75] border border-teal-100/80">
@@ -470,7 +470,7 @@ export function PrintSettingsTab() {
               )}
 
               {settings.clinicLogo ? (
-                <div className="flex items-center gap-4 p-3 bg-white rounded-xl border border-[#B5D8D0] shadow-nivara-xs">
+                <div className="flex items-center gap-4 p-3 bg-white rounded-xl border border-[#B5D8D0] shadow-clinixpulse-xs">
                   <div className="flex h-18 w-32 items-center justify-center rounded-lg border border-[#D9E6E2] bg-slate-50/50 p-1.5 overflow-hidden">
                     <img
                       src={settings.clinicLogo}
@@ -508,7 +508,7 @@ export function PrintSettingsTab() {
                   </div>
                 </div>
               ) : (
-                <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-[#CFE2DC] rounded-xl hover:border-[#287C75] bg-white hover:bg-teal-50/20 cursor-pointer transition text-center group shadow-nivara-xs">
+                <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-[#CFE2DC] rounded-xl hover:border-[#287C75] bg-white hover:bg-teal-50/20 cursor-pointer transition text-center group shadow-clinixpulse-xs">
                   <span className="p-3 rounded-full bg-teal-50 text-[#287C75] border border-teal-100 group-hover:scale-105 transition">
                     <Upload size={20} />
                   </span>
@@ -530,7 +530,7 @@ export function PrintSettingsTab() {
 
               {/* Watermark Toggle */}
               <div className="pt-2">
-                <label className="flex items-start gap-3 p-3 rounded-xl border border-[#D9E6E2] bg-white hover:bg-[#F7FAF8] cursor-pointer transition shadow-nivara-xs">
+                <label className="flex items-start gap-3 p-3 rounded-xl border border-[#D9E6E2] bg-white hover:bg-[#F7FAF8] cursor-pointer transition shadow-clinixpulse-xs">
                   <input
                     type="checkbox"
                     checked={Boolean(settings.watermarkEnabled)}
@@ -672,7 +672,7 @@ export function PrintSettingsTab() {
         {/* Right Column: Live Visual Preview Diagram (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
           <div className="sticky top-6">
-            <div className="bg-white p-6 rounded-2xl border border-[#D9E6E2] shadow-nivara-xs space-y-4">
+            <div className="bg-white p-6 rounded-2xl border border-[#D9E6E2] shadow-clinixpulse-xs space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <FileText className="text-[#287C75]" size={18} />
@@ -690,7 +690,7 @@ export function PrintSettingsTab() {
               {/* Scaled A4 Sheet Diagram */}
               <div className="flex justify-center py-2">
                 <div
-                  className="relative bg-white border border-[#D9E6E2] rounded-md shadow-nivara-sm overflow-hidden"
+                  className="relative bg-white border border-[#D9E6E2] rounded-md shadow-clinixpulse-sm overflow-hidden"
                   style={{
                     width: `${a4WidthPx}px`,
                     height: `${a4HeightPx}px`,

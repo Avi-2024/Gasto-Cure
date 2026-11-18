@@ -1,20 +1,20 @@
-# Nivara UI/UX System Redesign — Technical Specification & Visual Architecture
+# ClinixPulse UI/UX System Redesign — Technical Specification & Visual Architecture
 
 ## 1. Executive Summary & Intent
 
 ### 1.1 Intent & Why Now
 ClinicRx has established a solid, reliable, offline-first clinical engine with complete patient management, master medicine formulary, pre-printed letterhead pad calibration, and WhatsApp follow-up reminders—backed by 109 passing unit and integration tests.
 
-However, the existing visual interface is built on generic utility templates (standard Tailwind blues `#2563EB`, standard boxy cards, and plain layouts). The goal of this project is to execute a **complete, ground-up UI/UX redesign** that establishes **Nivara**: an authentic, world-class outpatient operations platform for doctors and clinics.
+However, the existing visual interface is built on generic utility templates (standard Tailwind blues `#2563EB`, standard boxy cards, and plain layouts). The goal of this project is to execute a **complete, ground-up UI/UX redesign** that establishes **ClinixPulse**: an authentic, world-class outpatient operations platform for doctors and clinics.
 
 The visual standard is calibrated against premier SaaS products like **Linear, Stripe, and Raycast**—prioritizing visual maturity, typography hierarchy, high-density data legibility, refined surfaces, and purposeful micro-interactions, while preserving **100% of the underlying business logic, state services, and test suites**.
 
 ---
 
-## 2. Brand Identity & Design System: The Nivara Language
+## 2. Brand Identity & Design System: The ClinixPulse Language
 
 ### 2.1 Brand Concept & Philosophy
-- **Brand Name:** Nivara
+- **Brand Name:** ClinixPulse
 - **Tagline:** *Secure outpatient operations platform. Every visit, securely in flow.*
 - **Core Pillars:** Calm, Protective, Precise, Traceable, Reliable, Human-centered.
 - **Key Motif:**
@@ -26,22 +26,22 @@ The visual standard is calibrated against premier SaaS products like **Linear, S
     3. **Closure:** Follow-up scheduling, Reminders, Prescription handover
 
 ### 2.2 Color Architecture
-The design system moves entirely away from generic blue gradients, replacing them with Nivara's organic, trustworthy forest and earth palette:
+The design system moves entirely away from generic blue gradients, replacing them with ClinixPulse's organic, trustworthy forest and earth palette:
 
 | Token Name | Hex Code | Role & Usage |
 |---|---|---|
-| `--nivara-primary` | `#123A3A` | Deep Spruce Teal — Global sidebar, primary brand surfaces, high-contrast headings |
-| `--nivara-secondary` | `#287C75` | Lush Pine Teal — Interactive accents, active navigation states, primary buttons |
-| `--nivara-accent` | `#C9A45C` | Warm Ochre / Polished Amber — Stage 3 highlights, reminder cues, focus rings |
-| `--nivara-canvas` | `#F7FAF8` | Pale Mint/Neutral Canvas — Soft, glare-free background for long clinical days |
-| `--nivara-surface` | `#FFFFFF` | Pure White — Elevated cards, modals, sheets, and interactive controls |
-| `--nivara-border` | `#D9E6E2` | Soft Sage Border — Hairline structural separation without harsh contrast |
-| `--nivara-text-primary` | `#10201F` | Deep Slate-Teal — Ultra-readable primary text |
-| `--nivara-text-secondary` | `#4E6460` | Muted Slate — Subtitles, table labels, secondary metadata |
-| `--nivara-text-muted` | `#7D908C` | Neutral Grey-Teal — Timestamps, search placeholders, tertiary cues |
-| `--nivara-success` | `#2E7D5B` | Forest Green — Active patients, completed visits, positive vitals |
-| `--nivara-warning` | `#B7791F` | Deep Amber — Waiting queue, approaching follow-ups |
-| `--nivara-danger` | `#B94A48` | Crimson Rose — Allergies, overdue follow-ups, destructive actions |
+| `--clinixpulse-primary` | `#123A3A` | Deep Spruce Teal — Global sidebar, primary brand surfaces, high-contrast headings |
+| `--clinixpulse-secondary` | `#287C75` | Lush Pine Teal — Interactive accents, active navigation states, primary buttons |
+| `--clinixpulse-accent` | `#C9A45C` | Warm Ochre / Polished Amber — Stage 3 highlights, reminder cues, focus rings |
+| `--clinixpulse-canvas` | `#F7FAF8` | Pale Mint/Neutral Canvas — Soft, glare-free background for long clinical days |
+| `--clinixpulse-surface` | `#FFFFFF` | Pure White — Elevated cards, modals, sheets, and interactive controls |
+| `--clinixpulse-border` | `#D9E6E2` | Soft Sage Border — Hairline structural separation without harsh contrast |
+| `--clinixpulse-text-primary` | `#10201F` | Deep Slate-Teal — Ultra-readable primary text |
+| `--clinixpulse-text-secondary` | `#4E6460` | Muted Slate — Subtitles, table labels, secondary metadata |
+| `--clinixpulse-text-muted` | `#7D908C` | Neutral Grey-Teal — Timestamps, search placeholders, tertiary cues |
+| `--clinixpulse-success` | `#2E7D5B` | Forest Green — Active patients, completed visits, positive vitals |
+| `--clinixpulse-warning` | `#B7791F` | Deep Amber — Waiting queue, approaching follow-ups |
+| `--clinixpulse-danger` | `#B94A48` | Crimson Rose — Allergies, overdue follow-ups, destructive actions |
 
 ### 2.3 Typography & Numerical Formatting
 - **Headings & Display:** `Manrope`, sans-serif (weights 600, 700, 800) — clean geometric curves, friendly yet deeply authoritative.
@@ -66,8 +66,8 @@ The design system moves entirely away from generic blue gradients, replacing the
 
 ### 3.1 App Shell (`DashboardLayout`, `Sidebar`, `AppHeader`)
 - **Left Navigation Sidebar:**
-  - Background: Solid Nivara Deep Teal (`#123A3A`) with subtle border `#1E4E4E`.
-  - Brand Area: Nivara SVG Hexagon brandmark with interconnected nodes, followed by clear wordmark "Nivara" and clinic type badge.
+  - Background: Solid ClinixPulse Deep Teal (`#123A3A`) with subtle border `#1E4E4E`.
+  - Brand Area: ClinixPulse SVG Hexagon brandmark with interconnected nodes, followed by clear wordmark "ClinixPulse" and clinic type badge.
   - Navigation Groups:
     - *Operations:*
       - Dashboard (`/dashboard`)
@@ -79,7 +79,7 @@ The design system moves entirely away from generic blue gradients, replacing the
     - *Configuration:*
       - Settings & Print Calibration (`/settings`)
     - *Secondary Roles (accessible under role toggle):*
-      - Appointments (`/appointments`), Billing (`/billing`), Reception (`/reception`) retain full route validity and receive Nivara styling.
+      - Appointments (`/appointments`), Billing (`/billing`), Reception (`/reception`) retain full route validity and receive ClinixPulse styling.
   - Active Nav Link: Soft Pine highlight (`bg-[#287C75] text-white shadow-sm`) with smooth spring transition.
   - Bottom Bar: Doctor profile pill with initials avatar and safe logout trigger.
 - **Top Header Bar:**
@@ -93,7 +93,7 @@ The design system moves entirely away from generic blue gradients, replacing the
 
 ### 4.1 Dashboard (`DashboardPage.jsx`)
 - **Hero Banner:**
-  - Replaces generic greeting with a modern welcome card featuring Nivara's 3-node journey summary:
+  - Replaces generic greeting with a modern welcome card featuring ClinixPulse's 3-node journey summary:
     - **Node 1: Entry:** Waiting Queue count (`localAppointments.getQueue().length`)
     - **Node 2: Consultation:** Consultations completed today (`localVisits` filtered by today's date)
     - **Node 3: Closure:** Scheduled Follow-ups & Reminders due within 2 days (`localVisits.getUpcomingFollowUps(2)`)
@@ -160,7 +160,7 @@ The design system moves entirely away from generic blue gradients, replacing the
 - Adding complex multi-tenant cloud backends or changing authentication into a 3rd-party SaaS provider (offline-first localStore remains the foundation).
 
 ### Anti-Goals
-- **No generic AI-style purple/blue gradients:** The design must look like an authentic, high-end healthcare operations software product (Nivara).
+- **No generic AI-style purple/blue gradients:** The design must look like an authentic, high-end healthcare operations software product (ClinixPulse).
 - **No breaking changes to automated tests:** All 109 existing unit, integration, and E2E tests MUST pass with 0 regressions.
 - **No disruption to print calibration:** Physical letterhead pad top-margin offset slider and `@media print` CSS variables must work with pixel-perfect accuracy.
 
@@ -180,7 +180,7 @@ The design system moves entirely away from generic blue gradients, replacing the
 
 ## 7. Verification & Success Criteria
 
-1. **Visual Quality:** The interface feels unmistakably premium, modern, calm, and trustworthy—matching the uploaded Nivara brand identity sheet.
+1. **Visual Quality:** The interface feels unmistakably premium, modern, calm, and trustworthy—matching the uploaded ClinixPulse brand identity sheet.
 2. **Functionality Parity:** Every single existing feature (Patient CRUD, Formulary search & auto-fill, 6-point vitals, visit history timeline, pre-printed pad printing, and WhatsApp reminders) functions without flaw.
 3. **Automated Test Suite:** All 8 test files (`localStore`, `MedicinesPage`, `MedicineAutocomplete`, `printSettings`, `prescriptionWorkflow`, `PatientManagement`, `FollowUpReminders`, and `endToEndWorkflow`) pass 100% green (109/109 tests).
 4. **Production Build:** `npm run build` compiles cleanly with 0 syntax or bundling errors.

@@ -147,7 +147,7 @@ function PrescriptionsPage() {
   return (
     <div className="space-y-6">
       {/* Header Bar */}
-      <section className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-nivara-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <section className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-clinixpulse-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-[#287C75]/25 bg-[#287C75]/10 px-2.5 py-0.5 text-xs font-semibold text-[#287C75]">
@@ -261,7 +261,7 @@ function PrescriptionsPage() {
       </section>
 
       {/* Prescriptions Table */}
-      <section className="rounded-3xl border border-[#D9E6E2] bg-white overflow-hidden shadow-nivara-xs">
+      <section className="rounded-3xl border border-[#D9E6E2] bg-white overflow-hidden shadow-clinixpulse-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="bg-[#F7FAF8] text-[11px] font-bold uppercase tracking-wider text-[#7D908C] border-b border-[#D9E6E2]">

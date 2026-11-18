@@ -2,16 +2,16 @@ import React, { useId } from 'react';
 import gastroCureLogo from '../../assets/gastro-cure-logo.svg';
 
 /**
- * Custom Brand Logo Component for Gastro Cure
+ * Custom Brand Logo Component for ClinixPulse / Gastro Cure
  * Features high-resolution clinic image emblem and authentic brand wordmark.
  * Also maintains screen-reader compatibility.
  *
  * Variants:
- *  - 'default': Full brandmark image + "Gastro Cure" wordmark + subtitle
+ *  - 'default': Full brandmark image + "ClinixPulse" wordmark + subtitle
  *  - 'compact': Icon image mark only
  *  - 'monochrome': Single currentColor tone for print/watermark
  */
-export default function NivaraLogo({
+export default function ClinixPulseLogo({
   variant = 'default',
   theme = 'light',
   size = 'md',
@@ -36,9 +36,9 @@ export default function NivaraLogo({
 
   const currentSize = iconSizes[size] || iconSizes.md;
 
-  const hexGradId = `nivara-hex-gradient-${uniqueId}`;
-  const flowGradId = `nivara-flow-${uniqueId}`;
-  const darkFlowGradId = `nivara-dark-flow-${uniqueId}`;
+  const hexGradId = `clinix-hex-gradient-${uniqueId}`;
+  const flowGradId = `clinix-flow-${uniqueId}`;
+  const darkFlowGradId = `clinix-dark-flow-${uniqueId}`;
 
   const flowStroke = isMonochrome
     ? 'currentColor'
@@ -68,7 +68,7 @@ export default function NivaraLogo({
       aria-label={`${brandName} Outpatient Platform`}
       {...props}
     >
-      {/* Gastro Cure Medical Logo Image */}
+      {/* ClinixPulse / Gastro Cure Medical Logo Image */}
       <div
         className={`relative shrink-0 flex items-center justify-center transition-all duration-200 ${currentSize.outer} ${
           isDark
@@ -136,7 +136,6 @@ export default function NivaraLogo({
             <span className={`font-heading font-extrabold tracking-tight whitespace-nowrap ${size === 'sm' ? 'text-base sm:text-lg' : size === 'lg' ? 'text-2xl' : 'text-xl'} ${titleColor}`}>
               {brandName}
             </span>
-            <span className={`sr-only ${titleColor}`}>Nivara</span>
             <span className="h-1.5 w-1.5 rounded-full bg-[#76C015] shrink-0" aria-hidden="true" />
           </div>
           {showSubtitle && (

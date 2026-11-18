@@ -74,7 +74,7 @@ const parseDuration = (val, selectedUnits = {}, medId) => {
 /**
  * MedicineTable Component
  *
- * Dynamic medicine table for Nivara Prescription Studio.
+ * Dynamic medicine table for ClinixPulse Prescription Studio.
  * - Fast autocomplete powered by localMedicines
  * - Auto-fills dosage, frequency, timing, duration, and remarks upon selection
  * - All cells remain directly editable

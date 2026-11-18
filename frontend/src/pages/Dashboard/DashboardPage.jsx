@@ -130,7 +130,7 @@ function DashboardPage() {
     );
   });
 
-  // Nivara 3-Stage Outpatient Lifecycle + System Status
+  // ClinixPulse 3-Stage Outpatient Lifecycle + System Status
   const statCards = [
     {
       label: 'Entry / Waiting Queue',
@@ -165,7 +165,7 @@ function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* Top Header & Prominent Patient Search */}
-      <section className="relative rounded-2xl border border-[#D9E6E2] bg-white p-6 shadow-nivara-xs">
+      <section className="relative rounded-2xl border border-[#D9E6E2] bg-white p-6 shadow-clinixpulse-xs">
         {/* Subtle decorative background glow / flow curve */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl">
           <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-gradient-to-br from-teal-50/80 to-[#287C75]/5 blur-2xl" />
@@ -204,7 +204,7 @@ function DashboardPage() {
         </div>
       </section>
 
-      {/* Nivara 3-Stage Outpatient Lifecycle Metrics */}
+      {/* ClinixPulse 3-Stage Outpatient Lifecycle Metrics */}
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {statCards.map((stat) => (
           <StatCard
@@ -224,7 +224,7 @@ function DashboardPage() {
         <FollowUpRemindersWidget />
 
         {/* Patient Waiting Queue */}
-        <article className="app-card p-6 border border-[#D9E6E2] bg-white rounded-2xl shadow-nivara-xs flex flex-col justify-between">
+        <article className="app-card p-6 border border-[#D9E6E2] bg-white rounded-2xl shadow-clinixpulse-xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between gap-4">
               <div>
@@ -275,7 +275,7 @@ function DashboardPage() {
                       className={`rounded-2xl border p-4 transition ${
                         isNext
                           ? 'border-emerald-300 bg-emerald-50/40 ring-1 ring-emerald-300/40'
-                          : 'border-[#D9E6E2] bg-[#F7FAF8]/70 hover:-translate-y-0.5 hover:bg-white hover:border-[#287C75]/40 hover:shadow-nivara-xs'
+                          : 'border-[#D9E6E2] bg-[#F7FAF8]/70 hover:-translate-y-0.5 hover:bg-white hover:border-[#287C75]/40 hover:shadow-clinixpulse-xs'
                       }`}
                     >
                       <div className="grid gap-3 lg:grid-cols-[1fr_auto] lg:items-center">
@@ -330,7 +330,7 @@ function DashboardPage() {
       </section>
 
       {/* Quick Actions Footer Strip */}
-      <section className="app-card p-6 border border-[#D9E6E2] bg-white rounded-2xl shadow-nivara-xs">
+      <section className="app-card p-6 border border-[#D9E6E2] bg-white rounded-2xl shadow-clinixpulse-xs">
         <div>
           <h2 className="text-lg font-heading font-bold text-[#10201F]">Quick Clinical Shortcuts</h2>
           <p className="mt-1 text-sm text-[#4E6460]">Direct navigation to key clinic workflows</p>
@@ -339,7 +339,7 @@ function DashboardPage() {
         <div className="mt-4 grid gap-4 sm:grid-cols-3">
           <Link
             to="/patients?action=new"
-            className="group block rounded-2xl border border-[#D9E6E2] bg-[#F7FAF8] p-4 transition duration-200 hover:-translate-y-0.5 hover:bg-white hover:border-[#287C75]/40 hover:shadow-nivara-xs"
+            className="group block rounded-2xl border border-[#D9E6E2] bg-[#F7FAF8] p-4 transition duration-200 hover:-translate-y-0.5 hover:bg-white hover:border-[#287C75]/40 hover:shadow-clinixpulse-xs"
           >
             <div className="flex items-center justify-between">
               <p className="text-sm font-heading font-bold text-[#10201F] group-hover:text-[#287C75] transition">
@@ -352,7 +352,7 @@ function DashboardPage() {
 
           <Link
             to="/prescription/new"
-            className="group block rounded-2xl border border-[#D9E6E2] bg-[#F7FAF8] p-4 transition duration-200 hover:-translate-y-0.5 hover:bg-white hover:border-[#287C75]/40 hover:shadow-nivara-xs"
+            className="group block rounded-2xl border border-[#D9E6E2] bg-[#F7FAF8] p-4 transition duration-200 hover:-translate-y-0.5 hover:bg-white hover:border-[#287C75]/40 hover:shadow-clinixpulse-xs"
           >
             <div className="flex items-center justify-between">
               <p className="text-sm font-heading font-bold text-[#10201F] group-hover:text-[#287C75] transition">
@@ -365,7 +365,7 @@ function DashboardPage() {
 
           <Link
             to="/medicines"
-            className="group block rounded-2xl border border-[#D9E6E2] bg-[#F7FAF8] p-4 transition duration-200 hover:-translate-y-0.5 hover:bg-white hover:border-[#287C75]/40 hover:shadow-nivara-xs"
+            className="group block rounded-2xl border border-[#D9E6E2] bg-[#F7FAF8] p-4 transition duration-200 hover:-translate-y-0.5 hover:bg-white hover:border-[#287C75]/40 hover:shadow-clinixpulse-xs"
           >
             <div className="flex items-center justify-between">
               <p className="text-sm font-heading font-bold text-[#10201F] group-hover:text-[#287C75] transition">

@@ -136,7 +136,7 @@ export default function ReceptionistDashboardPage() {
       }}
     >
       {/* Front Desk Hero Banner */}
-      <section className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-nivara-xs sm:p-8">
+      <section className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-clinixpulse-xs sm:p-8">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <div className="flex items-center gap-2">

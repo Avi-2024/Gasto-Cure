@@ -6,18 +6,18 @@
 
 @layer base {
   :root {
-    --nivara-primary: #123A3A;
-    --nivara-secondary: #287C75;
-    --nivara-accent: #C9A45C;
-    --nivara-canvas: #F7FAF8;
-    --nivara-surface: #FFFFFF;
-    --nivara-border: #D9E6E2;
-    --nivara-text-primary: #10201F;
-    --nivara-text-secondary: #4E6460;
-    --nivara-text-muted: #7D908C;
-    --nivara-success: #2E7D5B;
-    --nivara-warning: #B7791F;
-    --nivara-danger: #B94A48;
+    --clinixpulse-primary: #123A3A;
+    --clinixpulse-secondary: #287C75;
+    --clinixpulse-accent: #C9A45C;
+    --clinixpulse-canvas: #F7FAF8;
+    --clinixpulse-surface: #FFFFFF;
+    --clinixpulse-border: #D9E6E2;
+    --clinixpulse-text-primary: #10201F;
+    --clinixpulse-text-secondary: #4E6460;
+    --clinixpulse-text-muted: #7D908C;
+    --clinixpulse-success: #2E7D5B;
+    --clinixpulse-warning: #B7791F;
+    --clinixpulse-danger: #B94A48;
 
     /* Maintain backwards compatibility */
     --medical-primary: #123A3A;
@@ -45,8 +45,8 @@
 
   body {
     font-family: 'Inter', sans-serif;
-    background-color: var(--nivara-canvas);
-    color: var(--nivara-text-primary);
+    background-color: var(--clinixpulse-canvas);
+    color: var(--clinixpulse-text-primary);
     @apply antialiased;
   }
 
@@ -90,7 +90,7 @@
   input,
   select,
   textarea {
-    @apply w-full rounded-xl border border-nivara-border bg-white px-3.5 py-2.5 text-sm text-nivara-text outline-none transition focus:border-nivara-secondary focus:ring-2 focus:ring-nivara-secondary/20 placeholder:text-nivara-subtle;
+    @apply w-full rounded-xl border border-clinixpulse-border bg-white px-3.5 py-2.5 text-sm text-clinixpulse-text outline-none transition focus:border-clinixpulse-secondary focus:ring-2 focus:ring-clinixpulse-secondary/20 placeholder:text-clinixpulse-subtle;
   }
 
   textarea {
@@ -100,15 +100,15 @@
 
 @layer components {
   .app-card {
-    @apply rounded-2xl border border-nivara-border bg-white shadow-nivara-xs transition-shadow hover:shadow-nivara-sm;
+    @apply rounded-2xl border border-clinixpulse-border bg-white shadow-clinixpulse-xs transition-shadow hover:shadow-clinixpulse-sm;
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-nivara-secondary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1f635d] active:scale-[0.98] shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nivara-secondary/30 disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-clinixpulse-secondary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1f635d] active:scale-[0.98] shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clinixpulse-secondary/30 disabled:cursor-not-allowed disabled:opacity-60;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-nivara-border bg-white px-4 py-2.5 text-sm font-semibold text-nivara-text transition hover:border-slate-300 hover:bg-slate-50 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nivara-secondary/30 disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-clinixpulse-border bg-white px-4 py-2.5 text-sm font-semibold text-clinixpulse-text transition hover:border-slate-300 hover:bg-slate-50 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clinixpulse-secondary/30 disabled:cursor-not-allowed disabled:opacity-60;
   }
 
   .btn-danger {
@@ -116,19 +116,19 @@
   }
 
   .icon-button {
-    @apply inline-flex h-9 w-9 items-center justify-center rounded-xl border border-nivara-border bg-white text-nivara-muted transition hover:bg-slate-50 hover:text-nivara-text;
+    @apply inline-flex h-9 w-9 items-center justify-center rounded-xl border border-clinixpulse-border bg-white text-clinixpulse-muted transition hover:bg-slate-50 hover:text-clinixpulse-text;
   }
 
   .field-label {
-    @apply mb-1.5 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-nivara-muted;
+    @apply mb-1.5 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-clinixpulse-muted;
   }
 
   .page-title {
-    @apply font-heading text-2xl font-bold tracking-tight text-nivara-text;
+    @apply font-heading text-2xl font-bold tracking-tight text-clinixpulse-text;
   }
 
   .page-subtitle {
-    @apply mt-1 text-sm text-nivara-muted;
+    @apply mt-1 text-sm text-clinixpulse-muted;
   }
 
   .tabular-nums {
@@ -167,15 +167,15 @@
   }
 
   .module-kicker {
-    @apply text-xs font-semibold uppercase tracking-[0.08em] text-nivara-muted;
+    @apply text-xs font-semibold uppercase tracking-[0.08em] text-clinixpulse-muted;
   }
 
   .module-copy {
-    @apply mt-2 text-sm text-nivara-muted;
+    @apply mt-2 text-sm text-clinixpulse-muted;
   }
 
   .panel-title {
-    @apply font-heading text-lg font-semibold text-nivara-text;
+    @apply font-heading text-lg font-semibold text-clinixpulse-text;
   }
 
   .form-grid,
@@ -189,7 +189,7 @@
   }
 
   .input-icon {
-    @apply pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-nivara-subtle;
+    @apply pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-clinixpulse-subtle;
   }
 
   .input-wrap input {
@@ -217,11 +217,11 @@
   }
 
   .auth-card {
-    @apply w-full max-w-md rounded-2xl border border-nivara-border bg-white p-6 shadow-soft;
+    @apply w-full max-w-md rounded-2xl border border-clinixpulse-border bg-white p-6 shadow-soft;
   }
 
   .auth-subtitle {
-    @apply mt-2 text-sm text-nivara-muted;
+    @apply mt-2 text-sm text-clinixpulse-muted;
   }
 
   .auth-actions {
@@ -229,6 +229,6 @@
   }
 
   .auth-actions label {
-    @apply grid gap-2 text-sm font-medium text-nivara-text;
+    @apply grid gap-2 text-sm font-medium text-clinixpulse-text;
   }
 }

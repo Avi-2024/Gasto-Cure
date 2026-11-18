@@ -8,7 +8,7 @@ export default {
         heading: ['Manrope', 'sans-serif'],
       },
       colors: {
-        nivara: {
+        clinixpulse: {
           primary: '#123A3A',
           secondary: '#287C75',
           accent: '#C9A45C',
@@ -51,10 +51,10 @@ export default {
         },
       },
       boxShadow: {
-        'nivara-xs': '0 1px 2px rgba(18, 58, 58, 0.04)',
-        'nivara-sm': '0 2px 8px rgba(18, 58, 58, 0.05)',
-        'nivara-md': '0 8px 24px rgba(18, 58, 58, 0.07)',
-        'nivara-lg': '0 16px 36px rgba(18, 58, 58, 0.10)',
+        'clinixpulse-xs': '0 1px 2px rgba(18, 58, 58, 0.04)',
+        'clinixpulse-sm': '0 2px 8px rgba(18, 58, 58, 0.05)',
+        'clinixpulse-md': '0 8px 24px rgba(18, 58, 58, 0.07)',
+        'clinixpulse-lg': '0 16px 36px rgba(18, 58, 58, 0.10)',
         card: '0 2px 12px rgba(18, 58, 58, 0.04)',
         soft: '0 8px 24px rgba(18, 58, 58, 0.06)',
       },

@@ -6,7 +6,7 @@ import './PrintPreviewModal.css';
 /**
  * PrintPreviewModal Component
  *
- * Provides a realistic A4 preview of the Nivara prescription pad.
+ * Provides a realistic A4 preview of the ClinixPulse prescription pad.
  * - Displays Pad Mode top offset spacer or Digital Header letterhead
  * - Shows Patient Demographics, 6-Point Vitals, Symptoms, Diagnosis, Rx Medicine Table, Advice, and Follow-up
  * - Allows 1-click Direct Print and WhatsApp sharing directly from preview
@@ -45,7 +45,7 @@ function PrintPreviewModal({
   const padMode = Boolean(printSettings?.padMode);
   const topOffsetMm = Number(printSettings?.topOffsetMm) || 60;
   const doctorName = clinicSettings?.doctorName || 'Dr. Aarav Sharma';
-  const clinicName = clinicSettings?.clinicName || 'Nivara Clinic & Health Centre';
+  const clinicName = clinicSettings?.clinicName || 'ClinixPulse Clinic & Health Centre';
 
   let formattedDate = '';
   if (prescriptionDate) {
@@ -137,7 +137,7 @@ function PrintPreviewModal({
 
         {/* Preview A4 Sheet Container */}
         <div className="preview-sheet-scroll">
-          <div className="preview-sheet-a4 shadow-nivara-lg">
+          <div className="preview-sheet-a4 shadow-clinixpulse-lg">
             {/* Top Offset Spacer (Pad Mode) OR Digital Letterhead Header */}
             {padMode ? (
               <div

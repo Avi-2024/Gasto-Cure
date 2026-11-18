@@ -135,13 +135,13 @@ export default function AppHeader({ onMenuClick, sidebarOpen, navigate: customNa
   }, []);
 
   return (
-    <header className="mb-0 rounded-2xl border border-[#D9E6E2] bg-white/85 p-3.5 shadow-nivara-xs backdrop-blur-md transition-all sm:p-4 relative z-[100]">
+    <header className="mb-0 rounded-2xl border border-[#D9E6E2] bg-white/85 p-3.5 shadow-clinixpulse-xs backdrop-blur-md transition-all sm:p-4 relative z-[100]">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         {/* Left: Mobile Menu Toggle & Global Search Spotlight */}
         <div ref={searchContainerRef} className="relative flex items-center gap-3">
           <button
             type="button"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#D9E6E2] bg-white text-[#4E6460] shadow-nivara-xs hover:border-[#287C75]/50 hover:bg-[#F7FAF8] hover:text-[#287C75] transition cursor-pointer md:hidden"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#D9E6E2] bg-white text-[#4E6460] shadow-clinixpulse-xs hover:border-[#287C75]/50 hover:bg-[#F7FAF8] hover:text-[#287C75] transition cursor-pointer md:hidden"
             aria-label="Open menu"
             title={sidebarOpen ? "Close sidebar (Ctrl+B)" : "Open sidebar (Ctrl+B)"}
             onClick={onMenuClick}
@@ -195,7 +195,7 @@ export default function AppHeader({ onMenuClick, sidebarOpen, navigate: customNa
 
             {/* Omni-search Live Results Dropdown */}
             {isSearchOpen && searchQuery.trim().length > 0 && (
-              <div className="absolute left-0 right-0 top-full mt-2 max-h-[440px] overflow-y-auto rounded-2xl border border-[#D9E6E2] bg-white p-2.5 shadow-nivara-lg z-50 animate-in fade-in zoom-in-95 duration-100">
+              <div className="absolute left-0 right-0 top-full mt-2 max-h-[440px] overflow-y-auto rounded-2xl border border-[#D9E6E2] bg-white p-2.5 shadow-clinixpulse-lg z-50 animate-in fade-in zoom-in-95 duration-100">
                 {searchResults.total === 0 ? (
                   <div className="p-4 text-center">
                     <p className="text-xs font-semibold text-[#10201F]">No records found for "{searchQuery}"</p>
@@ -367,7 +367,7 @@ export default function AppHeader({ onMenuClick, sidebarOpen, navigate: customNa
           <button
             type="button"
             onClick={() => navigate('/patients?action=new')}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-[#287C75] px-3.5 py-1.5 text-xs font-semibold text-white shadow-nivara-xs hover:bg-[#1f635d] active:scale-[0.98] transition cursor-pointer"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-[#287C75] px-3.5 py-1.5 text-xs font-semibold text-white shadow-clinixpulse-xs hover:bg-[#1f635d] active:scale-[0.98] transition cursor-pointer"
             title="Register new patient"
             aria-label="Add New Patient"
           >
@@ -376,7 +376,7 @@ export default function AppHeader({ onMenuClick, sidebarOpen, navigate: customNa
           </button>
 
           {/* Contextual Clinic Selector Pill with Status Dot */}
-          <div className="flex items-center gap-2 rounded-xl border border-[#D9E6E2] bg-[#F7FAF8] px-3 py-1.5 shadow-nivara-xs">
+          <div className="flex items-center gap-2 rounded-xl border border-[#D9E6E2] bg-[#F7FAF8] px-3 py-1.5 shadow-clinixpulse-xs">
             <span
               className="h-2 w-2 shrink-0 rounded-full bg-[#2E7D5B] shadow-[0_0_6px_#2E7D5B]"
               title="Clinic operational & synced"
@@ -408,7 +408,7 @@ export default function AppHeader({ onMenuClick, sidebarOpen, navigate: customNa
                 refreshNotifications();
                 setIsNotifOpen((prev) => !prev);
               }}
-              className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-[#D9E6E2] bg-white text-[#4E6460] transition hover:bg-[#F7FAF8] hover:text-[#10201F] shadow-nivara-xs cursor-pointer"
+              className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-[#D9E6E2] bg-white text-[#4E6460] transition hover:bg-[#F7FAF8] hover:text-[#10201F] shadow-clinixpulse-xs cursor-pointer"
               aria-label="Notifications"
               title="Clinical Notifications & Alerts"
             >
@@ -511,7 +511,7 @@ export default function AppHeader({ onMenuClick, sidebarOpen, navigate: customNa
             <button
               type="button"
               onClick={() => navigate('/settings')}
-              className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#D9E6E2] bg-white text-[#4E6460] shadow-nivara-xs hover:border-[#287C75]/50 hover:bg-[#F7FAF8] hover:text-[#287C75] transition cursor-pointer"
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#D9E6E2] bg-white text-[#4E6460] shadow-clinixpulse-xs hover:border-[#287C75]/50 hover:bg-[#F7FAF8] hover:text-[#287C75] transition cursor-pointer"
               title="Clinic Logo, Header & Print Settings"
               aria-label="Clinic Settings"
             >
@@ -523,7 +523,7 @@ export default function AppHeader({ onMenuClick, sidebarOpen, navigate: customNa
           <button
             type="button"
             onClick={() => navigate('/profile')}
-            className="flex items-center gap-2.5 rounded-xl border border-[#D9E6E2] bg-white px-2.5 py-1.5 shadow-nivara-xs hover:border-[#287C75]/50 hover:bg-[#F7FAF8] transition cursor-pointer text-left"
+            className="flex items-center gap-2.5 rounded-xl border border-[#D9E6E2] bg-white px-2.5 py-1.5 shadow-clinixpulse-xs hover:border-[#287C75]/50 hover:bg-[#F7FAF8] transition cursor-pointer text-left"
             title="View & Edit Doctor Profile"
             aria-label="Doctor Profile"
           >

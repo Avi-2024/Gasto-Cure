@@ -101,7 +101,7 @@ export default function PatientPastHistoryDrawer({
         {/* Drawer Header */}
         <div className="flex items-center justify-between border-b border-[#D9E6E2] px-6 py-4 bg-[#F7FAF8] shrink-0">
           <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-50 text-[#287C75] border border-teal-100 shadow-nivara-xs">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-50 text-[#287C75] border border-teal-100 shadow-clinixpulse-xs">
               <History size={20} />
             </span>
             <div>
@@ -153,7 +153,7 @@ export default function PatientPastHistoryDrawer({
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
           {pastVisits.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="h-14 w-14 rounded-2xl bg-[#E8F3F1] text-[#287C75] flex items-center justify-center mb-3 shadow-nivara-xs">
+              <div className="h-14 w-14 rounded-2xl bg-[#E8F3F1] text-[#287C75] flex items-center justify-center mb-3 shadow-clinixpulse-xs">
                 <Clock size={28} />
               </div>
               <h3 className="font-heading text-base font-bold text-[#10201F]">
@@ -172,7 +172,7 @@ export default function PatientPastHistoryDrawer({
               return (
                 <div
                   key={visit.id || index}
-                  className="rounded-2xl border border-[#D9E6E2] bg-white p-4.5 shadow-nivara-xs hover:border-[#287C75]/40 transition duration-150"
+                  className="rounded-2xl border border-[#D9E6E2] bg-white p-4.5 shadow-clinixpulse-xs hover:border-[#287C75]/40 transition duration-150"
                 >
                   {/* Visit Top Header */}
                   <div className="flex items-start justify-between border-b border-[#EBF1EE] pb-3 mb-3">
@@ -203,7 +203,7 @@ export default function PatientPastHistoryDrawer({
                           onRepeatRx(meds, visit);
                           onClose?.();
                         }}
-                        className="inline-flex items-center gap-1.5 rounded-xl bg-teal-50 px-3 py-1.5 text-xs font-bold text-[#287C75] border border-teal-200 hover:bg-[#287C75] hover:text-white transition shadow-nivara-xs"
+                        className="inline-flex items-center gap-1.5 rounded-xl bg-teal-50 px-3 py-1.5 text-xs font-bold text-[#287C75] border border-teal-200 hover:bg-[#287C75] hover:text-white transition shadow-clinixpulse-xs"
                         title={`Copy ${meds.length} medicines from this visit to current prescription`}
                       >
                         <Copy size={13} />

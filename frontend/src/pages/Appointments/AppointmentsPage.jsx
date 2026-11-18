@@ -101,7 +101,7 @@ export default function AppointmentsPage() {
   return (
     <div className="space-y-6">
       {/* Page Title & Search Header */}
-      <section className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-nivara-xs">
+      <section className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-clinixpulse-xs">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex items-center gap-2">
@@ -192,7 +192,7 @@ export default function AppointmentsPage() {
       {/* Grid: Appointments List & Calendar */}
       <section className="grid gap-6 xl:grid-cols-[1.3fr_1fr]">
         {/* Left Column: Appointments List */}
-        <article className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-nivara-xs">
+        <article className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-clinixpulse-xs">
           <div className="flex items-center justify-between border-b border-[#D9E6E2]/60 pb-3">
             <h2 className="font-heading text-base font-bold text-[#10201F]">
               Appointment Register
@@ -270,7 +270,7 @@ export default function AppointmentsPage() {
         </article>
 
         {/* Right Column: Month Calendar View */}
-        <article className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-nivara-xs">
+        <article className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-clinixpulse-xs">
           <div className="flex items-center justify-between border-b border-[#D9E6E2]/60 pb-3">
             <h2 className="font-heading text-base font-bold text-[#10201F]">
               Monthly Schedule

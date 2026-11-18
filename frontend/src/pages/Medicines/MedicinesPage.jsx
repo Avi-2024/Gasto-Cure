@@ -196,11 +196,11 @@ function MedicinesPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header section with Nivara branding */}
+      {/* Header section with ClinixPulse branding */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-50 text-[#287C75] border border-teal-100 shadow-nivara-xs">
+            <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-50 text-[#287C75] border border-teal-100 shadow-clinixpulse-xs">
               <Pill size={22} />
             </span>
             <div>
@@ -218,7 +218,7 @@ function MedicinesPage() {
           <button
             type="button"
             onClick={handleOpenAdd}
-            className="btn-primary inline-flex items-center gap-2 shadow-nivara-xs"
+            className="btn-primary inline-flex items-center gap-2 shadow-clinixpulse-xs"
           >
             <Plus size={18} />
             <span>Add Medicine</span>
@@ -228,7 +228,7 @@ function MedicinesPage() {
 
       {/* Notification Toast */}
       {notification ? (
-        <div role="status" aria-live="polite" className="flex items-center justify-between rounded-xl border border-teal-200 bg-teal-50/80 px-4 py-3 text-sm font-medium text-[#123A3A] shadow-nivara-xs transition animate-in fade-in">
+        <div role="status" aria-live="polite" className="flex items-center justify-between rounded-xl border border-teal-200 bg-teal-50/80 px-4 py-3 text-sm font-medium text-[#123A3A] shadow-clinixpulse-xs transition animate-in fade-in">
           <div className="flex items-center gap-2.5">
             <CheckCircle2 size={18} className="text-[#2E7D5B]" />
             <span>{notification}</span>
@@ -277,7 +277,7 @@ function MedicinesPage() {
       </div>
 
       {/* Search and Filters Section */}
-      <section className="app-card rounded-2xl p-4 border border-[#D9E6E2] bg-white shadow-nivara-xs">
+      <section className="app-card rounded-2xl p-4 border border-[#D9E6E2] bg-white shadow-clinixpulse-xs">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="relative flex-1">
             <Search
@@ -363,7 +363,7 @@ function MedicinesPage() {
       </section>
 
       {/* Formulary Master Table */}
-      <section className="app-card overflow-hidden rounded-2xl border border-[#D9E6E2] bg-white shadow-nivara-xs">
+      <section className="app-card overflow-hidden rounded-2xl border border-[#D9E6E2] bg-white shadow-clinixpulse-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm text-[#4E6460]">
             <thead className="bg-[#F7FAF8] text-xs font-bold uppercase tracking-[0.08em] text-[#4E6460] border-b border-[#D9E6E2]">
@@ -404,7 +404,7 @@ function MedicinesPage() {
 
                     {/* Default Dosage (monospace chip) */}
                     <td className="px-4 py-3.5">
-                      <span className="inline-block rounded-lg border border-[#D9E6E2] bg-[#F7FAF8] px-2.5 py-1 font-mono text-xs font-semibold text-[#123A3A] shadow-nivara-xs">
+                      <span className="inline-block rounded-lg border border-[#D9E6E2] bg-[#F7FAF8] px-2.5 py-1 font-mono text-xs font-semibold text-[#123A3A] shadow-clinixpulse-xs">
                         {med.defaultDosage || '1-0-1'}
                       </span>
                     </td>
@@ -444,7 +444,7 @@ function MedicinesPage() {
                           type="button"
                           aria-label="Edit"
                           onClick={() => handleOpenEdit(med)}
-                          className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#D9E6E2] bg-white px-2.5 text-xs font-semibold text-[#10201F] transition hover:border-[#287C75] hover:bg-teal-50 hover:text-[#287C75] shadow-nivara-xs"
+                          className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#D9E6E2] bg-white px-2.5 text-xs font-semibold text-[#10201F] transition hover:border-[#287C75] hover:bg-teal-50 hover:text-[#287C75] shadow-clinixpulse-xs"
                           title="Edit Formulation"
                         >
                           <Pencil size={13} />
@@ -455,7 +455,7 @@ function MedicinesPage() {
                           type="button"
                           aria-label="Toggle Status"
                           onClick={() => handleToggleStatus(med)}
-                          className={`inline-flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-semibold transition shadow-nivara-xs ${
+                          className={`inline-flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-semibold transition shadow-clinixpulse-xs ${
                             med.isActive
                               ? 'border-amber-200 bg-amber-50/70 text-[#B7791F] hover:bg-amber-100 hover:border-amber-300'
                               : 'border-emerald-200 bg-emerald-50/70 text-[#2E7D5B] hover:bg-emerald-100 hover:border-emerald-300'
@@ -470,7 +470,7 @@ function MedicinesPage() {
                           type="button"
                           aria-label="Delete"
                           onClick={() => handleDelete(med)}
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-rose-200 bg-rose-50/60 text-[#B94A48] transition hover:bg-rose-100 hover:border-rose-300 shadow-nivara-xs"
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-rose-200 bg-rose-50/60 text-[#B94A48] transition hover:bg-rose-100 hover:border-rose-300 shadow-clinixpulse-xs"
                           title="Delete Formulation"
                         >
                           <Trash2 size={13} />
@@ -530,7 +530,7 @@ function MedicinesPage() {
               <ChevronLeft size={15} />
               Prev
             </button>
-            <span className="rounded-xl border border-[#D9E6E2] bg-white px-3 py-1.5 text-xs font-semibold text-[#10201F] shadow-nivara-xs">
+            <span className="rounded-xl border border-[#D9E6E2] bg-white px-3 py-1.5 text-xs font-semibold text-[#10201F] shadow-clinixpulse-xs">
               Page {page} of {totalPages}
             </span>
             <button

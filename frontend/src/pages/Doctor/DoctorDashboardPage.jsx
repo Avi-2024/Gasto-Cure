@@ -48,7 +48,7 @@ export default function DoctorDashboardPage() {
   return (
     <div className="space-y-6">
       {/* Doctor Console Hero Banner */}
-      <section className="relative overflow-hidden rounded-3xl border border-[#D9E6E2] bg-gradient-to-br from-white via-[#F7FAF8] to-[#E9F3F0] p-6 shadow-nivara-xs sm:p-8">
+      <section className="relative overflow-hidden rounded-3xl border border-[#D9E6E2] bg-gradient-to-br from-white via-[#F7FAF8] to-[#E9F3F0] p-6 shadow-clinixpulse-xs sm:p-8">
         <div className="relative z-10 flex flex-col justify-between gap-4 md:flex-row md:items-center">
           <div>
             <div className="flex items-center gap-2">
@@ -223,7 +223,7 @@ export default function DoctorDashboardPage() {
       </section>
 
       {/* Waiting Queue Live Feed */}
-      <section className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-nivara-xs">
+      <section className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-clinixpulse-xs">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="font-heading text-lg font-bold text-[#10201F]">

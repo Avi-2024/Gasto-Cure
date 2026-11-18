@@ -28,16 +28,16 @@ describe('Phase 2: Role-Based Auth, Viewport Layout & Operational Views', () => 
       });
     });
 
-    it('renders Nivara brand identity and 3 distinct role presets', () => {
+    it('renders ClinixPulse brand identity and 3 distinct role presets', () => {
       render(
         <MemoryRouter initialEntries={['/auth/login']}>
           <LoginPage />
         </MemoryRouter>
       );
 
-      expect(screen.getAllByText('Nivara').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText('ClinixPulse').length).toBeGreaterThanOrEqual(1);
       expect(screen.getByText(/Secure Clinic Gateway/i)).toBeDefined();
-      expect(screen.getByText(/Sign in to Nivara/i)).toBeDefined();
+      expect(screen.getByText(/Sign in to ClinixPulse/i)).toBeDefined();
 
       // 3 role selector options
       expect(screen.getAllByText('Doctor').length).toBeGreaterThanOrEqual(1);
@@ -92,7 +92,7 @@ describe('Phase 2: Role-Based Auth, Viewport Layout & Operational Views', () => 
       const passwordInput = screen.getByPlaceholderText('••••••••');
 
       // Type receptionist email and password directly
-      fireEvent.change(emailInput, { target: { value: 'reception@nivara.health' } });
+      fireEvent.change(emailInput, { target: { value: 'reception@clinixpulse.com' } });
       fireEvent.change(passwordInput, { target: { value: 'demo1234' } });
 
       // Verify button dynamically changes to Reception Desk
@@ -104,7 +104,7 @@ describe('Phase 2: Role-Based Auth, Viewport Layout & Operational Views', () => 
       const payloadBase64 = callArg.accessToken.split('.')[1];
       const payload = JSON.parse(atob(payloadBase64));
       expect(payload.role).toBe('STAFF');
-      expect(payload.email).toBe('reception@nivara.health');
+      expect(payload.email).toBe('reception@clinixpulse.com');
     });
 
     it('automatically routes to Clinic Dashboard (/dashboard) when clinic owner email is entered directly', () => {
@@ -118,7 +118,7 @@ describe('Phase 2: Role-Based Auth, Viewport Layout & Operational Views', () => 
       const passwordInput = screen.getByPlaceholderText('••••••••');
 
       // Type owner email and password directly
-      fireEvent.change(emailInput, { target: { value: 'owner@nivara.health' } });
+      fireEvent.change(emailInput, { target: { value: 'owner@clinixpulse.com' } });
       fireEvent.change(passwordInput, { target: { value: 'demo1234' } });
 
       // Verify button dynamically changes to Clinic Owner / Admin
@@ -130,7 +130,7 @@ describe('Phase 2: Role-Based Auth, Viewport Layout & Operational Views', () => 
       const payloadBase64 = callArg.accessToken.split('.')[1];
       const payload = JSON.parse(atob(payloadBase64));
       expect(payload.role).toBe('CLINIC_OWNER');
-      expect(payload.email).toBe('owner@nivara.health');
+      expect(payload.email).toBe('owner@clinixpulse.com');
     });
 
     it('shows error when invalid password is provided for a known staff account', () => {
@@ -143,13 +143,13 @@ describe('Phase 2: Role-Based Auth, Viewport Layout & Operational Views', () => 
       const emailInput = screen.getByLabelText(/Work Email/i);
       const passwordInput = screen.getByPlaceholderText('••••••••');
 
-      fireEvent.change(emailInput, { target: { value: 'dr.sharma@nivara.health' } });
+      fireEvent.change(emailInput, { target: { value: 'dr.sharma@clinixpulse.com' } });
       fireEvent.change(passwordInput, { target: { value: 'wrongpass' } });
 
       const submitBtn = screen.getByRole('button', { name: /Enter Doctor Console/i });
       fireEvent.click(submitBtn);
 
-      expect(screen.getByText(/Invalid password for dr\.sharma@nivara\.health/i)).toBeDefined();
+      expect(screen.getByText(/Invalid password for dr\.sharma@clinixpulse\.com/i)).toBeDefined();
       expect(mockLogin).not.toHaveBeenCalled();
     });
   });
@@ -284,7 +284,7 @@ describe('Phase 2: Role-Based Auth, Viewport Layout & Operational Views', () => 
       vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
         user: {
           name: 'Abebe Bikila',
-          email: 'dr.bikila@nivara.health',
+          email: 'dr.bikila@clinixpulse.com',
           role: 'DOCTOR',
         },
         activeClinicId: 'clinic-1',
@@ -313,7 +313,7 @@ describe('Phase 2: Role-Based Auth, Viewport Layout & Operational Views', () => 
       vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
         user: {
           name: 'Clinic Owner',
-          email: 'owner@nivara.health',
+          email: 'owner@clinixpulse.com',
           role: 'CLINIC_OWNER',
           clinicIds: ['clinic-1'],
         },

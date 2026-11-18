@@ -6,7 +6,7 @@ import AppHeader from '../components/layout/AppHeader';
 
 /**
  * DashboardLayout Component
- * Nivara operational shell providing:
+ * ClinixPulse operational shell providing:
  * 1. Viewport-contained boundary (h-screen w-screen overflow-hidden) preventing body scrolling.
  * 2. Sticky desktop sidebar (h-screen) with independent vertical scroll.
  * 3. Sticky header bar pinned to the top of the main workspace.
@@ -18,7 +18,7 @@ export default function DashboardLayout() {
   // Desktop/Mobile sidebar open/close state (persisted across sessions)
   const [sidebarOpen, setSidebarOpen] = useState(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('nivara_sidebar_open');
+      const saved = localStorage.getItem('clinixpulse_sidebar_open');
       if (saved !== null) return saved === 'true';
       return window.innerWidth >= 768; // default open on desktop, closed on small mobile
     }
@@ -29,7 +29,7 @@ export default function DashboardLayout() {
     setSidebarOpen((prev) => {
       const next = !prev;
       try {
-        localStorage.setItem('nivara_sidebar_open', String(next));
+        localStorage.setItem('clinixpulse_sidebar_open', String(next));
       } catch {}
       return next;
     });
@@ -67,7 +67,7 @@ export default function DashboardLayout() {
         onClose={() => {
           setSidebarOpen(false);
           try {
-            localStorage.setItem('nivara_sidebar_open', 'false');
+            localStorage.setItem('clinixpulse_sidebar_open', 'false');
           } catch {}
         }}
         onToggle={toggleSidebar}

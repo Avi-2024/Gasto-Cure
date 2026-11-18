@@ -18,7 +18,7 @@ export default function ConsultationForm({
     selectedQueueItem?.patientName || selectedQueueItem?.patient?.fullName || 'No patient selected';
 
   return (
-    <section className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-nivara-xs">
+    <section className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-clinixpulse-xs">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#D9E6E2]/60 pb-4">
         <div>
           <span className="text-xs font-semibold uppercase tracking-wider text-[#287C75]">

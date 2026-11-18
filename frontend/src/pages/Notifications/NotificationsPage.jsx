@@ -84,7 +84,7 @@ export default function NotificationsPage() {
   return (
     <div className="space-y-6 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       {/* Header Banner */}
-      <div className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-nivara-xs">
+      <div className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-clinixpulse-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-teal-50 text-[#287C75] border border-teal-100 shadow-sm">
@@ -167,7 +167,7 @@ export default function NotificationsPage() {
       </div>
 
       {/* Notifications List */}
-      <div className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-nivara-xs">
+      <div className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-clinixpulse-xs">
         {filtered.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-[#D9E6E2] bg-[#F7FAF8] p-12 text-center">
             <CheckCircle2 size={36} className="mx-auto text-[#2E7D5B]" />

@@ -94,7 +94,7 @@ export default function QuickPatientSearch() {
           }}
           placeholder="Search patient by name, mobile, or ID (e.g. PT-001)..."
           aria-label="Search patient by name, mobile, or ID"
-          className="w-full h-12 pl-12 pr-10 text-base font-medium rounded-2xl border-2 border-[#D9E6E2] bg-white placeholder:text-[#7D908C] text-[#10201F] focus:border-[#287C75] focus:outline-none focus:ring-4 focus:ring-[#287C75]/10 transition shadow-nivara-xs"
+          className="w-full h-12 pl-12 pr-10 text-base font-medium rounded-2xl border-2 border-[#D9E6E2] bg-white placeholder:text-[#7D908C] text-[#10201F] focus:border-[#287C75] focus:outline-none focus:ring-4 focus:ring-[#287C75]/10 transition shadow-clinixpulse-xs"
         />
         {query && (
           <button
@@ -110,7 +110,7 @@ export default function QuickPatientSearch() {
 
       {/* Instant Dropdown Results */}
       {isOpen && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-96 overflow-y-auto rounded-2xl border border-[#D9E6E2] bg-white p-2 shadow-nivara-lg">
+        <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-96 overflow-y-auto rounded-2xl border border-[#D9E6E2] bg-white p-2 shadow-clinixpulse-lg">
           <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-[#7D908C] border-b border-[#D9E6E2] flex justify-between items-center">
             <span>Patient Search Results</span>
             <span className="font-mono text-xs">{results.length} found</span>

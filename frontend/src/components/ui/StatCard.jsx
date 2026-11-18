@@ -24,7 +24,7 @@ function StatCard({
     <motion.article
       whileHover={{ y: -3 }}
       transition={{ type: 'spring', stiffness: 280, damping: 22 }}
-      className="app-card rounded-2xl p-5 border border-[#D9E6E2] bg-white shadow-nivara-xs hover:shadow-nivara-sm transition duration-200"
+      className="app-card rounded-2xl p-5 border border-[#D9E6E2] bg-white shadow-clinixpulse-xs hover:shadow-clinixpulse-sm transition duration-200"
     >
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm font-medium text-[#4E6460]">{label}</p>

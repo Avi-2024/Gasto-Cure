@@ -109,7 +109,7 @@ function PatientProfileDrawer({ isOpen, patient, onClose, onEdit, clinicSettings
       aria-labelledby="patient-profile-title"
     >
       <div
-        className="w-full max-w-2xl bg-white h-full border-l border-[#D9E6E2] shadow-nivara-lg flex flex-col overflow-hidden animate-in slide-in-from-right duration-200"
+        className="w-full max-w-2xl bg-white h-full border-l border-[#D9E6E2] shadow-clinixpulse-lg flex flex-col overflow-hidden animate-in slide-in-from-right duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Drawer Header Bar */}
@@ -118,7 +118,7 @@ function PatientProfileDrawer({ isOpen, patient, onClose, onEdit, clinicSettings
             <PatientAvatar
               gender={patient.gender}
               name={patient.name}
-              className="h-12 w-12 rounded-full shrink-0 shadow-nivara-xs"
+              className="h-12 w-12 rounded-full shrink-0 shadow-clinixpulse-xs"
             />
             <div>
               <h2 id="patient-profile-title" className="font-heading text-lg font-bold text-[#10201F] leading-tight">
@@ -160,7 +160,7 @@ function PatientProfileDrawer({ isOpen, patient, onClose, onEdit, clinicSettings
           <div className="rounded-2xl border border-[#D9E6E2] bg-[#F7FAF8]/60 p-5 space-y-4">
             {/* Quick Metrics Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              <div className="rounded-xl bg-white p-3.5 border border-[#D9E6E2] shadow-nivara-xs">
+              <div className="rounded-xl bg-white p-3.5 border border-[#D9E6E2] shadow-clinixpulse-xs">
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-[#7D908C]">Contact</p>
                 <p className="mt-1 text-sm font-semibold text-[#10201F] flex items-center gap-1.5 tabular-nums">
                   <Phone size={13} className="text-[#287C75]" />
@@ -168,7 +168,7 @@ function PatientProfileDrawer({ isOpen, patient, onClose, onEdit, clinicSettings
                 </p>
               </div>
 
-              <div className="rounded-xl bg-white p-3.5 border border-[#D9E6E2] shadow-nivara-xs">
+              <div className="rounded-xl bg-white p-3.5 border border-[#D9E6E2] shadow-clinixpulse-xs">
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-[#7D908C]">Blood Group</p>
                 <p className="mt-1 text-sm font-bold text-[#B94A48] flex items-center gap-1.5">
                   <Droplet size={13} className="text-[#B94A48]" />
@@ -176,7 +176,7 @@ function PatientProfileDrawer({ isOpen, patient, onClose, onEdit, clinicSettings
                 </p>
               </div>
 
-              <div className="rounded-xl bg-white p-3.5 border border-[#D9E6E2] shadow-nivara-xs col-span-2 sm:col-span-1">
+              <div className="rounded-xl bg-white p-3.5 border border-[#D9E6E2] shadow-clinixpulse-xs col-span-2 sm:col-span-1">
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-[#7D908C]">Last Visit</p>
                 <p className="mt-1 text-sm font-semibold text-[#10201F] flex items-center gap-1.5">
                   <Calendar size={13} className="text-[#4E6460]" />
@@ -311,7 +311,7 @@ function PatientProfileDrawer({ isOpen, patient, onClose, onEdit, clinicSettings
                   return (
                     <div
                       key={visit.id}
-                      className="rounded-2xl border border-[#D9E6E2] bg-white p-5 shadow-nivara-xs space-y-3.5 hover:border-teal-200 hover:shadow-nivara-sm transition duration-200"
+                      className="rounded-2xl border border-[#D9E6E2] bg-white p-5 shadow-clinixpulse-xs space-y-3.5 hover:border-teal-200 hover:shadow-clinixpulse-sm transition duration-200"
                     >
                       {/* Visit Header */}
                       <div className="flex flex-wrap items-start justify-between gap-2 border-b border-[#D9E6E2]/70 pb-3">

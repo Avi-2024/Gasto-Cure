@@ -1,5 +1,5 @@
 /**
- * WhatsApp Business & Patient Chat Service for Nivara / Gastro Cure Clinic
+ * WhatsApp Business & Patient Chat Service for ClinixPulse / Gastro Cure Clinic
  *
  * Manages two-way messaging threads between Clinic and Patients:
  * - Logs automated 24-48h reminders & interactive quick-replies
