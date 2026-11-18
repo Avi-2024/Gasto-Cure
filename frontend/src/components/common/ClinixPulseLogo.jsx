@@ -17,7 +17,7 @@ export default function ClinixPulseLogo({
   size = 'md',
   showSubtitle = true,
   brandName = 'ClinixPulse',
-  subtitle = 'Outpatient Operations Platform',
+  subtitle = 'Outpatient Platform',
   imageSrc,
   className = '',
   ...props
@@ -139,9 +139,8 @@ export default function ClinixPulseLogo({
             <span className="h-1.5 w-1.5 rounded-full bg-[#76C015] shrink-0" aria-hidden="true" />
           </div>
           {showSubtitle && (
-            <span className={`mt-0.5 sm:mt-1 font-heading text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.12em] sm:tracking-[0.16em] whitespace-nowrap ${subtitleColor}`}>
+            <span className={`mt-0.5 sm:mt-1 font-heading text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.12em] whitespace-nowrap max-w-[160px] truncate ${subtitleColor}`}>
               {subtitle}
-              <span className={`sr-only ${subtitleColor}`}>Outpatient Platform</span>
             </span>
           )}
         </div>
