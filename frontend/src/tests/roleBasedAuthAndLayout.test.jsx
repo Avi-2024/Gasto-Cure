@@ -80,6 +80,78 @@ describe('Phase 2: Role-Based Auth, Viewport Layout & Operational Views', () => 
       const callArg = mockLogin.mock.calls[0][0];
       expect(callArg.accessToken).toContain('header.');
     });
+
+    it('automatically routes to Reception Desk (/reception) when receptionist email is entered directly', () => {
+      render(
+        <MemoryRouter initialEntries={['/auth/login']}>
+          <LoginPage />
+        </MemoryRouter>
+      );
+
+      const emailInput = screen.getByLabelText(/Work Email/i);
+      const passwordInput = screen.getByPlaceholderText('••••••••');
+
+      // Type receptionist email and password directly
+      fireEvent.change(emailInput, { target: { value: 'reception@nivara.health' } });
+      fireEvent.change(passwordInput, { target: { value: 'demo1234' } });
+
+      // Verify button dynamically changes to Reception Desk
+      const submitBtn = screen.getByRole('button', { name: /Enter Reception Desk/i });
+      fireEvent.click(submitBtn);
+
+      expect(mockLogin).toHaveBeenCalledTimes(1);
+      const callArg = mockLogin.mock.calls[0][0];
+      const payloadBase64 = callArg.accessToken.split('.')[1];
+      const payload = JSON.parse(atob(payloadBase64));
+      expect(payload.role).toBe('STAFF');
+      expect(payload.email).toBe('reception@nivara.health');
+    });
+
+    it('automatically routes to Clinic Dashboard (/dashboard) when clinic owner email is entered directly', () => {
+      render(
+        <MemoryRouter initialEntries={['/auth/login']}>
+          <LoginPage />
+        </MemoryRouter>
+      );
+
+      const emailInput = screen.getByLabelText(/Work Email/i);
+      const passwordInput = screen.getByPlaceholderText('••••••••');
+
+      // Type owner email and password directly
+      fireEvent.change(emailInput, { target: { value: 'owner@nivara.health' } });
+      fireEvent.change(passwordInput, { target: { value: 'demo1234' } });
+
+      // Verify button dynamically changes to Clinic Owner / Admin
+      const submitBtn = screen.getByRole('button', { name: /Enter Clinic Owner/i });
+      fireEvent.click(submitBtn);
+
+      expect(mockLogin).toHaveBeenCalledTimes(1);
+      const callArg = mockLogin.mock.calls[0][0];
+      const payloadBase64 = callArg.accessToken.split('.')[1];
+      const payload = JSON.parse(atob(payloadBase64));
+      expect(payload.role).toBe('CLINIC_OWNER');
+      expect(payload.email).toBe('owner@nivara.health');
+    });
+
+    it('shows error when invalid password is provided for a known staff account', () => {
+      render(
+        <MemoryRouter initialEntries={['/auth/login']}>
+          <LoginPage />
+        </MemoryRouter>
+      );
+
+      const emailInput = screen.getByLabelText(/Work Email/i);
+      const passwordInput = screen.getByPlaceholderText('••••••••');
+
+      fireEvent.change(emailInput, { target: { value: 'dr.sharma@nivara.health' } });
+      fireEvent.change(passwordInput, { target: { value: 'wrongpass' } });
+
+      const submitBtn = screen.getByRole('button', { name: /Enter Doctor Console/i });
+      fireEvent.click(submitBtn);
+
+      expect(screen.getByText(/Invalid password for dr\.sharma@nivara\.health/i)).toBeDefined();
+      expect(mockLogin).not.toHaveBeenCalled();
+    });
   });
 
   describe('ProtectedRoute Role-Aware Redirection', () => {
