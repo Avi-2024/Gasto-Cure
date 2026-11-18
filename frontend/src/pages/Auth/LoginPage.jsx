@@ -3,9 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   Activity,
   ArrowRight,
-  Baby,
-  Bone,
-  Brain,
   Building2,
   CalendarDays,
   CheckCircle2,
@@ -13,16 +10,13 @@ import {
   Eye,
   EyeOff,
   Headphones,
-  Heart,
   Info,
   Laptop,
   Lock,
   Mail,
   MessageCircle,
-  Plus,
   Printer,
   ShieldCheck,
-  Sparkles,
   Stethoscope,
   Users,
   X,
@@ -31,7 +25,6 @@ import {
 import NivaraLogo from '../../components/common/NivaraLogo';
 import { useAuth } from '../../contexts/AuthContext';
 import doctorsHero from '../../assets/doctors-hero.png';
-import stethoscopeHero from '../../assets/stethoscope-hero.png';
 
 export const ROLE_PRESETS = [
   {
@@ -70,15 +63,6 @@ export const ROLE_PRESETS = [
     icon: Users,
     description: 'Fast patient intake, queue triage, appointments, and fee collection.',
   },
-];
-
-export const SPECIALTIES = [
-  { name: 'Cardiology', icon: Heart },
-  { name: 'Gastroenterology', icon: Activity },
-  { name: 'Neurology', icon: Brain },
-  { name: 'Orthopedics', icon: Bone },
-  { name: 'Dermatology', icon: Sparkles },
-  { name: 'Pediatrics', icon: Baby },
 ];
 
 /**
@@ -299,14 +283,14 @@ export default function LoginPage() {
               ───────────────────────────────────────────────────────── */}
           <div className="lg:col-span-7 xl:col-span-7 flex flex-col justify-center">
             {/* Tag Badge */}
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/80 bg-[#E0F5F0] px-3 py-1 text-[11px] font-bold text-[#064E49] w-fit shadow-2xs">
-              <Zap size={12} className="text-[#087F75] fill-[#087F75]" />
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/80 bg-[#E0F5F0] px-3.5 py-1 text-xs font-bold text-[#064E49] w-fit shadow-2xs">
+              <Zap size={13} className="text-[#087F75] fill-[#087F75]" />
               <span>All-in-One Clinic Management Platform</span>
               <span className="sr-only">Smart Outpatient Workflow Engine</span>
             </div>
 
             {/* Main Headline */}
-            <h1 className="mt-2.5 text-2xl sm:text-3xl xl:text-4xl font-extrabold tracking-tight text-[#102A35] leading-tight">
+            <h1 className="mt-3 text-3xl sm:text-4xl xl:text-[44px] font-extrabold tracking-tight text-[#102A35] leading-[1.15]">
               One Platform. <br className="hidden sm:inline" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#087F75] via-[#064E49] to-[#10B981]">
                 Every Practice.
@@ -315,70 +299,70 @@ export default function LoginPage() {
             </h1>
 
             {/* Description */}
-            <p className="mt-1.5 text-xs sm:text-sm text-[#647987] leading-relaxed max-w-lg font-medium">
+            <p className="mt-2 text-xs sm:text-sm text-[#647987] leading-relaxed max-w-lg font-medium">
               Manage your clinic, patients, appointments, prescriptions and daily operations from one secure workspace.
             </p>
 
             {/* Human-Made Composition: 2x2 Feature Cards + Circular Framed Medical Team */}
-            <div className="mt-4 flex items-center gap-5">
+            <div className="mt-5 flex items-center gap-5 xl:gap-6">
               {/* 4 Feature Cards arranged in a clean 2x2 Grid */}
-              <div className="grid grid-cols-2 gap-2.5 flex-1 max-w-[400px]">
+              <div className="grid grid-cols-2 gap-3 flex-1 max-w-[430px] xl:max-w-[450px]">
                 {/* 1. Smart Appointment Management */}
-                <div className="rounded-xl border border-emerald-100/90 bg-white/95 p-2.5 shadow-[0_4px_16px_rgba(8,127,117,0.04)] backdrop-blur-xs transition hover:shadow-md hover:border-emerald-300">
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#E8F7F4] text-[#087F75] border border-emerald-200/80">
-                      <CalendarDays size={14} />
+                <div className="rounded-xl border border-emerald-100/90 bg-white/95 p-3 shadow-[0_4px_16px_rgba(8,127,117,0.05)] backdrop-blur-xs transition hover:shadow-md hover:border-emerald-300">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex h-7.5 w-7.5 shrink-0 items-center justify-center rounded-lg bg-[#E8F7F4] text-[#087F75] border border-emerald-200/80">
+                      <CalendarDays size={15} />
                     </div>
-                    <h4 className="text-[11px] font-bold text-[#102A35] leading-tight">
+                    <h4 className="text-xs font-bold text-[#102A35] leading-tight">
                       Smart Appointment Management
                     </h4>
                   </div>
-                  <p className="mt-1 text-[10px] text-[#647987] leading-snug">
+                  <p className="mt-1.5 text-[11px] text-[#647987] leading-snug">
                     Schedule, triage and reduce clinic no-shows.
                   </p>
                 </div>
 
                 {/* 2. Digital Prescription Studio */}
-                <div className="rounded-xl border border-emerald-100/90 bg-white/95 p-2.5 shadow-[0_4px_16px_rgba(8,127,117,0.04)] backdrop-blur-xs transition hover:shadow-md hover:border-emerald-300">
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#E8F7F4] text-[#087F75] border border-emerald-200/80">
-                      <Printer size={14} />
+                <div className="rounded-xl border border-emerald-100/90 bg-white/95 p-3 shadow-[0_4px_16px_rgba(8,127,117,0.05)] backdrop-blur-xs transition hover:shadow-md hover:border-emerald-300">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex h-7.5 w-7.5 shrink-0 items-center justify-center rounded-lg bg-[#E8F7F4] text-[#087F75] border border-emerald-200/80">
+                      <Printer size={15} />
                     </div>
-                    <h4 className="text-[11px] font-bold text-[#102A35] leading-tight">
+                    <h4 className="text-xs font-bold text-[#102A35] leading-tight">
                       Digital Prescription Studio
                     </h4>
                   </div>
-                  <p className="mt-1 text-[10px] text-[#647987] leading-snug">
+                  <p className="mt-1.5 text-[11px] text-[#647987] leading-snug">
                     Create, save and share e-prescriptions instantly.
                   </p>
                 </div>
 
                 {/* 3. Patient Records Management */}
-                <div className="rounded-xl border border-emerald-100/90 bg-white/95 p-2.5 shadow-[0_4px_16px_rgba(8,127,117,0.04)] backdrop-blur-xs transition hover:shadow-md hover:border-emerald-300">
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#E8F7F4] text-[#087F75] border border-emerald-200/80">
-                      <Users size={14} />
+                <div className="rounded-xl border border-emerald-100/90 bg-white/95 p-3 shadow-[0_4px_16px_rgba(8,127,117,0.05)] backdrop-blur-xs transition hover:shadow-md hover:border-emerald-300">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex h-7.5 w-7.5 shrink-0 items-center justify-center rounded-lg bg-[#E8F7F4] text-[#087F75] border border-emerald-200/80">
+                      <Users size={15} />
                     </div>
-                    <h4 className="text-[11px] font-bold text-[#102A35] leading-tight">
+                    <h4 className="text-xs font-bold text-[#102A35] leading-tight">
                       Patient Records Management
                     </h4>
                   </div>
-                  <p className="mt-1 text-[10px] text-[#647987] leading-snug">
+                  <p className="mt-1.5 text-[11px] text-[#647987] leading-snug">
                     Complete, secure and organized patient history.
                   </p>
                 </div>
 
                 {/* 4. Automated WhatsApp Reminders */}
-                <div className="rounded-xl border border-emerald-100/90 bg-white/95 p-2.5 shadow-[0_4px_16px_rgba(8,127,117,0.04)] backdrop-blur-xs transition hover:shadow-md hover:border-emerald-300">
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#E8F7F4] text-[#087F75] border border-emerald-200/80">
-                      <MessageCircle size={14} />
+                <div className="rounded-xl border border-emerald-100/90 bg-white/95 p-3 shadow-[0_4px_16px_rgba(8,127,117,0.05)] backdrop-blur-xs transition hover:shadow-md hover:border-emerald-300">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex h-7.5 w-7.5 shrink-0 items-center justify-center rounded-lg bg-[#E8F7F4] text-[#087F75] border border-emerald-200/80">
+                      <MessageCircle size={15} />
                     </div>
-                    <h4 className="text-[11px] font-bold text-[#102A35] leading-tight">
+                    <h4 className="text-xs font-bold text-[#102A35] leading-tight">
                       Automated WhatsApp Reminders
                     </h4>
                   </div>
-                  <p className="mt-1 text-[10px] text-[#647987] leading-snug">
+                  <p className="mt-1.5 text-[11px] text-[#647987] leading-snug">
                     Appointment, follow-up and medication alerts.
                   </p>
                 </div>
@@ -386,7 +370,7 @@ export default function LoginPage() {
 
               {/* Human-Made Circular Team Portrait with Zero Rectangular Crop Edges */}
               <div className="hidden xl:flex flex-col items-center justify-center relative shrink-0">
-                <div className="relative w-40 h-40 xl:w-44 xl:h-44 rounded-full p-1 bg-gradient-to-tr from-[#087F75] via-[#10B981] to-emerald-200 shadow-lg">
+                <div className="relative w-44 h-44 xl:w-50 xl:h-50 rounded-full p-1 bg-gradient-to-tr from-[#087F75] via-[#10B981] to-emerald-200 shadow-lg">
                   <div className="w-full h-full rounded-full overflow-hidden bg-gradient-to-b from-[#E8F7F4] to-[#CDEEE6] flex items-center justify-center">
                     <img
                       src={doctorsHero}
@@ -398,32 +382,7 @@ export default function LoginPage() {
                 {/* Floating Human Touch Pill Badge */}
                 <div className="absolute -bottom-2 bg-white rounded-full px-3 py-0.5 shadow-md border border-emerald-100 flex items-center gap-1.5">
                   <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-[10px] font-bold text-[#064E49]">Clinic Online</span>
-                </div>
-              </div>
-            </div>
-
-            {/* "Built for All Specialities" Row - Single Clean Line */}
-            <div className="mt-4 hidden sm:flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 shrink-0">
-                Specialties:
-              </span>
-              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-                {SPECIALTIES.map((spec) => {
-                  const Icon = spec.icon;
-                  return (
-                    <div
-                      key={spec.name}
-                      className="flex items-center gap-1 rounded-md border border-slate-200/80 bg-white/90 px-2 py-0.5 text-[10px] font-semibold text-[#102A35] shadow-2xs hover:border-emerald-300 transition"
-                    >
-                      <Icon size={11} className="text-[#087F75]" />
-                      <span>{spec.name}</span>
-                    </div>
-                  );
-                })}
-                <div className="flex items-center gap-0.5 rounded-md border border-dashed border-emerald-300 bg-[#E8F7F4]/60 px-2 py-0.5 text-[10px] font-bold text-[#064E49]">
-                  <Plus size={10} />
-                  <span>More</span>
+                  <span className="text-[11px] font-bold text-[#064E49]">Clinic Online</span>
                 </div>
               </div>
             </div>
@@ -433,34 +392,34 @@ export default function LoginPage() {
               RIGHT COLUMN: Elevated Pure White Authentication Card
               ───────────────────────────────────────────────────────── */}
           <div className="lg:col-span-5 xl:col-span-5 flex justify-center lg:justify-end">
-            <div className="w-full max-w-[420px] rounded-2xl bg-white p-5 sm:p-6 shadow-[0_20px_45px_-10px_rgba(6,78,73,0.14)] border border-emerald-100/90 relative">
+            <div className="w-full max-w-[440px] xl:max-w-[455px] rounded-2xl bg-white p-6 sm:p-7 shadow-[0_20px_45px_-10px_rgba(6,78,73,0.14)] border border-emerald-100/90 relative">
               {/* Clinic Pill Badge */}
-              <div className="inline-flex items-center gap-1.5 rounded-md border border-emerald-200 bg-[#E8F7F4] px-2.5 py-0.5 text-[11px] font-bold text-[#064E49]">
-                <Building2 size={12} className="text-[#087F75]" />
+              <div className="inline-flex items-center gap-1.5 rounded-md border border-emerald-200 bg-[#E8F7F4] px-2.5 py-1 text-xs font-bold text-[#064E49]">
+                <Building2 size={13} className="text-[#087F75]" />
                 <span>Gastro Cure Healthcare Platform</span>
               </div>
 
               {/* Title & Subtitle */}
-              <h2 className="mt-2 text-xl sm:text-2xl font-extrabold tracking-tight text-[#102A35] leading-snug">
+              <h2 className="mt-2.5 text-2xl sm:text-[26px] font-extrabold tracking-tight text-[#102A35] leading-snug">
                 Sign In to Your Workspace <span className="sr-only">Sign in to Nivara</span>
               </h2>
-              <p className="mt-0.5 text-xs text-[#647987] leading-normal font-medium">
+              <p className="mt-1 text-xs sm:text-sm text-[#647987] leading-normal font-medium">
                 Enter your work email and password to access your clinic workspace.
               </p>
 
               {/* Authentication Form */}
-              <form onSubmit={handleLogin} className="mt-3.5 space-y-3">
+              <form onSubmit={handleLogin} className="mt-4 space-y-3.5">
                 {/* Work Email Field */}
                 <div>
                   <label
                     htmlFor="auth-email"
-                    className="block text-[10px] font-bold uppercase tracking-wider text-[#102A35]"
+                    className="block text-[11px] font-bold uppercase tracking-wider text-[#102A35]"
                   >
                     Work Email
                   </label>
                   <div className="relative mt-1">
-                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-[#647987]">
-                      <Mail size={15} />
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-[#647987]">
+                      <Mail size={16} />
                     </span>
                     <input
                       id="auth-email"
@@ -469,7 +428,7 @@ export default function LoginPage() {
                       value={email}
                       onChange={(e) => handleEmailChange(e.target.value)}
                       placeholder="doctor@clinic.com or dr.sharma@nivara.health"
-                      className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-xs sm:text-sm font-semibold text-[#102A35] placeholder-slate-400 focus:border-[#087F75] focus:outline-none focus:ring-2 focus:ring-[#087F75]/15 shadow-2xs transition"
+                      className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-10 pr-3.5 text-xs sm:text-sm font-semibold text-[#102A35] placeholder-slate-400 focus:border-[#087F75] focus:outline-none focus:ring-2 focus:ring-[#087F75]/15 shadow-2xs transition"
                     />
                   </div>
                 </div>
@@ -479,21 +438,21 @@ export default function LoginPage() {
                   <div className="flex items-center justify-between">
                     <label
                       htmlFor="auth-password"
-                      className="block text-[10px] font-bold uppercase tracking-wider text-[#102A35]"
+                      className="block text-[11px] font-bold uppercase tracking-wider text-[#102A35]"
                     >
                       Password
                     </label>
                     <button
                       type="button"
                       onClick={() => setShowForgotModal(true)}
-                      className="text-[11px] font-bold text-[#087F75] hover:text-[#064E49] hover:underline cursor-pointer"
+                      className="text-xs font-bold text-[#087F75] hover:text-[#064E49] hover:underline cursor-pointer"
                     >
                       Forgot password?
                     </button>
                   </div>
                   <div className="relative mt-1">
-                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-[#647987]">
-                      <Lock size={15} />
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-[#647987]">
+                      <Lock size={16} />
                     </span>
                     <input
                       id="auth-password"
@@ -502,27 +461,27 @@ export default function LoginPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-9 text-xs sm:text-sm font-semibold text-[#102A35] placeholder-slate-400 focus:border-[#087F75] focus:outline-none focus:ring-2 focus:ring-[#087F75]/15 shadow-2xs transition"
+                      className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-10 pr-10 text-xs sm:text-sm font-semibold text-[#102A35] placeholder-slate-400 focus:border-[#087F75] focus:outline-none focus:ring-2 focus:ring-[#087F75]/15 shadow-2xs transition"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-[#647987] hover:text-[#102A35] transition cursor-pointer"
+                      className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-[#647987] hover:text-[#102A35] transition cursor-pointer"
                       aria-label={showPassword ? 'Hide password' : 'Show password'}
                     >
-                      {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
                 </div>
 
                 {/* Remember Me Checkbox */}
-                <div className="flex items-center text-[11px] text-[#647987]">
-                  <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                <div className="flex items-center text-xs text-[#647987]">
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
                     <input
                       type="checkbox"
                       checked={rememberMe}
                       onChange={(e) => setRememberMe(e.target.checked)}
-                      className="h-3.5 w-3.5 rounded border-slate-300 text-[#087F75] focus:ring-[#087F75]"
+                      className="h-4 w-4 rounded border-slate-300 text-[#087F75] focus:ring-[#087F75]"
                     />
                     <span className="font-semibold">Remember my session on this computer</span>
                   </label>
@@ -530,7 +489,7 @@ export default function LoginPage() {
 
                 {/* Error Banner */}
                 {error && (
-                  <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-[11px] text-rose-700 font-semibold animate-in fade-in">
+                  <div className="rounded-lg border border-rose-200 bg-rose-50 px-3.5 py-2 text-xs text-rose-700 font-semibold animate-in fade-in">
                     {error}
                   </div>
                 )}
@@ -540,21 +499,21 @@ export default function LoginPage() {
                   type="submit"
                   disabled={loading}
                   aria-label={`Enter ${resolvedTarget.title}`}
-                  className="w-full flex items-center justify-center gap-1.5 rounded-lg bg-[#064E49] hover:bg-[#087F75] px-4 py-2.5 text-xs sm:text-sm font-bold text-white shadow-sm transition disabled:opacity-60 cursor-pointer active:scale-[0.99] mt-1"
+                  className="w-full flex items-center justify-center gap-2 rounded-lg bg-[#064E49] hover:bg-[#087F75] px-4 py-3 text-xs sm:text-sm font-bold text-white shadow-md transition disabled:opacity-60 cursor-pointer active:scale-[0.99] mt-1"
                 >
                   {loading ? (
                     <span>Signing in...</span>
                   ) : (
                     <>
                       <span>Sign In</span>
-                      <ArrowRight size={15} />
+                      <ArrowRight size={16} />
                     </>
                   )}
                 </button>
               </form>
 
               {/* Divider: OR QUICK LOGIN */}
-              <div className="relative my-3 flex items-center justify-center">
+              <div className="relative my-3.5 flex items-center justify-center">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-slate-200" />
                 </div>
@@ -573,7 +532,7 @@ export default function LoginPage() {
                       key={preset.role}
                       type="button"
                       onClick={() => handleQuickPresetSelect(preset)}
-                      className={`flex items-center justify-center gap-1 rounded-lg px-2 py-2 text-[11px] font-semibold transition cursor-pointer ${
+                      className={`flex items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-xs font-semibold transition cursor-pointer ${
                         isSelected
                           ? 'border-2 border-[#10B981] bg-[#E8F7F4] text-[#064E49] font-bold shadow-2xs'
                           : 'border border-slate-200 bg-white text-[#647987] hover:bg-slate-50 hover:border-slate-300'
@@ -581,7 +540,7 @@ export default function LoginPage() {
                       title={`Click to load ${preset.title} (${preset.destination})`}
                     >
                       <Icon
-                        size={13}
+                        size={14}
                         className={isSelected ? 'text-[#087F75]' : 'text-[#647987]'}
                       />
                       <span>{preset.shortTitle}</span>
@@ -599,21 +558,21 @@ export default function LoginPage() {
               </div>
 
               {/* Secure & Compliant Card Bottom Banner */}
-              <div className="mt-3.5 rounded-xl bg-[#F0FAF7] border border-emerald-100/90 p-2.5 flex items-center justify-between gap-2.5">
-                <div className="flex items-center gap-2">
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-100/80 text-[#087F75]">
-                    <ShieldCheck size={15} />
+              <div className="mt-4 rounded-xl bg-[#F0FAF7] border border-emerald-100/90 p-3 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-100/80 text-[#087F75]">
+                    <ShieldCheck size={16} />
                   </div>
                   <div>
-                    <h5 className="text-[11px] font-bold text-[#064E49] leading-tight">
+                    <h5 className="text-xs font-bold text-[#064E49] leading-tight">
                       Secure &amp; Compliant
                     </h5>
-                    <p className="text-[10px] text-[#647987] leading-tight">
+                    <p className="text-[11px] text-[#647987] leading-tight">
                       Role-based access, clinic data isolation and end-to-end encryption.
                     </p>
                   </div>
                 </div>
-                <Lock size={14} className="text-[#087F75] shrink-0" />
+                <Lock size={15} className="text-[#087F75] shrink-0" />
                 <span className="sr-only">
                   Protected by Nivara Outpatient Tenant Boundary • Role-Based Access Control
                 </span>
