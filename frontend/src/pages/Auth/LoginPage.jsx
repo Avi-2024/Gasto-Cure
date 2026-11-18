@@ -298,20 +298,22 @@ export default function LoginPage() {
             <div className="mt-6 flex items-center gap-6 xl:gap-8">
               {/* Clean, authentic human clinical highlights (No clunky AI boxes) */}
               <div className="space-y-4 flex-1 max-w-[380px]">
+                {/* 1. Digital Prescription & GI Protocols */}
                 <div className="flex items-start gap-3">
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#E8F7F4] text-[#087F75] border border-emerald-200/80">
-                    <Printer size={16} />
+                    <Stethoscope size={16} />
                   </div>
                   <div>
                     <h4 className="text-sm font-bold text-[#102A35] leading-tight">
-                      Calibrated Prescription Studio
+                      Digital Prescription &amp; GI Protocols
                     </h4>
                     <p className="text-xs text-[#647987] mt-0.5 leading-relaxed">
-                      Dual-mode printing for custom letterheads &amp; digital headers with instant formulary.
+                      Instant drug formulary autocomplete, pre-built GI treatment protocols, and dual-mode letterhead printing.
                     </p>
                   </div>
                 </div>
 
+                {/* 2. Automated WhatsApp Reminders */}
                 <div className="flex items-start gap-3">
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#E8F7F4] text-[#087F75] border border-emerald-200/80">
                     <MessageCircle size={16} />
@@ -321,21 +323,22 @@ export default function LoginPage() {
                       Automated WhatsApp Reminders
                     </h4>
                     <p className="text-xs text-[#647987] mt-0.5 leading-relaxed">
-                      Reduce clinic no-shows with proactive visit and follow-up alerts.
+                      Reduce clinic no-shows with proactive appointment alerts, medicine reminders, and instant Rx delivery.
                     </p>
                   </div>
                 </div>
 
+                {/* 3. Lifetime Patient Records & OPD Queue */}
                 <div className="flex items-start gap-3">
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#E8F7F4] text-[#087F75] border border-emerald-200/80">
-                    <ShieldCheck size={16} />
+                    <Users size={16} />
                   </div>
                   <div>
                     <h4 className="text-sm font-bold text-[#102A35] leading-tight">
-                      Secure Clinic Data &amp; Role Access
+                      Lifetime Patient Records &amp; OPD Queue
                     </h4>
                     <p className="text-xs text-[#647987] mt-0.5 leading-relaxed">
-                      Dedicated workspaces for Doctors, Administrators, and Front Desk staff.
+                      Live outpatient token queue, comprehensive visit history, diagnostic reports, and allergy safety alerts.
                     </p>
                   </div>
                 </div>
