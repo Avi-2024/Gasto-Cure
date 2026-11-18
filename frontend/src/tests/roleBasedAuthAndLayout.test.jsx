@@ -35,7 +35,7 @@ describe('Phase 2: Role-Based Auth, Viewport Layout & Operational Views', () => 
         </MemoryRouter>
       );
 
-      expect(screen.getByText('Nivara')).toBeDefined();
+      expect(screen.getAllByText('Nivara').length).toBeGreaterThanOrEqual(1);
       expect(screen.getByText(/Secure Clinic Gateway/i)).toBeDefined();
       expect(screen.getByText(/Sign in to Nivara/i)).toBeDefined();
 
