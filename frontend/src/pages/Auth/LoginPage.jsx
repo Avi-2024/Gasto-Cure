@@ -282,33 +282,33 @@ export default function LoginPage() {
           <div className="hidden lg:flex lg:col-span-7 xl:col-span-7 flex-col justify-center text-left">
             {/* Main Headline */}
             <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-[44px] font-extrabold tracking-tight text-[#102A35] leading-tight sm:leading-[1.18]">
-              Specialized Care for <br className="hidden sm:inline" />
+              One Platform. <br className="hidden sm:inline" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#087F75] via-[#064E49] to-[#10B981]">
-                Digestive &amp; Liver Health.
+                Every Practice.
               </span>
               <span className="sr-only">One Platform. Every Practice.</span>
             </h1>
 
             {/* Description */}
             <p className="mt-2 sm:mt-2.5 text-xs sm:text-sm text-[#647987] leading-relaxed max-w-lg mx-auto lg:mx-0 font-medium">
-              Seamless clinical consultation, calibrated letterhead digital prescriptions, and automated WhatsApp appointment follow-ups.
+              Manage your clinic, patients, appointments, prescriptions, and daily outpatient operations from one secure workspace.
             </p>
 
             {/* Human Clinical Highlights + 3D Digestive System Illustration */}
             <div className="mt-5 sm:mt-6 flex flex-col sm:flex-row items-center sm:items-start lg:items-center gap-6 xl:gap-8">
               {/* Clean, authentic human clinical highlights */}
               <div className="space-y-3.5 sm:space-y-4 flex-1 max-w-[380px] text-left">
-                {/* 1. Digital Prescription & GI Protocols */}
+                {/* 1. Digital Prescription & Clinical Protocols */}
                 <div className="flex items-start gap-3">
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#E8F7F4] text-[#087F75] border border-emerald-200/80">
                     <Stethoscope size={16} />
                   </div>
                   <div>
                     <h4 className="text-xs sm:text-sm font-bold text-[#102A35] leading-tight">
-                      Digital Prescription &amp; GI Protocols
+                      Digital Prescription &amp; Clinical Protocols
                     </h4>
                     <p className="text-[11px] sm:text-xs text-[#647987] mt-0.5 leading-relaxed">
-                      Instant drug formulary autocomplete, pre-built GI treatment protocols, and dual-mode letterhead printing.
+                      Instant drug formulary autocomplete, pre-built treatment protocols, and dual-mode letterhead printing.
                     </p>
                   </div>
                 </div>
