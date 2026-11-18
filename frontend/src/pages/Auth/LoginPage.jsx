@@ -243,20 +243,20 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="h-screen max-h-screen w-screen flex flex-col justify-between bg-gradient-to-br from-[#FFFFFF] via-[#F4FAF8] to-[#E2F5F0] text-[#102A35] relative overflow-hidden select-none selection:bg-[#087F75]/20 selection:text-[#064E49] font-sans">
+    <div className="min-h-screen lg:h-screen lg:max-h-screen w-full flex flex-col justify-between bg-gradient-to-br from-[#FFFFFF] via-[#F4FAF8] to-[#E2F5F0] text-[#102A35] relative overflow-x-hidden overflow-y-auto lg:overflow-hidden select-none selection:bg-[#087F75]/20 selection:text-[#064E49] font-sans">
       {/* ─────────────────────────────────────────────────────────────
           DECORATIVE MEDICAL AMBIANCE & AIRY LIGHT GLOWS
           ───────────────────────────────────────────────────────────── */}
-      <div className="absolute -top-32 -left-32 w-[420px] h-[420px] rounded-full bg-emerald-100/50 blur-3xl pointer-events-none" />
-      <div className="absolute top-1/4 left-1/2 w-[520px] h-[380px] rounded-full bg-teal-100/30 blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-24 right-1/4 w-[450px] h-[450px] rounded-full bg-emerald-200/20 blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-12 -right-12 w-[600px] h-[380px] bg-gradient-to-tl from-[#087F75]/10 to-transparent rounded-full blur-2xl pointer-events-none" />
+      <div className="absolute -top-32 -left-32 w-72 sm:w-[420px] h-72 sm:h-[420px] rounded-full bg-emerald-100/50 blur-3xl pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 w-80 sm:w-[520px] h-72 sm:h-[380px] rounded-full bg-teal-100/30 blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-24 right-1/4 w-80 sm:w-[450px] h-80 sm:h-[450px] rounded-full bg-emerald-200/20 blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-12 -right-12 w-96 sm:w-[600px] h-80 sm:h-[380px] bg-gradient-to-tl from-[#087F75]/10 to-transparent rounded-full blur-2xl pointer-events-none" />
 
       {/* ─────────────────────────────────────────────────────────────
-          TOP NAVIGATION BAR (Clean, Spacious, Zero Overlap)
+          TOP NAVIGATION BAR (Clean, Spacious, Fully Responsive)
           ───────────────────────────────────────────────────────────── */}
-      <header className="relative z-20 w-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 pt-4 pb-2 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-3">
+      <header className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 pt-3 sm:pt-4 pb-2 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-2.5 sm:gap-3">
           <NivaraLogo theme="light" size="sm" />
           <div className="hidden sm:block h-4 w-px bg-slate-200" />
           <div className="hidden md:inline-flex items-center gap-2 rounded-full border border-emerald-200/90 bg-white/90 px-3.5 py-1 text-[11px] font-semibold text-[#064E49] shadow-2xs backdrop-blur-xs">
@@ -265,23 +265,23 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200/90 bg-white px-3.5 py-1 text-[11px] font-semibold text-[#064E49] shadow-xs backdrop-blur-xs">
-          <ShieldCheck size={14} className="text-[#087F75]" />
+        <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200/90 bg-white px-2.5 sm:px-3.5 py-1 text-[10px] sm:text-[11px] font-semibold text-[#064E49] shadow-xs backdrop-blur-xs shrink-0">
+          <ShieldCheck size={13} className="text-[#087F75]" />
           <span>Secure Clinic Gateway</span>
         </div>
       </header>
 
       {/* ─────────────────────────────────────────────────────────────
-          MAIN CONTENT AREA (Symmetrical 2-Column Grid: Hero + Form)
+          MAIN CONTENT AREA (Responsive 2-Column Grid / Stack)
           ───────────────────────────────────────────────────────────── */}
-      <main className="relative z-10 flex-1 max-w-7xl mx-auto w-full px-6 sm:px-10 lg:px-12 py-2 flex items-center min-h-0">
+      <main className="relative z-10 flex-1 max-w-7xl mx-auto w-full px-4 sm:px-8 lg:px-12 py-4 sm:py-6 lg:py-2 flex items-center min-h-0">
         <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 xl:gap-12 items-center">
           {/* ─────────────────────────────────────────────────────────
               LEFT COLUMN: Clinical Brand Hero & Human-Touched Visuals
               ───────────────────────────────────────────────────────── */}
-          <div className="lg:col-span-7 xl:col-span-7 flex flex-col justify-center">
+          <div className="lg:col-span-7 xl:col-span-7 flex flex-col justify-center text-center lg:text-left">
             {/* Main Headline */}
-            <h1 className="text-3xl sm:text-4xl xl:text-[44px] font-extrabold tracking-tight text-[#102A35] leading-[1.18]">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-[44px] font-extrabold tracking-tight text-[#102A35] leading-tight sm:leading-[1.18]">
               Specialized Care for <br className="hidden sm:inline" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#087F75] via-[#064E49] to-[#10B981]">
                 Digestive &amp; Liver Health.
@@ -290,24 +290,24 @@ export default function LoginPage() {
             </h1>
 
             {/* Description */}
-            <p className="mt-2.5 text-xs sm:text-sm text-[#647987] leading-relaxed max-w-lg font-medium">
+            <p className="mt-2 sm:mt-2.5 text-xs sm:text-sm text-[#647987] leading-relaxed max-w-lg mx-auto lg:mx-0 font-medium">
               Seamless clinical consultation, calibrated letterhead digital prescriptions, and automated WhatsApp appointment follow-ups.
             </p>
 
             {/* Human Clinical Highlights + 3D Digestive System Illustration */}
-            <div className="mt-6 flex items-center gap-6 xl:gap-8">
-              {/* Clean, authentic human clinical highlights (No clunky AI boxes) */}
-              <div className="space-y-4 flex-1 max-w-[380px]">
+            <div className="mt-5 sm:mt-6 flex flex-col sm:flex-row items-center sm:items-start lg:items-center gap-6 xl:gap-8">
+              {/* Clean, authentic human clinical highlights */}
+              <div className="space-y-3.5 sm:space-y-4 flex-1 max-w-[380px] text-left">
                 {/* 1. Digital Prescription & GI Protocols */}
                 <div className="flex items-start gap-3">
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#E8F7F4] text-[#087F75] border border-emerald-200/80">
                     <Stethoscope size={16} />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-[#102A35] leading-tight">
+                    <h4 className="text-xs sm:text-sm font-bold text-[#102A35] leading-tight">
                       Digital Prescription &amp; GI Protocols
                     </h4>
-                    <p className="text-xs text-[#647987] mt-0.5 leading-relaxed">
+                    <p className="text-[11px] sm:text-xs text-[#647987] mt-0.5 leading-relaxed">
                       Instant drug formulary autocomplete, pre-built GI treatment protocols, and dual-mode letterhead printing.
                     </p>
                   </div>
@@ -319,10 +319,10 @@ export default function LoginPage() {
                     <MessageCircle size={16} />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-[#102A35] leading-tight">
+                    <h4 className="text-xs sm:text-sm font-bold text-[#102A35] leading-tight">
                       Automated WhatsApp Reminders
                     </h4>
-                    <p className="text-xs text-[#647987] mt-0.5 leading-relaxed">
+                    <p className="text-[11px] sm:text-xs text-[#647987] mt-0.5 leading-relaxed">
                       Reduce clinic no-shows with proactive appointment alerts, medicine reminders, and instant Rx delivery.
                     </p>
                   </div>
@@ -334,10 +334,10 @@ export default function LoginPage() {
                     <Users size={16} />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-[#102A35] leading-tight">
+                    <h4 className="text-xs sm:text-sm font-bold text-[#102A35] leading-tight">
                       Lifetime Patient Records &amp; OPD Queue
                     </h4>
-                    <p className="text-xs text-[#647987] mt-0.5 leading-relaxed">
+                    <p className="text-[11px] sm:text-xs text-[#647987] mt-0.5 leading-relaxed">
                       Live outpatient token queue, comprehensive visit history, diagnostic reports, and allergy safety alerts.
                     </p>
                   </div>
@@ -361,17 +361,17 @@ export default function LoginPage() {
           {/* ─────────────────────────────────────────────────────────
               RIGHT COLUMN: Elevated Pure White Authentication Card
               ───────────────────────────────────────────────────────── */}
-          <div className="lg:col-span-5 xl:col-span-5 flex justify-center lg:justify-end">
-            <div className="w-full max-w-[420px] xl:max-w-[440px] rounded-2xl bg-white p-6 sm:p-7 shadow-[0_20px_45px_-10px_rgba(6,78,73,0.14)] border border-emerald-100/90 relative">
-              {/* Title & Subtitle (Clean Human Header, No redundant top pill badge) */}
-              <h2 className="text-2xl sm:text-[26px] font-extrabold tracking-tight text-[#102A35] leading-snug">
+          <div className="lg:col-span-5 xl:col-span-5 flex justify-center lg:justify-end w-full">
+            <div className="w-full max-w-[420px] xl:max-w-[440px] rounded-2xl bg-white p-5 sm:p-6 lg:p-7 shadow-[0_20px_45px_-10px_rgba(6,78,73,0.14)] border border-emerald-100/90 relative">
+              {/* Title & Subtitle (Clean Human Header) */}
+              <h2 className="text-xl sm:text-2xl lg:text-[26px] font-extrabold tracking-tight text-[#102A35] leading-snug">
                 Sign In to Gastro Cure <span className="sr-only">Sign in to Nivara</span>
               </h2>
               <p className="mt-1 text-xs sm:text-sm text-[#647987] leading-normal font-medium">
                 Enter your work email and password to access your authorized clinic workspace.
               </p>
 
-              {/* Direct Authentication Form (No Manual Role Selection Needed!) */}
+              {/* Direct Authentication Form */}
               <form onSubmit={handleLogin} className="mt-4 space-y-3.5">
                 {/* Work Email Field */}
                 <div>
@@ -490,7 +490,7 @@ export default function LoginPage() {
               </div>
 
               {/* 3 Quick Fill Chips: Doctor / Clinic / Reception */}
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
                 {ROLE_PRESETS.map((preset) => {
                   const Icon = preset.icon;
                   const isSelected = selectedRole === preset.role;
@@ -499,7 +499,7 @@ export default function LoginPage() {
                       key={preset.role}
                       type="button"
                       onClick={() => handleQuickPresetSelect(preset)}
-                      className={`flex items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-semibold transition cursor-pointer ${
+                      className={`flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg px-1.5 sm:px-2 py-1.5 text-[11px] sm:text-xs font-semibold transition cursor-pointer ${
                         isSelected
                           ? 'border border-[#087F75] bg-[#E8F7F4] text-[#064E49] font-bold shadow-2xs'
                           : 'border border-slate-200 bg-white text-[#647987] hover:bg-slate-50'
@@ -527,7 +527,7 @@ export default function LoginPage() {
               {/* Clean Human Security Note */}
               <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-center gap-1.5 text-xs text-[#647987]">
                 <Lock size={13} className="text-[#087F75]" />
-                <span>Encrypted 256-bit clinic session • Role-based access</span>
+                <span className="text-[11px] sm:text-xs">Encrypted 256-bit clinic session • Role-based access</span>
                 <span className="sr-only">
                   Protected by Nivara Outpatient Tenant Boundary • Role-Based Access Control
                 </span>
@@ -538,11 +538,11 @@ export default function LoginPage() {
       </main>
 
       {/* ─────────────────────────────────────────────────────────────
-          GLOBAL TRUST FOOTER (Deep Teal Gradient Bar Across Bottom)
+          GLOBAL TRUST FOOTER (Deep Teal Bar Across Bottom, Responsive)
           ───────────────────────────────────────────────────────────── */}
-      <footer className="relative z-10 w-full border-t border-emerald-900/30 bg-gradient-to-r from-[#064E49] via-[#087F75] to-[#043d39] px-6 sm:px-10 lg:px-12 py-2 text-[11px] text-white/90 flex flex-col md:flex-row items-center justify-between gap-2 shrink-0 shadow-lg">
+      <footer className="relative z-10 w-full border-t border-emerald-900/30 bg-gradient-to-r from-[#064E49] via-[#087F75] to-[#043d39] px-4 sm:px-8 lg:px-12 py-3 lg:py-2 text-[11px] text-white/90 flex flex-col md:flex-row items-center justify-between gap-2 shrink-0 shadow-lg mt-auto">
         {/* Left Trust Badges */}
-        <div className="flex flex-wrap items-center justify-center gap-4 text-[10px] sm:text-[11px] font-medium text-emerald-100">
+        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-[10px] sm:text-[11px] font-medium text-emerald-100">
           <span className="flex items-center gap-1">
             <ShieldCheck size={12} className="text-emerald-300" /> Secure &amp; Encrypted
           </span>
