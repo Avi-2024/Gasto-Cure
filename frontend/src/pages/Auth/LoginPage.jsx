@@ -365,7 +365,7 @@ export default function LoginPage() {
             <div className="w-full max-w-[380px] sm:max-w-[420px] xl:max-w-[440px] rounded-2xl bg-white p-4 sm:p-6 lg:p-7 shadow-[0_16px_40px_-10px_rgba(6,78,73,0.12)] border border-emerald-100/90 relative">
               {/* Title & Subtitle (Clean Human Header) */}
               <h2 className="text-xl sm:text-2xl lg:text-[26px] font-extrabold tracking-tight text-[#102A35] leading-snug">
-                Sign In to Gastro Cure <span className="sr-only">Sign in to Nivara</span>
+                Sign In to ClinixPulse <span className="sr-only">Sign in to Nivara</span>
               </h2>
               <p className="mt-0.5 sm:mt-1 text-[11px] sm:text-sm text-[#647987] leading-normal font-medium">
                 Enter your work email and password to access your authorized clinic workspace.
@@ -561,7 +561,7 @@ export default function LoginPage() {
 
         {/* Right Compliance Notice */}
         <div className="flex items-center gap-2.5 text-[9.5px] sm:text-[11px] text-emerald-200">
-          <span>&copy; {new Date().getFullYear()} Gastro Cure Outpatient Operations</span>
+          <span>&copy; {new Date().getFullYear()} ClinixPulse Outpatient Operations</span>
         </div>
       </footer>
 

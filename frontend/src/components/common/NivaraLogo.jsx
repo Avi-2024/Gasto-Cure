@@ -16,8 +16,8 @@ export default function NivaraLogo({
   theme = 'light',
   size = 'md',
   showSubtitle = true,
-  brandName = 'Gastro Cure',
-  subtitle = 'Digestive & Liver Centre',
+  brandName = 'ClinixPulse',
+  subtitle = 'Outpatient Operations Platform',
   imageSrc,
   className = '',
   ...props
