@@ -131,16 +131,16 @@ export default function NivaraLogo({
 
       {/* Brand Wordmark and Subtitle */}
       {!isCompact && (
-        <div className="flex flex-col justify-center leading-none">
-          <div className="flex items-center gap-1.5">
-            <span className={`font-heading font-extrabold tracking-tight ${size === 'sm' ? 'text-lg' : size === 'lg' ? 'text-2xl' : 'text-xl'} ${titleColor}`}>
+        <div className="flex flex-col justify-center leading-none shrink-0 whitespace-nowrap">
+          <div className="flex items-center gap-1.5 whitespace-nowrap">
+            <span className={`font-heading font-extrabold tracking-tight whitespace-nowrap ${size === 'sm' ? 'text-base sm:text-lg' : size === 'lg' ? 'text-2xl' : 'text-xl'} ${titleColor}`}>
               {brandName}
             </span>
             <span className={`sr-only ${titleColor}`}>Nivara</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-[#76C015]" aria-hidden="true" />
+            <span className="h-1.5 w-1.5 rounded-full bg-[#76C015] shrink-0" aria-hidden="true" />
           </div>
           {showSubtitle && (
-            <span className={`mt-1 font-heading text-[10px] font-semibold uppercase tracking-[0.16em] ${subtitleColor}`}>
+            <span className={`mt-0.5 sm:mt-1 font-heading text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.12em] sm:tracking-[0.16em] whitespace-nowrap ${subtitleColor}`}>
               {subtitle}
               <span className={`sr-only ${subtitleColor}`}>Outpatient Platform</span>
             </span>
