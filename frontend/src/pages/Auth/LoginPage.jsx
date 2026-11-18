@@ -274,12 +274,12 @@ export default function LoginPage() {
       {/* ─────────────────────────────────────────────────────────────
           MAIN CONTENT AREA (Responsive 2-Column Grid / Stack)
           ───────────────────────────────────────────────────────────── */}
-      <main className="relative z-10 flex-1 max-w-7xl mx-auto w-full px-4 sm:px-8 lg:px-12 py-4 sm:py-6 lg:py-2 flex items-center min-h-0">
+      <main className="relative z-10 flex-1 max-w-7xl mx-auto w-full px-4 sm:px-8 lg:px-12 py-4 sm:py-6 lg:py-2 flex items-center justify-center min-h-0">
         <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 xl:gap-12 items-center">
           {/* ─────────────────────────────────────────────────────────
-              LEFT COLUMN: Clinical Brand Hero & Human-Touched Visuals
+              LEFT COLUMN: Clinical Brand Hero & Human-Touched Visuals (Hidden on small screens)
               ───────────────────────────────────────────────────────── */}
-          <div className="lg:col-span-7 xl:col-span-7 flex flex-col justify-center text-center lg:text-left">
+          <div className="hidden lg:flex lg:col-span-7 xl:col-span-7 flex-col justify-center text-left">
             {/* Main Headline */}
             <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-[44px] font-extrabold tracking-tight text-[#102A35] leading-tight sm:leading-[1.18]">
               Specialized Care for <br className="hidden sm:inline" />
@@ -359,9 +359,9 @@ export default function LoginPage() {
           </div>
 
           {/* ─────────────────────────────────────────────────────────
-              RIGHT COLUMN: Elevated Pure White Authentication Card
+              RIGHT COLUMN: Elevated Pure White Authentication Card (Centered on small screens)
               ───────────────────────────────────────────────────────── */}
-          <div className="lg:col-span-5 xl:col-span-5 flex justify-center lg:justify-end w-full">
+          <div className="col-span-1 lg:col-span-5 xl:col-span-5 flex justify-center lg:justify-end w-full">
             <div className="w-full max-w-[420px] xl:max-w-[440px] rounded-2xl bg-white p-5 sm:p-6 lg:p-7 shadow-[0_20px_45px_-10px_rgba(6,78,73,0.14)] border border-emerald-100/90 relative">
               {/* Title & Subtitle (Clean Human Header) */}
               <h2 className="text-xl sm:text-2xl lg:text-[26px] font-extrabold tracking-tight text-[#102A35] leading-snug">
