@@ -8,6 +8,7 @@ import {
   Brain,
   Building2,
   CalendarDays,
+  CheckCircle2,
   Cloud,
   Eye,
   EyeOff,
@@ -78,7 +79,6 @@ export const SPECIALTIES = [
   { name: 'Orthopedics', icon: Bone },
   { name: 'Dermatology', icon: Sparkles },
   { name: 'Pediatrics', icon: Baby },
-  { name: 'And More', icon: Plus },
 ];
 
 /**
@@ -259,32 +259,30 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="h-screen max-h-screen w-screen flex flex-col justify-between bg-gradient-to-br from-[#FFFFFF] via-[#F4FBF9] to-[#E2F5F0] text-[#102A35] relative overflow-hidden select-none selection:bg-[#087F75]/20 selection:text-[#064E49]">
+    <div className="h-screen max-h-screen w-screen flex flex-col justify-between bg-gradient-to-br from-[#FFFFFF] via-[#F4FAF8] to-[#E2F5F0] text-[#102A35] relative overflow-hidden select-none selection:bg-[#087F75]/20 selection:text-[#064E49]">
       {/* ─────────────────────────────────────────────────────────────
           DECORATIVE MEDICAL AMBIANCE & AIRY LIGHT GLOWS
           ───────────────────────────────────────────────────────────── */}
-      <div className="absolute -top-32 -left-32 w-[420px] h-[420px] rounded-full bg-emerald-100/60 blur-3xl pointer-events-none" />
-      <div className="absolute top-1/3 left-1/2 w-[520px] h-[380px] rounded-full bg-teal-100/40 blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-24 right-1/4 w-[450px] h-[450px] rounded-full bg-emerald-200/30 blur-3xl pointer-events-none" />
-
-      {/* Decorative Wave Curvature in Bottom Right */}
-      <div className="absolute -bottom-12 -right-12 w-[600px] h-[380px] bg-gradient-to-tl from-[#087F75]/12 to-transparent rounded-full blur-2xl pointer-events-none" />
+      <div className="absolute -top-32 -left-32 w-[420px] h-[420px] rounded-full bg-emerald-100/50 blur-3xl pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 w-[520px] h-[380px] rounded-full bg-teal-100/30 blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-24 right-1/4 w-[450px] h-[450px] rounded-full bg-emerald-200/20 blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-12 -right-12 w-[600px] h-[380px] bg-gradient-to-tl from-[#087F75]/10 to-transparent rounded-full blur-2xl pointer-events-none" />
 
       {/* ─────────────────────────────────────────────────────────────
-          TOP NAVIGATION BAR (Clean, Airy Mint Header)
+          TOP NAVIGATION BAR (Clean, Spacious, Zero Overlap)
           ───────────────────────────────────────────────────────────── */}
-      <header className="relative z-10 w-full px-6 sm:px-10 lg:px-12 pt-3.5 pb-1 flex items-center justify-between shrink-0">
+      <header className="relative z-20 w-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 pt-4 pb-2 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
           <NivaraLogo theme="light" size="sm" />
-          <div className="hidden sm:block h-4 w-px bg-slate-300" />
-          <div className="hidden md:inline-flex items-center gap-2 rounded-full border border-emerald-200/90 bg-white/80 px-3.5 py-1 text-[11px] font-semibold text-[#064E49] shadow-2xs backdrop-blur-xs">
+          <div className="hidden sm:block h-4 w-px bg-slate-200" />
+          <div className="hidden md:inline-flex items-center gap-2 rounded-full border border-emerald-200/90 bg-white/90 px-3.5 py-1 text-[11px] font-semibold text-[#064E49] shadow-2xs backdrop-blur-xs">
             <Laptop size={13} className="text-[#087F75]" />
             <span>Clinic &bull; Patient &bull; Practice &bull; Operations</span>
             <span className="sr-only">Outpatient Operations Platform</span>
           </div>
         </div>
 
-        <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-white px-3 py-1 text-[11px] font-semibold text-[#064E49] shadow-xs backdrop-blur-xs">
+        <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200/90 bg-white px-3.5 py-1 text-[11px] font-semibold text-[#064E49] shadow-xs backdrop-blur-xs">
           <ShieldCheck size={14} className="text-[#087F75]" />
           <span>Secure Healthcare Gateway</span>
           <span className="sr-only">Secure Clinic Gateway</span>
@@ -292,23 +290,23 @@ export default function LoginPage() {
       </header>
 
       {/* ─────────────────────────────────────────────────────────────
-          MAIN CONTENT AREA (100vh Zero-Scroll Responsive Two-Column Layout)
+          MAIN CONTENT AREA (Human-Crafted, Symmetrical 2-Column Grid)
           ───────────────────────────────────────────────────────────── */}
-      <main className="relative z-10 flex-1 max-w-7xl mx-auto w-full px-6 sm:px-10 lg:px-12 py-1.5 flex items-center min-h-0">
-        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 xl:gap-10 items-center">
+      <main className="relative z-10 flex-1 max-w-7xl mx-auto w-full px-6 sm:px-10 lg:px-12 py-2 flex items-center min-h-0">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 items-center">
           {/* ─────────────────────────────────────────────────────────
-              LEFT COLUMN: One Platform Every Practice & Doctors Hero
+              LEFT COLUMN: Clinical Brand Hero, 2x2 Cards & Framed Team
               ───────────────────────────────────────────────────────── */}
           <div className="lg:col-span-7 xl:col-span-7 flex flex-col justify-center">
             {/* Tag Badge */}
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/80 bg-[#E3F6F2] px-3 py-0.5 text-[11px] font-bold text-[#064E49] w-fit shadow-2xs">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/80 bg-[#E0F5F0] px-3 py-1 text-[11px] font-bold text-[#064E49] w-fit shadow-2xs">
               <Zap size={12} className="text-[#087F75] fill-[#087F75]" />
               <span>All-in-One Clinic Management Platform</span>
               <span className="sr-only">Smart Outpatient Workflow Engine</span>
             </div>
 
             {/* Main Headline */}
-            <h1 className="mt-2 text-2xl sm:text-3xl xl:text-4xl font-extrabold tracking-tight text-[#102A35] leading-tight">
+            <h1 className="mt-2.5 text-2xl sm:text-3xl xl:text-4xl font-extrabold tracking-tight text-[#102A35] leading-tight">
               One Platform. <br className="hidden sm:inline" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#087F75] via-[#064E49] to-[#10B981]">
                 Every Practice.
@@ -317,16 +315,16 @@ export default function LoginPage() {
             </h1>
 
             {/* Description */}
-            <p className="mt-1 text-xs sm:text-sm text-[#647987] leading-relaxed max-w-lg font-medium">
+            <p className="mt-1.5 text-xs sm:text-sm text-[#647987] leading-relaxed max-w-lg font-medium">
               Manage your clinic, patients, appointments, prescriptions and daily operations from one secure workspace.
             </p>
 
-            {/* Showcase Row: 2x2 Feature Cards + 3D Doctors Team */}
-            <div className="mt-3.5 flex items-center gap-4">
+            {/* Human-Made Composition: 2x2 Feature Cards + Circular Framed Medical Team */}
+            <div className="mt-4 flex items-center gap-5">
               {/* 4 Feature Cards arranged in a clean 2x2 Grid */}
-              <div className="grid grid-cols-2 gap-2 flex-1 max-w-[410px]">
+              <div className="grid grid-cols-2 gap-2.5 flex-1 max-w-[400px]">
                 {/* 1. Smart Appointment Management */}
-                <div className="rounded-xl border border-emerald-200/70 bg-white/95 p-2.5 shadow-[0_4px_12px_rgba(8,127,117,0.05)] backdrop-blur-xs transition hover:shadow-md hover:border-emerald-300">
+                <div className="rounded-xl border border-emerald-100/90 bg-white/95 p-2.5 shadow-[0_4px_16px_rgba(8,127,117,0.04)] backdrop-blur-xs transition hover:shadow-md hover:border-emerald-300">
                   <div className="flex items-center gap-2">
                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#E8F7F4] text-[#087F75] border border-emerald-200/80">
                       <CalendarDays size={14} />
@@ -336,12 +334,12 @@ export default function LoginPage() {
                     </h4>
                   </div>
                   <p className="mt-1 text-[10px] text-[#647987] leading-snug">
-                    Schedule, manage and reduce no-shows.
+                    Schedule, triage and reduce clinic no-shows.
                   </p>
                 </div>
 
                 {/* 2. Digital Prescription Studio */}
-                <div className="rounded-xl border border-emerald-200/70 bg-white/95 p-2.5 shadow-[0_4px_12px_rgba(8,127,117,0.05)] backdrop-blur-xs transition hover:shadow-md hover:border-emerald-300">
+                <div className="rounded-xl border border-emerald-100/90 bg-white/95 p-2.5 shadow-[0_4px_16px_rgba(8,127,117,0.04)] backdrop-blur-xs transition hover:shadow-md hover:border-emerald-300">
                   <div className="flex items-center gap-2">
                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#E8F7F4] text-[#087F75] border border-emerald-200/80">
                       <Printer size={14} />
@@ -356,7 +354,7 @@ export default function LoginPage() {
                 </div>
 
                 {/* 3. Patient Records Management */}
-                <div className="rounded-xl border border-emerald-200/70 bg-white/95 p-2.5 shadow-[0_4px_12px_rgba(8,127,117,0.05)] backdrop-blur-xs transition hover:shadow-md hover:border-emerald-300">
+                <div className="rounded-xl border border-emerald-100/90 bg-white/95 p-2.5 shadow-[0_4px_16px_rgba(8,127,117,0.04)] backdrop-blur-xs transition hover:shadow-md hover:border-emerald-300">
                   <div className="flex items-center gap-2">
                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#E8F7F4] text-[#087F75] border border-emerald-200/80">
                       <Users size={14} />
@@ -371,7 +369,7 @@ export default function LoginPage() {
                 </div>
 
                 {/* 4. Automated WhatsApp Reminders */}
-                <div className="rounded-xl border border-emerald-200/70 bg-white/95 p-2.5 shadow-[0_4px_12px_rgba(8,127,117,0.05)] backdrop-blur-xs transition hover:shadow-md hover:border-emerald-300">
+                <div className="rounded-xl border border-emerald-100/90 bg-white/95 p-2.5 shadow-[0_4px_16px_rgba(8,127,117,0.04)] backdrop-blur-xs transition hover:shadow-md hover:border-emerald-300">
                   <div className="flex items-center gap-2">
                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#E8F7F4] text-[#087F75] border border-emerald-200/80">
                       <MessageCircle size={14} />
@@ -381,51 +379,53 @@ export default function LoginPage() {
                     </h4>
                   </div>
                   <p className="mt-1 text-[10px] text-[#647987] leading-snug">
-                    Appointment, follow-up and medication reminders.
+                    Appointment, follow-up and medication alerts.
                   </p>
                 </div>
               </div>
 
-              {/* 3D Doctors Team Hero Illustration */}
-              <div className="hidden xl:flex items-center justify-center relative shrink-0">
-                <div className="relative max-w-[185px] xl:max-w-[210px]">
-                  <img
-                    src={doctorsHero}
-                    alt="ClinixOne Expert Healthcare Medical Team"
-                    className="w-full h-auto object-contain drop-shadow-[0_12px_24px_rgba(8,127,117,0.20)] select-none pointer-events-none hover:scale-105 transition-transform duration-300"
-                  />
+              {/* Human-Made Circular Team Portrait with Zero Rectangular Crop Edges */}
+              <div className="hidden xl:flex flex-col items-center justify-center relative shrink-0">
+                <div className="relative w-40 h-40 xl:w-44 xl:h-44 rounded-full p-1 bg-gradient-to-tr from-[#087F75] via-[#10B981] to-emerald-200 shadow-lg">
+                  <div className="w-full h-full rounded-full overflow-hidden bg-gradient-to-b from-[#E8F7F4] to-[#CDEEE6] flex items-center justify-center">
+                    <img
+                      src={doctorsHero}
+                      alt="Gastro Cure Clinical Team"
+                      className="w-full h-full object-cover object-top scale-110 translate-y-1 select-none pointer-events-none"
+                    />
+                  </div>
+                </div>
+                {/* Floating Human Touch Pill Badge */}
+                <div className="absolute -bottom-2 bg-white rounded-full px-3 py-0.5 shadow-md border border-emerald-100 flex items-center gap-1.5">
+                  <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-[10px] font-bold text-[#064E49]">Clinic Online</span>
                 </div>
               </div>
             </div>
 
-            {/* "Built for All Specialities" Strip */}
-            <div className="mt-3.5 hidden sm:block">
-              <span className="text-[10px] font-bold tracking-wider text-slate-700 uppercase">
-                Built for All Specialities
+            {/* "Built for All Specialities" Row - Single Clean Line */}
+            <div className="mt-4 hidden sm:flex items-center gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 shrink-0">
+                Specialties:
               </span>
-              <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
                 {SPECIALTIES.map((spec) => {
                   const Icon = spec.icon;
                   return (
                     <div
                       key={spec.name}
-                      className="flex items-center gap-1.5 rounded-lg border border-emerald-200/80 bg-white/90 px-2 py-1 text-[10px] font-semibold text-[#102A35] shadow-2xs transition hover:border-emerald-400"
+                      className="flex items-center gap-1 rounded-md border border-slate-200/80 bg-white/90 px-2 py-0.5 text-[10px] font-semibold text-[#102A35] shadow-2xs hover:border-emerald-300 transition"
                     >
-                      <Icon size={12} className="text-[#087F75]" />
+                      <Icon size={11} className="text-[#087F75]" />
                       <span>{spec.name}</span>
                     </div>
                   );
                 })}
+                <div className="flex items-center gap-0.5 rounded-md border border-dashed border-emerald-300 bg-[#E8F7F4]/60 px-2 py-0.5 text-[10px] font-bold text-[#064E49]">
+                  <Plus size={10} />
+                  <span>More</span>
+                </div>
               </div>
-            </div>
-
-            {/* Bottom-left Decorative Clinical Stethoscope */}
-            <div className="hidden xl:block mt-1 relative -ml-3 max-w-[210px] opacity-95 pointer-events-none">
-              <img
-                src={stethoscopeHero}
-                alt="Clinical Stethoscope"
-                className="w-full h-auto object-contain drop-shadow-sm select-none"
-              />
             </div>
           </div>
 
@@ -433,7 +433,7 @@ export default function LoginPage() {
               RIGHT COLUMN: Elevated Pure White Authentication Card
               ───────────────────────────────────────────────────────── */}
           <div className="lg:col-span-5 xl:col-span-5 flex justify-center lg:justify-end">
-            <div className="w-full max-w-[420px] rounded-2xl bg-white p-5 sm:p-6 shadow-[0_20px_45px_-10px_rgba(6,78,73,0.16)] border border-emerald-100 relative">
+            <div className="w-full max-w-[420px] rounded-2xl bg-white p-5 sm:p-6 shadow-[0_20px_45px_-10px_rgba(6,78,73,0.14)] border border-emerald-100/90 relative">
               {/* Clinic Pill Badge */}
               <div className="inline-flex items-center gap-1.5 rounded-md border border-emerald-200 bg-[#E8F7F4] px-2.5 py-0.5 text-[11px] font-bold text-[#064E49]">
                 <Building2 size={12} className="text-[#087F75]" />
