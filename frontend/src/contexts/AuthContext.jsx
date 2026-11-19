@@ -43,6 +43,7 @@ export function AuthProvider({ children }) {
       email: jwtPayload.email,
       name: jwtPayload.name || (jwtPayload.email ? jwtPayload.email.split('@')[0] : 'User'),
       role: normalizedRole,
+      globalRole: jwtPayload.globalRole || normalizedRole,
       clinicId: jwtPayload.clinicId,
       clinicIds: jwtPayload.clinicIds || (jwtPayload.clinicId ? [jwtPayload.clinicId] : []),
       rawRole: jwtPayload.role,

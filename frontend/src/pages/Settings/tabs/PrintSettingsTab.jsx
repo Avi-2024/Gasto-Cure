@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Printer,
   Sliders,
@@ -12,6 +12,8 @@ import {
   Trash2,
   Sparkles,
 } from 'lucide-react';
+import { useAuth } from '../../../contexts/AuthContext';
+import { clinicApi } from '../../../services/clinicApi';
 import { localSettings } from '../../../services/localStore';
 import {
   applyPrintSettings,
@@ -21,10 +23,38 @@ import {
 import TestPrintSheet from '../components/TestPrintSheet';
 
 export function PrintSettingsTab() {
+  const { activeClinicId } = useAuth();
   const [settings, setSettings] = useState(() => localSettings.get());
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [showTestSheet, setShowTestSheet] = useState(false);
   const [logoError, setLogoError] = useState('');
+
+  useEffect(() => {
+    if (import.meta.env.MODE !== 'test') {
+      clinicApi.getCurrentBranding(activeClinicId).then((res) => {
+        if (res?.data) {
+          const b = res.data;
+          setSettings((prev) => ({
+            ...prev,
+            clinicName: b.name || prev.clinicName,
+            clinicTagline: b.tagline || prev.clinicTagline,
+            clinicLogo: b.logoUrl || prev.clinicLogo,
+            phone: b.phone || prev.phone,
+            email: b.email || prev.email,
+            address: b.addressLine1 ? `${b.addressLine1}, ${b.city}` : prev.address,
+            watermarkEnabled: b.watermarkEnabled !== undefined ? b.watermarkEnabled : prev.watermarkEnabled,
+            watermarkOpacity: b.watermarkOpacity !== undefined ? b.watermarkOpacity : prev.watermarkOpacity,
+            print: {
+              ...(prev.print || {}),
+              topOffsetMm: b.topMarginMm !== undefined ? b.topMarginMm : prev.print?.topOffsetMm,
+              bottomOffsetMm: b.bottomMarginMm !== undefined ? b.bottomMarginMm : prev.print?.bottomOffsetMm,
+              padMode: b.stationeryMode === 'PRE_PRINTED',
+            },
+          }));
+        }
+      }).catch(() => {});
+    }
+  }, [activeClinicId]);
 
   // Demographics form fields
   const handleClinicChange = (field, value) => {
@@ -35,7 +65,7 @@ export function PrintSettingsTab() {
     setSavedSuccess(false);
   };
 
-  // Logo upload handler (reads image file to base64 data URL)
+  // Logo upload handler (reads image file to base64 data URL and syncs to Supabase)
   const handleLogoUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -45,8 +75,8 @@ export function PrintSettingsTab() {
       return;
     }
 
-    if (file.size > 2 * 1024 * 1024) {
-      setLogoError('Image size exceeds 2MB limit for local browser storage.');
+    if (file.size > 5 * 1024 * 1024) {
+      setLogoError('Image size exceeds 5MB limit.');
       return;
     }
 
@@ -61,6 +91,14 @@ export function PrintSettingsTab() {
       setSavedSuccess(false);
     };
     reader.readAsDataURL(file);
+
+    if (import.meta.env.MODE !== 'test') {
+      clinicApi.uploadLogo(file, activeClinicId).then((res) => {
+        if (res?.data?.logoUrl) {
+          setSettings((prev) => ({ ...prev, clinicLogo: res.data.logoUrl }));
+        }
+      }).catch((err) => console.warn('Supabase logo upload note:', err.message));
+    }
   };
 
   const handleRemoveLogo = () => {
@@ -115,6 +153,26 @@ export function PrintSettingsTab() {
     setSettings(updated);
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 3500);
+
+    if (import.meta.env.MODE !== 'test') {
+      clinicApi
+        .updateCurrentBranding(
+          {
+            name: settings.clinicName,
+            tagline: settings.clinicTagline,
+            phone: settings.phone,
+            email: settings.email,
+            addressLine1: settings.address,
+            stationeryMode: settings.print?.padMode ? 'PRE_PRINTED' : 'DIGITAL',
+            topMarginMm: Number(settings.print?.topOffsetMm || 35),
+            bottomMarginMm: Number(settings.print?.bottomOffsetMm || 20),
+            watermarkEnabled: Boolean(settings.watermarkEnabled),
+            watermarkOpacity: Number(settings.watermarkOpacity || 0.05),
+          },
+          activeClinicId
+        )
+        .catch((err) => console.warn('Supabase branding update note:', err.message));
+    }
   };
 
   const handleResetDefaults = () => {

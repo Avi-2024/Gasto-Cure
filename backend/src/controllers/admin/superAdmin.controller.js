@@ -1,70 +1,55 @@
-const mongoose = require('mongoose');
-const Clinic = require('../../models/Clinic.model');
-const User = require('../../models/User.model');
-const Patient = require('../../models/Patient.model');
-const Billing = require('../../models/Billing.model');
+const prisma = require('../../config/prisma');
 
-const toObjectId = (id) => new mongoose.Types.ObjectId(id);
-
+/**
+ * Super Admin: List All Tenant Clinics on the Platform
+ */
 const listClinics = async (req, res, next) => {
   try {
     const { status } = req.query;
 
-    const clinicFilter = {};
-    if (status === 'active') clinicFilter.isActive = true;
-    if (status === 'inactive') clinicFilter.isActive = false;
+    const where = {};
+    if (status === 'active') where.isActive = true;
+    if (status === 'inactive') where.isActive = false;
 
-    const clinics = await Clinic.find(clinicFilter)
-      .select('name code contact isActive subscriptionStatus planName createdAt')
-      .sort({ createdAt: -1 });
-
-    const clinicIds = clinics.map((c) => c._id);
-
-    const [doctorCounts, patientCounts, revenueByClinic] = await Promise.all([
-      User.aggregate([
-        { $match: { clinicId: { $in: clinicIds }, role: 'DOCTOR', isActive: true } },
-        { $group: { _id: '$clinicId', count: { $sum: 1 } } },
-      ]),
-      Patient.aggregate([
-        { $match: { clinicId: { $in: clinicIds }, isActive: true } },
-        { $group: { _id: '$clinicId', count: { $sum: 1 } } },
-      ]),
-      Billing.aggregate([
-        { $match: { clinicId: { $in: clinicIds }, status: { $ne: 'cancelled' } } },
-        {
-          $group: {
-            _id: '$clinicId',
-            totalBilled: { $sum: '$grandTotal' },
-            totalCollected: { $sum: '$amountPaid' },
-            totalDue: { $sum: '$amountDue' },
+    const clinics = await prisma.clinic.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        _count: {
+          select: {
+            patients: true,
+            appointments: true,
+            prescriptions: true,
+            memberships: true,
           },
         },
-      ]),
-    ]);
-
-    const doctorMap = new Map(doctorCounts.map((d) => [String(d._id), d.count]));
-    const patientMap = new Map(patientCounts.map((p) => [String(p._id), p.count]));
-    const revenueMap = new Map(revenueByClinic.map((r) => [String(r._id), r]));
-
-    const data = clinics.map((clinic) => {
-      const revenue = revenueMap.get(String(clinic._id)) || { totalBilled: 0, totalCollected: 0, totalDue: 0 };
-
-      return {
-        id: clinic._id,
-        name: clinic.name,
-        code: clinic.code,
-        contact: clinic.contact,
-        isActive: clinic.isActive,
-        subscriptionStatus: clinic.subscriptionStatus || 'unknown',
-        planName: clinic.planName || 'N/A',
-        doctorsCount: doctorMap.get(String(clinic._id)) || 0,
-        patientsCount: patientMap.get(String(clinic._id)) || 0,
-        revenueOverview: revenue,
-        createdAt: clinic.createdAt,
-      };
+      },
     });
 
+    const data = clinics.map((c) => ({
+      id: c.id,
+      name: c.name,
+      shortName: c.shortName,
+      code: c.code,
+      slug: c.slug,
+      tagline: c.tagline,
+      logoUrl: c.logoUrl,
+      phone: c.phone,
+      email: c.email,
+      city: c.city,
+      state: c.state,
+      plan: c.plan,
+      planStatus: c.planStatus,
+      isActive: c.isActive,
+      patientsCount: c._count.patients,
+      appointmentsCount: c._count.appointments,
+      prescriptionsCount: c._count.prescriptions,
+      doctorsCount: c._count.memberships,
+      createdAt: c.createdAt,
+    }));
+
     return res.status(200).json({
+      success: true,
       totalClinics: data.length,
       filters: { status: status || 'all' },
       clinics: data,
@@ -74,131 +59,197 @@ const listClinics = async (req, res, next) => {
   }
 };
 
+/**
+ * Super Admin: Get Full Clinic Summary & Membership Details
+ */
 const getClinicSummary = async (req, res, next) => {
   try {
     const { clinicId } = req.params;
-    if (!mongoose.isValidObjectId(clinicId)) {
-      return res.status(400).json({ message: 'Invalid clinicId' });
-    }
 
-    const clinic = await Clinic.findById(clinicId).select('name code isActive subscriptionStatus planName contact settings');
-    if (!clinic) {
-      return res.status(404).json({ message: 'Clinic not found' });
-    }
-
-    const [doctorsCount, patientsCount, revenue] = await Promise.all([
-      User.countDocuments({ clinicId: toObjectId(clinicId), role: 'DOCTOR', isActive: true }),
-      Patient.countDocuments({ clinicId: toObjectId(clinicId), isActive: true }),
-      Billing.aggregate([
-        { $match: { clinicId: toObjectId(clinicId), status: { $ne: 'cancelled' } } },
-        {
-          $group: {
-            _id: null,
-            totalBilled: { $sum: '$grandTotal' },
-            totalCollected: { $sum: '$amountPaid' },
-            totalDue: { $sum: '$amountDue' },
-            totalInvoices: { $sum: 1 },
+    const clinic = await prisma.clinic.findUnique({
+      where: { id: clinicId },
+      include: {
+        memberships: {
+          where: { isActive: true },
+          include: {
+            user: {
+              select: { id: true, fullName: true, email: true, phone: true },
+            },
           },
         },
-      ]),
-    ]);
+        _count: {
+          select: {
+            patients: true,
+            appointments: true,
+            prescriptions: true,
+            invoices: true,
+          },
+        },
+      },
+    });
+
+    if (!clinic) {
+      return res.status(404).json({
+        success: false,
+        message: 'Clinic not found.',
+      });
+    }
 
     return res.status(200).json({
-      clinic,
-      doctorsCount,
-      patientsCount,
-      revenueOverview: revenue[0] || { totalBilled: 0, totalCollected: 0, totalDue: 0, totalInvoices: 0 },
+      success: true,
+      data: clinic,
     });
   } catch (error) {
     return next(error);
   }
 };
 
+/**
+ * Super Admin: Toggle Clinic Active / Suspended Status
+ */
 const updateClinicActiveStatus = async (req, res, next) => {
   try {
     const { clinicId } = req.params;
     const { isActive } = req.body;
 
-    if (!mongoose.isValidObjectId(clinicId)) {
-      return res.status(400).json({ message: 'Invalid clinicId' });
-    }
-
     if (typeof isActive !== 'boolean') {
-      return res.status(400).json({ message: 'isActive boolean is required' });
+      return res.status(400).json({
+        success: false,
+        message: 'isActive boolean flag is required.',
+      });
     }
 
-    const clinic = await Clinic.findByIdAndUpdate(clinicId, { isActive }, { new: true }).select(
-      'name code isActive subscriptionStatus planName updatedAt'
-    );
-
-    if (!clinic) {
-      return res.status(404).json({ message: 'Clinic not found' });
-    }
+    const updated = await prisma.clinic.update({
+      where: { id: clinicId },
+      data: { isActive },
+    });
 
     return res.status(200).json({
-      message: `Clinic ${isActive ? 'enabled' : 'disabled'} successfully`,
-      clinic,
+      success: true,
+      message: `Clinic ${isActive ? 'activated' : 'suspended'} successfully.`,
+      clinic: updated,
     });
   } catch (error) {
     return next(error);
   }
 };
 
+/**
+ * Super Admin: Onboard New Clinic onto ClinixPulse Platform
+ */
+const onboardClinic = async (req, res, next) => {
+  try {
+    const {
+      name,
+      shortName,
+      code,
+      phone,
+      email,
+      addressLine1,
+      city,
+      state,
+      pincode,
+      plan = 'PRO',
+      ownerEmail,
+      ownerName,
+      ownerPhone,
+    } = req.body;
+
+    if (!name || !code || !phone) {
+      return res.status(400).json({
+        success: false,
+        message: 'Clinic name, unique code, and phone are required.',
+      });
+    }
+
+    const slug = name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. Create Clinic
+      const newClinic = await tx.clinic.create({
+        data: {
+          name: name.trim(),
+          shortName: shortName?.trim() || name.trim(),
+          code: code.trim().toUpperCase(),
+          slug,
+          phone: phone.trim(),
+          email: email?.trim() || null,
+          addressLine1: addressLine1?.trim() || 'Main Road',
+          city: city?.trim() || 'Indore',
+          state: state?.trim() || 'Madhya Pradesh',
+          pincode: pincode?.trim() || '452001',
+          plan,
+          planStatus: 'ACTIVE',
+        },
+      });
+
+      // 2. Link or create Clinic Owner if owner details provided
+      if (ownerEmail) {
+        let ownerUser = await tx.user.findUnique({
+          where: { email: ownerEmail.trim().toLowerCase() },
+        });
+
+        if (!ownerUser) {
+          const bcrypt = require('bcryptjs');
+          const defaultPassword = await bcrypt.hash('Clinic@1234', 10);
+          ownerUser = await tx.user.create({
+            data: {
+              email: ownerEmail.trim().toLowerCase(),
+              fullName: ownerName || `${name} Admin`,
+              phone: ownerPhone || phone,
+              passwordHash: defaultPassword,
+              globalRole: 'USER',
+              defaultClinicId: newClinic.id,
+            },
+          });
+        }
+
+        await tx.clinicMembership.create({
+          data: {
+            userId: ownerUser.id,
+            clinicId: newClinic.id,
+            role: 'CLINIC_OWNER',
+          },
+        });
+      }
+
+      return newClinic;
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: `Clinic '${result.name}' successfully onboarded to ClinixPulse™!`,
+      clinic: result,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+/**
+ * Super Admin: Platform Revenue & SaaS Overview
+ */
 const getPlatformRevenueOverview = async (req, res, next) => {
   try {
-    const summary = await Billing.aggregate([
-      { $match: { status: { $ne: 'cancelled' } } },
-      {
-        $group: {
-          _id: null,
-          totalBilled: { $sum: '$grandTotal' },
-          totalCollected: { $sum: '$amountPaid' },
-          totalDue: { $sum: '$amountDue' },
-          invoicesCount: { $sum: 1 },
-        },
-      },
-    ]);
-
-    const clinicBreakdown = await Billing.aggregate([
-      { $match: { status: { $ne: 'cancelled' } } },
-      {
-        $group: {
-          _id: '$clinicId',
-          totalBilled: { $sum: '$grandTotal' },
-          totalCollected: { $sum: '$amountPaid' },
-          totalDue: { $sum: '$amountDue' },
-        },
-      },
-      {
-        $lookup: {
-          from: 'clinics',
-          localField: '_id',
-          foreignField: '_id',
-          as: 'clinic',
-        },
-      },
-      { $unwind: { path: '$clinic', preserveNullAndEmptyArrays: true } },
-      {
-        $project: {
-          clinicId: '$_id',
-          clinicName: '$clinic.name',
-          clinicCode: '$clinic.code',
-          totalBilled: 1,
-          totalCollected: 1,
-          totalDue: 1,
-        },
-      },
-      { $sort: { totalCollected: -1 } },
+    const [totalClinics, activeClinics, totalPatients, totalPrescriptions] = await Promise.all([
+      prisma.clinic.count(),
+      prisma.clinic.count({ where: { isActive: true } }),
+      prisma.patient.count(),
+      prisma.prescription.count(),
     ]);
 
     return res.status(200).json({
-      platformRevenue: summary[0] || {
-        totalBilled: 0,
-        totalCollected: 0,
-        totalDue: 0,
-        invoicesCount: 0,
+      success: true,
+      platform: 'ClinixPulse™ Enterprise',
+      metrics: {
+        totalClinics,
+        activeClinics,
+        totalPatients,
+        totalPrescriptions,
       },
-      clinicBreakdown,
     });
   } catch (error) {
     return next(error);
@@ -209,5 +260,6 @@ module.exports = {
   listClinics,
   getClinicSummary,
   updateClinicActiveStatus,
+  onboardClinic,
   getPlatformRevenueOverview,
 };

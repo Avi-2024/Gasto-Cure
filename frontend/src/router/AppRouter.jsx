@@ -17,6 +17,7 @@ import ChatPage from '../pages/Chat/ChatPage';
 import DoctorDashboardPage from '../pages/Doctor/DoctorDashboardPage';
 import ConsultationPage from '../pages/Doctor/ConsultationPage';
 import ReceptionistDashboardPage from '../pages/Receptionist/ReceptionistDashboardPage';
+import SuperAdminPage from '../pages/Admin/SuperAdminPage';
 import { useAuth } from '../contexts/AuthContext';
 
 /**
@@ -26,6 +27,9 @@ function RoleHomeRedirect() {
   const { isAuthenticated, user } = useAuth();
   if (!isAuthenticated) return <Navigate to="/auth/login" replace />;
 
+  if (user?.role === 'SUPER_ADMIN' || user?.globalRole === 'SUPER_ADMIN') {
+    return <Navigate to="/admin" replace />;
+  }
   if (user?.role === 'DOCTOR') return <Navigate to="/doctor" replace />;
   if (user?.role === 'RECEPTIONIST') return <Navigate to="/reception" replace />;
   return <Navigate to="/dashboard" replace />;
@@ -73,6 +77,13 @@ function AppRouter() {
       <Route element={<ProtectedRoute allowedRoles={['CLINIC_OWNER', 'DOCTOR']} />}>
         <Route element={<DashboardLayout />}>
           <Route path="/settings" element={<SettingsPage />} />
+        </Route>
+      </Route>
+
+      {/* Super Admin Control Plane */}
+      <Route element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']} />}>
+        <Route element={<DashboardLayout />}>
+          <Route path="/admin" element={<SuperAdminPage />} />
         </Route>
       </Route>
 

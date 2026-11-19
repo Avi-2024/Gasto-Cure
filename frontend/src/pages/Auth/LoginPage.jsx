@@ -264,11 +264,17 @@ export default function LoginPage() {
           activeClinic: liveRes.data.activeClinic,
         });
 
-        const activeRole = liveRes.data.user?.activeRole || resolved.role;
+        const activeRole =
+          liveRes.data.user?.globalRole === 'SUPER_ADMIN'
+            ? 'SUPER_ADMIN'
+            : liveRes.data.user?.activeRole || resolved.role;
+
         const liveDest =
-          activeRole === 'RECEPTIONIST'
+          activeRole === 'SUPER_ADMIN'
+            ? '/admin'
+            : activeRole === 'RECEPTIONIST'
             ? '/reception'
-            : activeRole === 'SUPER_ADMIN' || activeRole === 'CLINIC_OWNER'
+            : activeRole === 'CLINIC_OWNER'
             ? '/dashboard'
             : '/doctor';
 

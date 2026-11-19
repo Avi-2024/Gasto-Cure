@@ -9,13 +9,17 @@ function ProtectedRoute({ allowedRoles = [] }) {
     return <Navigate to="/auth/login" replace />;
   }
 
-  if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
+  const userRole = user?.role || user?.globalRole;
+
+  if (allowedRoles.length > 0 && !allowedRoles.includes(userRole) && userRole !== 'SUPER_ADMIN') {
     // Redirect unauthorized user to their role-specific home panel
     const roleHome =
-      user?.role === 'DOCTOR'
+      userRole === 'DOCTOR'
         ? '/doctor'
-        : user?.role === 'RECEPTIONIST'
+        : userRole === 'RECEPTIONIST'
         ? '/reception'
+        : userRole === 'SUPER_ADMIN'
+        ? '/admin'
         : '/dashboard';
     return <Navigate to={roleHome} replace />;
   }

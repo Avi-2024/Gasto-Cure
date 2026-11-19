@@ -1,13 +1,13 @@
 const express = require('express');
 const superAdminController = require('../../controllers/admin/superAdmin.controller');
-const { jwtAuth } = require('../../middleware/auth/jwtAuth.middleware');
-const { requireSuperAdmin } = require('../../middleware/auth/superAdmin.middleware');
+const { authenticate, requireSuperAdmin } = require('../../middleware/auth');
 
 const router = express.Router();
 
-router.use(jwtAuth, requireSuperAdmin);
+router.use(authenticate, requireSuperAdmin);
 
 router.get('/clinics', superAdminController.listClinics);
+router.post('/clinics', superAdminController.onboardClinic);
 router.get('/clinics/:clinicId', superAdminController.getClinicSummary);
 router.patch('/clinics/:clinicId/status', superAdminController.updateClinicActiveStatus);
 router.get('/revenue-overview', superAdminController.getPlatformRevenueOverview);
