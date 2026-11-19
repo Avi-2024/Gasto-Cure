@@ -1,4 +1,5 @@
 const prisma = require('../config/prisma');
+const { uploadFile } = require('../services/storage/supabaseStorage');
 
 /**
  * Get current clinic profile and dynamic branding
@@ -136,6 +137,52 @@ exports.updateCurrentClinicBranding = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Failed to update clinic branding.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * Upload clinic logo to Supabase Storage & update clinic record
+ */
+exports.uploadClinicLogo = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No logo file provided. Please attach a valid image.',
+      });
+    }
+
+    const ext = req.file.originalname.split('.').pop() || 'png';
+    const filename = `clinic_${req.clinicId}_logo_${Date.now()}.${ext}`;
+
+    const { url, storageProvider } = await uploadFile({
+      buffer: req.file.buffer,
+      filename,
+      mimeType: req.file.mimetype,
+      folder: 'clinic-logos',
+    });
+
+    const updated = await prisma.clinic.update({
+      where: { id: req.clinicId },
+      data: { logoUrl: url },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Clinic logo uploaded successfully.',
+      data: {
+        logoUrl: url,
+        storageProvider,
+        clinic: updated,
+      },
+    });
+  } catch (error) {
+    console.error('Logo upload error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to upload clinic logo.',
       error: error.message,
     });
   }
