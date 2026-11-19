@@ -12,7 +12,7 @@ import { getDosageFormIconSrc } from '../common/DosageFormIcon';
  * contextual clinic selector pill with active status dot, + Patient quick action, and doctor profile badge.
  */
 export default function AppHeader({ onMenuClick, sidebarOpen, navigate: customNavigate }) {
-  const { activeClinicId, user, switchClinic } = useAuth();
+  const { activeClinicId, user, switchClinic, availableClinics, activeClinic } = useAuth();
   const searchInputRef = useRef(null);
   const searchContainerRef = useRef(null);
   const notifContainerRef = useRef(null);
@@ -387,16 +387,22 @@ export default function AppHeader({ onMenuClick, sidebarOpen, navigate: customNa
               onChange={(event) => switchClinic(event.target.value)}
               disabled={clinicIds.length === 0}
               aria-label="Select clinic"
-              className="cursor-pointer border-0 bg-transparent p-0 pr-6 text-xs font-semibold text-[#10201F] focus:outline-none focus:ring-0"
+              className="cursor-pointer border-0 bg-transparent p-0 pr-6 text-xs font-semibold text-[#10201F] focus:outline-none focus:ring-0 max-w-[200px] truncate"
             >
               {clinicIds.length === 0 ? (
                 <option value="">No clinic available</option>
               ) : null}
-              {clinicIds.map((clinicId) => (
-                <option key={clinicId} value={clinicId}>
-                  Clinic #{clinicId}
-                </option>
-              ))}
+              {clinicIds.map((clinicId) => {
+                const found = (availableClinics || user?.clinics || []).find(
+                  (c) => c.clinicId === clinicId || c.id === clinicId
+                );
+                const clinicLabel = found?.shortName || found?.clinicName || found?.name || `Clinic #${clinicId}`;
+                return (
+                  <option key={clinicId} value={clinicId}>
+                    {clinicLabel}
+                  </option>
+                );
+              })}
             </select>
           </div>
 

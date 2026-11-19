@@ -232,7 +232,7 @@ export const SIDEBAR_THEMES = {
 };
 
 export default function Sidebar({ isOpen, onClose, onToggle }) {
-  const { user, logout } = useAuth();
+  const { user, logout, activeClinic } = useAuth();
   const role = user?.role || 'DOCTOR';
 
   // Finalized Spruce Teal Theme (Gastro Cure Official)
@@ -313,7 +313,13 @@ export default function Sidebar({ isOpen, onClose, onToggle }) {
           <div className="w-[236px] flex flex-col flex-1 min-h-0">
             {/* Brand Header */}
             <div className={`flex items-center justify-between border-b ${activeTheme.borderClasses} pb-4 pt-1 w-full`}>
-              <ClinixPulseLogo theme={activeTheme.headerTheme} size="md" />
+              <ClinixPulseLogo
+                theme={activeTheme.headerTheme}
+                size="md"
+                brandName={activeClinic?.shortName || 'ClinixPulse'}
+                subtitle={activeClinic?.tagline ? activeClinic.tagline.slice(0, 22) : 'Outpatient Platform'}
+                imageSrc={activeClinic?.logoUrl || undefined}
+              />
               {/* Mobile drawer close button */}
               <button
                 type="button"
