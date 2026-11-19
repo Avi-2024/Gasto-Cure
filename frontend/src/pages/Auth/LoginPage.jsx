@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import ClinixPulseLogo from '../../components/common/ClinixPulseLogo';
 import { useAuth } from '../../contexts/AuthContext';
-import digestiveHero from '../../assets/digestive-system-hero.png';
+import doctorsHero from '../../assets/doctors-hero.png';
 
 export const ROLE_PRESETS = [
   {
@@ -344,13 +344,13 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              {/* 3D Digestive System Hero Visual */}
+              {/* Modern Clinical Healthcare SaaS Hero Visual */}
               <div className="hidden xl:flex items-center justify-center relative shrink-0">
                 <div className="relative w-52 h-52 xl:w-60 xl:h-60 flex items-center justify-center">
                   <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#087F75]/15 via-emerald-100/40 to-transparent blur-2xl" />
                   <img
-                    src={digestiveHero}
-                    alt="Digestive & Liver Anatomical System"
+                    src={doctorsHero}
+                    alt="ClinixPulse Outpatient Practice Management"
                     className="w-full h-full object-contain drop-shadow-[0_12px_24px_rgba(8,127,117,0.18)] select-none pointer-events-none transition hover:scale-105 duration-300"
                   />
                 </div>

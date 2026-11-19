@@ -1,0 +1,337 @@
+// ClinixPulse™ Multi-Tenant Outpatient SaaS Schema
+// Optimized for PostgreSQL with strict tenant indexing, RLS, and JSONB flexibility
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// -------------------------------------------------------------
+// ENUMS
+// -------------------------------------------------------------
+
+enum GlobalRole {
+  SUPER_ADMIN
+  USER
+}
+
+enum ClinicRole {
+  CLINIC_OWNER
+  DOCTOR
+  RECEPTIONIST
+  NURSE
+  BILLING
+}
+
+enum SubscriptionPlan {
+  FREE_TRIAL
+  STARTER
+  PRO
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+}
+
+enum StationeryMode {
+  PAD
+  DIGITAL
+}
+
+enum AppointmentStatus {
+  WAITING
+  IN_CONSULTATION
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum PaymentStatus {
+  PAID
+  PENDING
+  REFUNDED
+}
+
+// -------------------------------------------------------------
+// CLINIC (TENANT & WHITE-LABEL BRANDING)
+// -------------------------------------------------------------
+
+model Clinic {
+  id              String             @id @default(uuid()) @db.Uuid
+  code            String             @unique @db.VarChar(20) // e.g. "GC", "APEX"
+  slug            String             @unique @db.VarChar(60) // e.g. "gastrocure"
+  name            String             @db.VarChar(150)        // e.g. "Gastro Cure Digestive & Liver Centre"
+  shortName       String?            @db.VarChar(60)         // e.g. "Gastro Cure"
+  tagline         String?            @db.VarChar(255)        // e.g. "Digestive & Liver Health Specialists"
+  logoUrl         String?            @db.Text                // Supabase Storage or CDN logo URL
+  iconUrl         String?            @db.Text                // Favicon or compact mark
+  
+  // Contact
+  phone           String             @db.VarChar(30)
+  email           String?            @db.VarChar(120)
+  whatsappNumber  String?            @db.VarChar(30)
+  website         String?            @db.VarChar(255)
+  
+  // Address
+  addressLine1    String             @db.VarChar(255)
+  addressLine2    String?            @db.VarChar(255)
+  city            String             @db.VarChar(100)
+  state           String             @db.VarChar(100)
+  pincode         String             @db.VarChar(20)
+  country         String             @default("India") @db.VarChar(100)
+  
+  // Stationery & Custom Letterhead Settings
+  stationeryMode  StationeryMode     @default(DIGITAL)
+  topMarginMm     Float              @default(35)
+  bottomMarginMm  Float              @default(20)
+  watermarkEnabled Boolean           @default(true)
+  watermarkOpacity Float             @default(0.05)
+  customRegText   String?            @db.VarChar(255)
+  
+  // Visual Theme Tokens
+  primaryColor    String             @default("#123A3A") @db.VarChar(10)
+  accentColor     String             @default("#C9A45C") @db.VarChar(10)
+  
+  // Subscription Lifecycle
+  plan            SubscriptionPlan   @default(PRO)
+  planStatus      SubscriptionStatus @default(ACTIVE)
+  validUntil      DateTime?
+  
+  isActive        Boolean            @default(true)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  // Tenant-Scoped Relationships
+  memberships     ClinicMembership[]
+  patients        Patient[]
+  appointments    Appointment[]
+  prescriptions   Prescription[]
+  invoices        Invoice[]
+  formularyDrugs  FormularyDrug[]
+
+  @@index([isActive])
+  @@map("clinics")
+}
+
+// -------------------------------------------------------------
+// USER & MULTI-CLINIC MEMBERSHIP
+// -------------------------------------------------------------
+
+model User {
+  id                   String             @id @default(uuid()) @db.Uuid
+  fullName             String             @db.VarChar(120)
+  email                String             @unique @db.VarChar(120)
+  phone                String             @db.VarChar(30)
+  passwordHash         String             @db.VarChar(255)
+  globalRole           GlobalRole         @default(USER)
+  isActive             Boolean            @default(true)
+  defaultClinicId      String?            @db.Uuid
+  
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  memberships          ClinicMembership[]
+  prescriptionsCreated Prescription[]     @relation("DoctorPrescriptions")
+  appointmentsDoctor   Appointment[]      @relation("DoctorAppointments")
+
+  @@map("users")
+}
+
+model ClinicMembership {
+  id              String       @id @default(uuid()) @db.Uuid
+  userId          String       @db.Uuid
+  clinicId        String       @db.Uuid
+  role            ClinicRole   // CLINIC_OWNER, DOCTOR, RECEPTIONIST, NURSE, BILLING
+  isActive        Boolean      @default(true)
+  
+  // Doctor-Specific Profile in this Clinic
+  regNumber       String?      @db.VarChar(60)
+  qualifications  String?      @db.VarChar(255)
+  specialization  String?      @db.VarChar(120)
+  consultationFee Float?       @default(500)
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clinic          Clinic       @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, clinicId, role])
+  @@index([clinicId])
+  @@index([userId])
+  @@map("clinic_memberships")
+}
+
+// -------------------------------------------------------------
+// PATIENT (TENANT-SCOPED)
+// -------------------------------------------------------------
+
+model Patient {
+  id                String         @id @default(uuid()) @db.Uuid
+  clinicId          String         @db.Uuid
+  mrn               String         @db.VarChar(40) // Medical Record Number e.g. "GC-2026-0001"
+  name              String         @db.VarChar(120)
+  age               Int?
+  gender            String?        @db.VarChar(20) // MALE, FEMALE, OTHER
+  phone             String         @db.VarChar(30)
+  email             String?        @db.VarChar(120)
+  bloodGroup        String?        @db.VarChar(10)
+  allergies         String[]       // PostgreSQL native text array
+  chronicConditions String[]
+  address           String?        @db.Text
+  lastVisitDate     DateTime?
+  
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  clinic            Clinic         @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  appointments      Appointment[]
+  prescriptions     Prescription[]
+  invoices          Invoice[]
+
+  @@unique([clinicId, mrn])
+  @@index([clinicId, phone])
+  @@index([clinicId, name])
+  @@map("patients")
+}
+
+// -------------------------------------------------------------
+// APPOINTMENTS & OPD QUEUE
+// -------------------------------------------------------------
+
+model Appointment {
+  id              String            @id @default(uuid()) @db.Uuid
+  clinicId        String            @db.Uuid
+  doctorId        String            @db.Uuid
+  patientId       String            @db.Uuid
+  tokenNumber     Int
+  appointmentDate DateTime          @db.Date
+  timeSlot        String?           @db.VarChar(30) // e.g. "10:30 AM"
+  status          AppointmentStatus @default(WAITING)
+  visitType       String            @default("NEW_VISIT") @db.VarChar(30) // NEW_VISIT, FOLLOW_UP, EMERGENCY
+  chiefComplaint  String?           @db.Text
+  vitals          Json?             // { bp: "120/80", pulse: 72, temp: 98.6, weightKg: 68 }
+  
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  clinic          Clinic            @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  doctor          User              @relation("DoctorAppointments", fields: [doctorId], references: [id])
+  patient         Patient           @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  prescription    Prescription?
+
+  @@index([clinicId, appointmentDate, status])
+  @@index([clinicId, doctorId, appointmentDate])
+  @@index([patientId])
+  @@map("appointments")
+}
+
+// -------------------------------------------------------------
+// PRESCRIPTION STUDIO (WITH IMMUTABLE SNAPSHOT)
+// -------------------------------------------------------------
+
+model Prescription {
+  id               String       @id @default(uuid()) @db.Uuid
+  clinicId         String       @db.Uuid
+  doctorId         String       @db.Uuid
+  patientId        String       @db.Uuid
+  appointmentId    String?      @unique @db.Uuid
+  rxNumber         String       @db.VarChar(40) // e.g. "RX-GC-0001"
+  visitDate        DateTime     @default(now())
+  
+  // Clinical Data
+  symptoms         String[]
+  diagnosis        String[]
+  vitals           Json?
+  medicines        Json         // Array of { brandName, composition, dosage, timing, frequency, duration, instructions }
+  advice           String[]
+  investigations   String[]     // Tests ordered
+  
+  followUpDate     DateTime?    @db.Date
+  followUpNotes    String?      @db.Text
+  
+  // Snapshot of clinic stationery at Rx generation time (Legal & Audit requirement)
+  brandingSnapshot Json         // { clinicName, doctorName, regNumber, logoUrl, address }
+  pdfUrl           String?      @db.Text
+  
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  clinic           Clinic       @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  doctor           User         @relation("DoctorPrescriptions", fields: [doctorId], references: [id])
+  patient          Patient      @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  appointment      Appointment? @relation(fields: [appointmentId], references: [id])
+
+  @@unique([clinicId, rxNumber])
+  @@index([clinicId, visitDate])
+  @@index([clinicId, patientId])
+  @@index([doctorId])
+  @@map("prescriptions")
+}
+
+// -------------------------------------------------------------
+// MASTER FORMULARY (DRUGS & MEDICINES)
+// -------------------------------------------------------------
+
+model FormularyDrug {
+  id               String    @id @default(uuid()) @db.Uuid
+  clinicId         String?   @db.Uuid // NULL = Global Base Library, Non-Null = Clinic Custom
+  brandName        String    @db.VarChar(150)
+  genericName      String    @db.VarChar(200)
+  category         String    @db.VarChar(100) // Antibiotic, PPI, Antacid, etc.
+  dosageForm       String    @db.VarChar(50)  // Tablet, Syrup, Capsule, etc.
+  strength         String?   @db.VarChar(50)  // e.g. "40mg"
+  defaultTiming    String?   @db.VarChar(50)  // "Before Food"
+  defaultFrequency String?   @db.VarChar(50)  // "1-0-1"
+  defaultDuration  String?   @db.VarChar(50)  // "5 Days"
+  instructions     String?   @db.Text
+  isCommon         Boolean   @default(false)
+
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  clinic           Clinic?   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+
+  @@index([clinicId, brandName])
+  @@index([genericName])
+  @@map("formulary_drugs")
+}
+
+// -------------------------------------------------------------
+// BILLING & INVOICING
+// -------------------------------------------------------------
+
+model Invoice {
+  id            String        @id @default(uuid()) @db.Uuid
+  clinicId      String        @db.Uuid
+  patientId     String        @db.Uuid
+  appointmentId String?       @db.Uuid
+  invoiceNumber String        @db.VarChar(40) // e.g. "INV-GC-2026-0001"
+  amount        Float
+  discount      Float         @default(0)
+  tax           Float         @default(0)
+  total         Float
+  status        PaymentStatus @default(PAID)
+  paymentMode   String        @default("CASH") @db.VarChar(30) // CASH, UPI, CARD, ONLINE
+  items         Json          // Array of { item: "Consultation Fee", qty: 1, rate: 500, amount: 500 }
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  clinic        Clinic        @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  patient       Patient       @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@unique([clinicId, invoiceNumber])
+  @@index([clinicId, createdAt])
+  @@index([patientId])
+  @@map("invoices")
+}
