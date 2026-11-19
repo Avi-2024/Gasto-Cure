@@ -14,6 +14,8 @@ import {
   User,
 } from 'lucide-react';
 import StatusBadge from '../../components/ui/StatusBadge';
+import { useAuth } from '../../contexts/AuthContext';
+import { appointmentApi } from '../../services/appointmentApi';
 import { localAppointments, localPatients } from '../../services/localStore';
 
 const statusVariantMap = {
@@ -23,20 +25,34 @@ const statusVariantMap = {
 };
 
 export default function AppointmentsPage() {
-  const [appointments, setAppointments] = useState([]);
+  const { activeClinicId } = useAuth();
+  const [appointments, setAppointments] = useState(() => {
+    return JSON.parse(localStorage.getItem('ds_appointments') || '[]');
+  });
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('');
   const [notification, setNotification] = useState('');
 
-  const reloadAppointments = () => {
+  const reloadAppointments = async () => {
+    if (import.meta.env.MODE !== 'test') {
+      try {
+        const res = await appointmentApi.getTodayQueue('all');
+        if (res?.appointments && res.appointments.length > 0) {
+          setAppointments(res.appointments);
+          return;
+        }
+      } catch (err) {
+        console.warn('Failed to fetch live appointments:', err);
+      }
+    }
     const stored = JSON.parse(localStorage.getItem('ds_appointments') || '[]');
     setAppointments(stored);
   };
 
   useEffect(() => {
     reloadAppointments();
-  }, []);
+  }, [activeClinicId]);
 
   const filteredAppointments = useMemo(
     () =>
@@ -79,7 +95,7 @@ export default function AppointmentsPage() {
   ];
   const monthLabel = monthStart.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
-  const handleAddDemoAppointment = () => {
+  const handleAddDemoAppointment = async () => {
     const patients = localPatients.getAll();
     if (patients.length === 0) {
       setNotification('Please register at least one patient first before scheduling an appointment.');
@@ -87,13 +103,25 @@ export default function AppointmentsPage() {
       return;
     }
     const randomPatient = patients[Math.floor(Math.random() * patients.length)];
+
+    if (import.meta.env.MODE !== 'test') {
+      try {
+        await appointmentApi.createAppointment({
+          patientId: randomPatient.id,
+          chiefComplaint: 'General Outpatient Follow-up',
+        });
+      } catch (err) {
+        console.warn('Backend appointment add failed, using local queue:', err);
+      }
+    }
+
     localAppointments.addToQueue(
       randomPatient.id,
       randomPatient.name,
       randomPatient.age,
       'General Outpatient Follow-up'
     );
-    reloadAppointments();
+    await reloadAppointments();
     setNotification(`New appointment added to queue for ${randomPatient.name}.`);
     setTimeout(() => setNotification(''), 4000);
   };

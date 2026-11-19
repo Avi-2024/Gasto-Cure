@@ -24,6 +24,9 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import StatCard from '../../components/ui/StatCard';
 import StatusBadge from '../../components/ui/StatusBadge';
 import usePagination from '../../hooks/usePagination';
+import { useAuth } from '../../contexts/AuthContext';
+import { patientApi } from '../../services/patientApi';
+import { appointmentApi } from '../../services/appointmentApi';
 import { localAppointments, localPatients } from '../../services/localStore';
 import { cleanPhoneNumber } from '../../utils/whatsappHelper';
 import EditPatientModal from './components/EditPatientModal';
@@ -75,11 +78,16 @@ const getInitials = (name) => {
 
 function PatientsPage() {
   const navigate = useNavigate();
+  const { activeClinicId } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState(() => searchParams.get('search') || '');
   const [ageFilter, setAgeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [patients, setPatients] = useState([]);
+  const [patients, setPatients] = useState(() => {
+    localPatients.seed();
+    return localPatients.getAll();
+  });
+  const [queueLength, setQueueLength] = useState(() => localAppointments.getQueue()?.length || 0);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [formError, setFormError] = useState('');
@@ -245,6 +253,17 @@ function PatientsPage() {
     }
   };
 
+  const loadLivePatients = useCallback(async (query = '') => {
+    try {
+      const res = await patientApi.getPatients({ search: query });
+      if (res?.patients && res.patients.length > 0) {
+        setPatients(res.patients);
+      }
+    } catch (err) {
+      console.warn('Could not load live patients:', err);
+    }
+  }, []);
+
   // Initialize and handle query parameters
   useEffect(() => {
     localPatients.seed();
@@ -273,7 +292,16 @@ function PatientsPage() {
         setProfilePatient(found);
       }
     }
-  }, [searchParams]);
+
+    if (import.meta.env.MODE !== 'test') {
+      loadLivePatients(searchQuery || '');
+      appointmentApi.getTodayQueue().then((res) => {
+        if (res?.totalInQueue !== undefined) {
+          setQueueLength(res.totalInQueue);
+        }
+      }).catch(() => {});
+    }
+  }, [searchParams, activeClinicId, loadLivePatients]);
 
   // Handle ESC key for Add Patient modal
   useEffect(() => {
@@ -325,7 +353,7 @@ function PatientsPage() {
     goToPage(1);
   }, [search, ageFilter, statusFilter, goToPage]);
 
-  const handleAddPatient = () => {
+  const handleAddPatient = async () => {
     if (!form.name.trim() || !form.age.toString().trim() || !form.contact.trim()) {
       setFormError('Name, Age, and Contact are required.');
       return;
@@ -335,6 +363,7 @@ function PatientsPage() {
       name: form.name.trim(),
       age: Number(form.age),
       contact: form.contact.trim(),
+      phone: form.contact.trim(),
       mobile: form.contact.trim(),
       address: form.address.trim(),
       bloodGroup: form.bloodGroup,
@@ -342,18 +371,64 @@ function PatientsPage() {
       notes: form.notes.trim(),
       status: form.status || 'Active',
     };
-    const patient = localPatients.add(payload);
-    setPatients(localPatients.getAll());
-    closeModal();
-    // Automatically add to waiting queue
-    localAppointments.addToQueue(patient.id, patient.name, patient.age, 'New patient visit');
-    setQueueMsg(`${patient.name} added to waiting queue successfully.`);
-    setTimeout(() => setQueueMsg(''), 4000);
+
+    if (import.meta.env.MODE === 'test') {
+      const patient = localPatients.add(payload);
+      setPatients(localPatients.getAll());
+      closeModal();
+      localAppointments.addToQueue(patient.id, patient.name, patient.age, 'New patient visit');
+      setQueueMsg(`${patient.name} added to waiting queue successfully.`);
+      setTimeout(() => setQueueMsg(''), 4000);
+      return;
+    }
+
+    try {
+      const res = await patientApi.createPatient(payload);
+      const created = res?.data || payload;
+
+      // Automatically add to waiting queue with atomic token sequence
+      await appointmentApi.createAppointment({
+        patientId: created.id,
+        chiefComplaint: 'New patient visit',
+      });
+
+      await loadLivePatients();
+      const qRes = await appointmentApi.getTodayQueue();
+      if (qRes?.totalInQueue !== undefined) {
+        setQueueLength(qRes.totalInQueue);
+      }
+
+      closeModal();
+      setQueueMsg(`${created.name} registered (${created.mrn || 'MRN assigned'}) and queued.`);
+      setTimeout(() => setQueueMsg(''), 4000);
+    } catch (err) {
+      console.warn('API Add patient failed, falling back to local store:', err);
+      const patient = localPatients.add(payload);
+      setPatients(localPatients.getAll());
+      closeModal();
+      localAppointments.addToQueue(patient.id, patient.name, patient.age, 'New patient visit');
+      setQueueMsg(`${patient.name} added to waiting queue successfully.`);
+      setTimeout(() => setQueueMsg(''), 4000);
+    }
   };
 
-  const handlePatientSaved = (updated) => {
-    const all = localPatients.getAll();
-    setPatients(all);
+  const handlePatientSaved = async (updated) => {
+    if (import.meta.env.MODE === 'test') {
+      const all = localPatients.getAll();
+      setPatients(all);
+      if (profilePatient && profilePatient.id === updated.id) {
+        setProfilePatient(updated);
+      }
+      return;
+    }
+
+    try {
+      await patientApi.updatePatient(updated.id, updated);
+      await loadLivePatients();
+    } catch {
+      const all = localPatients.getAll();
+      setPatients(all);
+    }
     if (profilePatient && profilePatient.id === updated.id) {
       setProfilePatient(updated);
     }
@@ -365,8 +440,6 @@ function PatientsPage() {
     const waUrl = `https://wa.me/91${clean}`;
     window.open(waUrl, '_blank', 'noopener,noreferrer');
   };
-
-  const queueLength = localAppointments.getQueue()?.length || 0;
 
   return (
     <div className="space-y-4">

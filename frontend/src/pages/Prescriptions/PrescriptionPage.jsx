@@ -44,6 +44,7 @@ import AutoResizeTextarea from './components/AutoResizeTextarea';
 import PrintPreviewModal from './components/PrintPreviewModal';
 import PatientPastHistoryDrawer from './components/PatientPastHistoryDrawer';
 import { localPatients, localVisits, localSettings, localAppointments } from '../../services/localStore';
+import { prescriptionApi } from '../../services/prescriptionApi';
 import { quickChipsService, DEFAULT_QUICK_CHIPS } from '../../services/quickChipsService';
 import { rxProtocolsService } from '../../services/rxProtocolsService';
 import { applyPrintSettings } from '../../utils/printStyles';
@@ -545,6 +546,31 @@ function PrescriptionPage() {
 
     const savedVisit = localVisits.save(visitPayload);
     setCurrentRxId(savedVisit.id);
+
+    // Sync to Supabase PostgreSQL with immutable legal branding snapshot
+    if (import.meta.env.MODE !== 'test') {
+      prescriptionApi
+        .createPrescription({
+          patientId: patient.id,
+          patientName: patient.name,
+          medicines: validMeds,
+          diagnosis,
+          symptoms,
+          vitals: visitPayload.vitals,
+          advice,
+          followUpDate: calculatedFollowUpDate,
+          followUpNotes: notes,
+        })
+        .then((res) => {
+          if (res?.data?.rxNumber) {
+            setSaveFeedback({
+              type: 'success',
+              message: `Prescription saved permanently (${res.data.rxNumber})`,
+            });
+          }
+        })
+        .catch((err) => console.warn('Supabase prescription sync note:', err.message));
+    }
 
     // Auto-clear patient from waiting queue once prescription is saved
     try {

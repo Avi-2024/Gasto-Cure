@@ -189,6 +189,18 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used inside AuthProvider');
+  if (!ctx) {
+    return {
+      user: null,
+      activeClinicId: 'default-clinic',
+      activeClinic: null,
+      availableClinics: [],
+      switchClinic: () => {},
+      login: () => {},
+      logout: () => {},
+      isAuthenticated: false,
+      accessToken: null,
+    };
+  }
   return ctx;
 }

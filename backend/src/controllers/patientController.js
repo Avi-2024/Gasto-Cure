@@ -165,3 +165,53 @@ exports.getPatientById = async (req, res) => {
     });
   }
 };
+
+/**
+ * Update Patient Profile (Tenant-Scoped)
+ */
+exports.updatePatient = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, phone, age, gender, bloodGroup, allergies, chronicConditions, address } = req.body;
+
+    const existing = await prisma.patient.findFirst({
+      where: { id, clinicId: req.clinicId },
+    });
+
+    if (!existing) {
+      return res.status(404).json({
+        success: false,
+        message: 'Patient not found in this clinic.',
+      });
+    }
+
+    const updated = await prisma.patient.update({
+      where: { id },
+      data: {
+        ...(name !== undefined && { name: name.trim() }),
+        ...(phone !== undefined && { phone: phone.trim() }),
+        ...(age !== undefined && { age: age ? parseInt(age, 10) : null }),
+        ...(gender !== undefined && { gender }),
+        ...(bloodGroup !== undefined && { bloodGroup }),
+        ...(allergies !== undefined && { allergies: Array.isArray(allergies) ? allergies : [] }),
+        ...(chronicConditions !== undefined && {
+          chronicConditions: Array.isArray(chronicConditions) ? chronicConditions : [],
+        }),
+        ...(address !== undefined && { address }),
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Patient profile updated successfully.',
+      data: updated,
+    });
+  } catch (error) {
+    console.error('Update patient error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to update patient profile.',
+      error: error.message,
+    });
+  }
+};

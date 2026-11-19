@@ -6,6 +6,7 @@ const tenantContext = require('../../middleware/tenantContext');
 
 router.use(authenticate, tenantContext);
 
+router.get('/', appointmentController.getTodayQueue);
 router.get('/today', appointmentController.getTodayQueue);
 router.post('/', appointmentController.createAppointment);
 router.patch('/:id/status', appointmentController.updateAppointmentStatus);

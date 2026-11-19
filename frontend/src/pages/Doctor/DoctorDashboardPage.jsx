@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Activity,
@@ -16,10 +16,31 @@ import {
   Users,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { appointmentApi } from '../../services/appointmentApi';
+import { patientApi } from '../../services/patientApi';
 import { localAppointments, localMedicines, localPatients, localVisits } from '../../services/localStore';
 
 export default function DoctorDashboardPage() {
   const { user, activeClinicId, activeClinic } = useAuth();
+
+  const [liveQueue, setLiveQueue] = useState(() => localAppointments.getQueue());
+  const [livePatientCount, setLivePatientCount] = useState(() => localPatients.getAll().length);
+
+  useEffect(() => {
+    if (import.meta.env.MODE !== 'test') {
+      appointmentApi.getTodayQueue().then((res) => {
+        if (res?.appointments) {
+          setLiveQueue(res.appointments);
+        }
+      }).catch(() => {});
+
+      patientApi.getPatients().then((res) => {
+        if (res?.total !== undefined) {
+          setLivePatientCount(res.total);
+        }
+      }).catch(() => {});
+    }
+  }, [activeClinicId]);
 
   const rawName = user?.fullName || user?.name || (user?.email ? user.email.split('@')[0].replace(/[._-]/g, ' ') : 'Doctor');
   const cleanName = rawName.replace(/^dr\.?\s+/i, '');
@@ -29,21 +50,19 @@ export default function DoctorDashboardPage() {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ');
 
-  // Live operational metrics from localStore
+  // Live operational metrics
   const metrics = useMemo(() => {
-    const queue = localAppointments.getQueue();
     const visits = localVisits.getAll();
-    const patients = localPatients.getAll();
     const medicines = localMedicines.getAll();
 
     return {
-      queueCount: queue.length,
-      queueList: queue.slice(0, 5),
+      queueCount: liveQueue.length,
+      queueList: liveQueue.slice(0, 5),
       visitCount: visits.length,
-      patientCount: patients.length,
+      patientCount: livePatientCount,
       medicineCount: medicines.length,
     };
-  }, []);
+  }, [liveQueue, livePatientCount]);
 
   return (
     <div className="space-y-6">

@@ -35,7 +35,17 @@ async function tryOrOffline(apiFn, offlineFn) {
 export const receptionistApi = {
   quickRegisterPatient: ({ clinicId, token, payload }) =>
     tryOrOffline(
-      () => request('/patients', { method: 'POST', token, body: { clinicId, ...payload } }),
+      () =>
+        request('/patients', {
+          method: 'POST',
+          token,
+          body: {
+            name: payload.fullName || payload.name || 'Walk-in Patient',
+            phone: payload.phone || '',
+            gender: payload.gender || 'OTHER',
+            age: payload.age ? Number(payload.age) : null,
+          },
+        }),
       () => {
         const newPatient = localPatients.create({
           name: payload.fullName || payload.name || 'Walk-in Patient',
@@ -49,7 +59,16 @@ export const receptionistApi = {
 
   quickBookAppointment: ({ clinicId, token, payload }) =>
     tryOrOffline(
-      () => request('/appointments/book', { method: 'POST', token, body: { clinicId, ...payload } }),
+      () =>
+        request('/appointments', {
+          method: 'POST',
+          token,
+          body: {
+            patientId: payload.patientId,
+            doctorId: payload.doctorId,
+            chiefComplaint: payload.reason || payload.chiefComplaint || 'Front Desk Appointment',
+          },
+        }),
       () => {
         const patient = payload.patientId ? localPatients.getById(payload.patientId) : null;
         const patientName = patient?.name || payload.patientName || 'Patient';

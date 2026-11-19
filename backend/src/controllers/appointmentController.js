@@ -8,11 +8,19 @@ exports.getTodayQueue = async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    const { status } = req.query;
+    let statusFilter = { in: ['WAITING', 'IN_CONSULTATION'] };
+    if (status === 'all') {
+      statusFilter = undefined;
+    } else if (status) {
+      statusFilter = status;
+    }
+
     const appointments = await prisma.appointment.findMany({
       where: {
         clinicId: req.clinicId,
         appointmentDate: today,
-        status: { in: ['WAITING', 'IN_CONSULTATION'] },
+        ...(statusFilter ? { status: statusFilter } : {}),
       },
       include: {
         patient: true,

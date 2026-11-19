@@ -9,5 +9,6 @@ router.use(authenticate, tenantContext);
 router.get('/', patientController.getPatients);
 router.post('/', patientController.createPatient);
 router.get('/:id', patientController.getPatientById);
+router.put('/:id', patientController.updatePatient);
 
 module.exports = router;
