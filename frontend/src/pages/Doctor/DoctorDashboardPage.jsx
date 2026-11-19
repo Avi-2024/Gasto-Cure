@@ -19,9 +19,9 @@ import { useAuth } from '../../contexts/AuthContext';
 import { localAppointments, localMedicines, localPatients, localVisits } from '../../services/localStore';
 
 export default function DoctorDashboardPage() {
-  const { user, activeClinicId } = useAuth();
+  const { user, activeClinicId, activeClinic } = useAuth();
 
-  const rawName = user?.name || (user?.email ? user.email.split('@')[0].replace(/[._-]/g, ' ') : 'Doctor');
+  const rawName = user?.fullName || user?.name || (user?.email ? user.email.split('@')[0].replace(/[._-]/g, ' ') : 'Doctor');
   const cleanName = rawName.replace(/^dr\.?\s+/i, '');
   const doctorName = cleanName
     .split(' ')
@@ -65,7 +65,7 @@ export default function DoctorDashboardPage() {
               Welcome back, Dr. {doctorName || 'Practitioner'}
             </h1>
             <p className="mt-1.5 text-sm text-[#4E6460]">
-              Clinic: <span className="font-semibold text-[#123A3A]">{activeClinicId || 'Default Practice'}</span> • Ready for outpatient consultations and prescription generation.
+              Clinic: <span className="font-semibold text-[#123A3A]">{activeClinic?.name || activeClinic?.shortName || activeClinicId || 'Default Practice'}</span> • Ready for outpatient consultations and prescription generation.
             </p>
           </div>
 

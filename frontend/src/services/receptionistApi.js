@@ -1,6 +1,10 @@
 import { localAppointments, localPatients } from './localStore';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1';
+const configuredUrl = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL =
+  configuredUrl && !configuredUrl.includes(':8080')
+    ? configuredUrl
+    : 'http://localhost:8081/api/v1';
 
 async function request(path, { method = 'GET', token, body } = {}) {
   const response = await fetch(`${API_BASE_URL}${path}`, {
