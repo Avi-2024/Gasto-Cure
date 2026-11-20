@@ -519,3 +519,82 @@ exports.updateAppointmentStatus = async (req, res) => {
     });
   }
 };
+
+/**
+ * Automated WhatsApp Appointment Reminders Engine
+ * Scans upcoming appointments (today and tomorrow) and dispatches reminder notifications.
+ */
+exports.dispatchAppointmentReminders = async (req, res) => {
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const endOfTomorrow = new Date(tomorrow);
+    endOfTomorrow.setHours(23, 59, 59, 999);
+
+    // Query active appointments due today or tomorrow
+    const upcomingAppointments = await prisma.appointment.findMany({
+      where: {
+        clinicId: req.clinicId,
+        appointmentDate: {
+          gte: today,
+          lte: endOfTomorrow,
+        },
+        status: 'WAITING',
+      },
+      include: {
+        patient: true,
+        doctor: { select: { fullName: true } },
+        clinic: { select: { name: true, phone: true, addressLine1: true, city: true } },
+      },
+      orderBy: { tokenNumber: 'asc' },
+    });
+
+    const dispatchedList = [];
+
+    for (const appt of upcomingAppointments) {
+      const patientPhone = (appt.patient?.phone || '').replace(/[^\d]/g, '');
+      const cleanPhone = patientPhone.slice(-10);
+      const isTomorrow = new Date(appt.appointmentDate).getDate() === tomorrow.getDate();
+      const dayLabel = isTomorrow ? 'tomorrow' : 'today';
+
+      const doctorName = appt.doctor?.fullName || 'Consultant Physician';
+      const clinicName = appt.clinic?.name || req.clinic?.name || 'Clinic';
+      const tokenFormatted = `Token #${appt.tokenNumber}`;
+
+      const message = `Namaste ${appt.patient?.name}!\n\nThis is an automated reminder that your OPD appointment at *${clinicName}* with *${doctorName}* is scheduled for *${dayLabel}*.\n\n*Token Number:* ${tokenFormatted}\n*Complaint / Slot:* ${appt.chiefComplaint || 'Consultation'}\n\nPlease arrive 15 minutes prior to your token checkup. Reply 'YES' to confirm or 'NO' to reschedule.`;
+      const waUrl = cleanPhone ? `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(message)}` : null;
+
+      dispatchedList.push({
+        appointmentId: appt.id,
+        patientName: appt.patient?.name,
+        patientPhone: cleanPhone ? `+91 ${cleanPhone}` : 'N/A',
+        tokenFormatted,
+        doctorName,
+        scheduledDate: appt.appointmentDate.toISOString().split('T')[0],
+        dayLabel,
+        waUrl,
+        status: 'REMINDER_GENERATED',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Processed ${dispatchedList.length} automated appointment reminders for ${req.clinic?.name || 'clinic'}.`,
+      data: {
+        totalReminders: dispatchedList.length,
+        reminders: dispatchedList,
+      },
+    });
+  } catch (error) {
+    console.error('Dispatch appointment reminders error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to process automated appointment reminders.',
+      error: error.message,
+    });
+  }
+};

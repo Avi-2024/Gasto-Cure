@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   Clock3,
   MapPin,
+  MessageCircle,
   Phone,
   Printer,
   RotateCcw,
@@ -210,14 +211,32 @@ export default function PublicBookingPage() {
 
             {/* Actions */}
             <div className="mt-6 flex flex-wrap items-center justify-between gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => window.print()}
-                className="inline-flex items-center gap-2 rounded-xl border border-[#D9E6E2] bg-white px-4 py-2.5 text-xs font-bold text-[#10201F] shadow-xs hover:bg-[#F7FAF8] transition"
-              >
-                <Printer size={15} />
-                <span>Print Booking Pass</span>
-              </button>
+              <div className="flex flex-wrap items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const phoneRaw = confirmedPass.patient?.phone || '';
+                    const cleanPhone = phoneRaw.replace(/[^\d]/g, '');
+                    const tokenText = confirmedPass.tokenFormatted || `Token #${confirmedPass.tokenNumber}`;
+                    const msg = `*${clinic.name} - OPD Appointment Pass*\n\nNamaste ${confirmedPass.patient?.name}!\nYour OPD Appointment is confirmed.\n\n*Token Number:* ${tokenText}\n*Date:* ${confirmedPass.appointmentDate}\n*Time Slot:* ${confirmedPass.timeSlot}\n*Doctor:* ${confirmedPass.doctorName || 'Consultant Physician'}\n*Location:* ${confirmedPass.clinic?.address || clinic.address}\n\nPlease arrive 15 minutes before your time slot. Bring previous medical records.`;
+                    const waUrl = `https://wa.me/91${cleanPhone.slice(-10)}?text=${encodeURIComponent(msg)}`;
+                    window.open(waUrl, '_blank', 'noopener,noreferrer');
+                  }}
+                  className="inline-flex items-center gap-2 rounded-xl bg-[#25D366] px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-[#1EBE5D] transition cursor-pointer"
+                >
+                  <MessageCircle size={15} />
+                  <span>Send Pass to WhatsApp</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="inline-flex items-center gap-2 rounded-xl border border-[#D9E6E2] bg-white px-4 py-2.5 text-xs font-bold text-[#10201F] shadow-xs hover:bg-[#F7FAF8] transition cursor-pointer"
+                >
+                  <Printer size={15} />
+                  <span>Print Booking Pass</span>
+                </button>
+              </div>
 
               <button
                 type="button"
@@ -234,7 +253,7 @@ export default function PublicBookingPage() {
                     reason: 'General Outpatient Consultation',
                   });
                 }}
-                className="inline-flex items-center gap-2 rounded-xl bg-[#123A3A] px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-[#287C75] transition"
+                className="inline-flex items-center gap-2 rounded-xl bg-[#123A3A] px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-[#287C75] transition cursor-pointer"
               >
                 <RotateCcw size={14} />
                 <span>Book Another Appointment</span>

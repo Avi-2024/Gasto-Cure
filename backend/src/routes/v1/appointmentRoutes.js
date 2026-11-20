@@ -15,5 +15,6 @@ router.get('/', appointmentController.getTodayQueue);
 router.get('/today', appointmentController.getTodayQueue);
 router.post('/', appointmentController.createAppointment);
 router.patch('/:id/status', appointmentController.updateAppointmentStatus);
+router.all('/reminders/dispatch', appointmentController.dispatchAppointmentReminders);
 
 module.exports = router;
