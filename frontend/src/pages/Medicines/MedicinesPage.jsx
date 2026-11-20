@@ -18,6 +18,8 @@ import {
 import StatCard from '../../components/ui/StatCard';
 import StatusBadge from '../../components/ui/StatusBadge';
 import usePagination from '../../hooks/usePagination';
+import { useAuth } from '../../contexts/AuthContext';
+import { formularyApi } from '../../services/formularyApi';
 import { localMedicines } from '../../services/localStore';
 import AddEditMedicineModal from './components/AddEditMedicineModal';
 import DosageFormIcon, { getDosageFormIconSrc } from '../../components/common/DosageFormIcon';
@@ -73,13 +75,30 @@ function MedicinesPage() {
   const [notification, setNotification] = useState('');
   const notificationTimerRef = useRef(null);
 
-  const refreshList = () => {
-    setMedicines(localMedicines.getAll());
+  const refreshList = async () => {
+    const local = localMedicines.getAll();
+    setMedicines(local);
+
+    try {
+      const res = await formularyApi.getDrugs();
+      if (res?.drugs && res.drugs.length > 0) {
+        const localMap = new Map(local.map((m) => [m.name?.toLowerCase(), m]));
+        const merged = [...local];
+        res.drugs.forEach((d) => {
+          if (!localMap.has(d.name?.toLowerCase())) {
+            merged.push(d);
+          }
+        });
+        setMedicines(merged);
+      }
+    } catch {
+      // Keep local
+    }
   };
 
   useEffect(() => {
     localMedicines.seed();
-    setMedicines(localMedicines.getAll());
+    refreshList();
     return () => {
       if (notificationTimerRef.current) {
         clearTimeout(notificationTimerRef.current);
@@ -163,6 +182,10 @@ function MedicinesPage() {
     } else {
       localMedicines.add(data);
       showNotification(`Added ${data.name} to clinic formulary`);
+      // Asynchronously sync to Supabase PostgreSQL master formulary
+      formularyApi.createDrug(data).catch((err) => {
+        console.warn('Formulary sync to backend warning:', err.message);
+      });
     }
     setModalOpen(false);
     setEditingMedicine(null);

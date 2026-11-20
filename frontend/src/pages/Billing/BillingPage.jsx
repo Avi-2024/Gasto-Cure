@@ -18,7 +18,10 @@ import {
   X,
 } from 'lucide-react';
 import StatusBadge from '../../components/ui/StatusBadge';
+import { useAuth } from '../../contexts/AuthContext';
 import { localPatients } from '../../services/localStore';
+import { billingApi } from '../../services/billingApi';
+import { patientApi } from '../../services/patientApi';
 
 const INITIAL_INVOICES = [
   {
@@ -70,9 +73,21 @@ export default function BillingPage() {
     status: 'Paid',
   });
 
-  const patients = useMemo(() => localPatients.getAll(), []);
+  const [patients, setPatients] = useState(() => localPatients.getAll());
+  const { activeClinic } = useAuth();
 
-  // Load invoices from localStorage with fallback seed
+  const refreshInvoices = async () => {
+    try {
+      const res = await billingApi.getInvoices();
+      if (res?.invoices && res.invoices.length > 0) {
+        setInvoices(res.invoices);
+      }
+    } catch {
+      // keep local
+    }
+  };
+
+  // Load invoices from localStorage with fallback seed & live backend sync
   useEffect(() => {
     const stored = localStorage.getItem('ds_billing');
     if (stored) {
@@ -86,7 +101,24 @@ export default function BillingPage() {
       setInvoices(INITIAL_INVOICES);
       localStorage.setItem('ds_billing', JSON.stringify(INITIAL_INVOICES));
     }
-  }, []);
+
+    refreshInvoices();
+
+    patientApi
+      .getPatients({ limit: 100 })
+      .then((pRes) => {
+        if (pRes?.patients?.length > 0) {
+          const mapped = pRes.patients.map((p) => ({
+            id: p.id,
+            name: p.name,
+            phone: p.phone,
+            mrn: p.mrn,
+          }));
+          setPatients(mapped);
+        }
+      })
+      .catch(() => {});
+  }, [activeClinic?.id]);
 
   const saveInvoices = (updated) => {
     setInvoices(updated);
@@ -152,6 +184,9 @@ export default function BillingPage() {
     const updated = [created, ...invoices];
     saveInvoices(updated);
     setShowModal(false);
+
+    const invoicePayload = { ...newInvoice };
+
     setNewInvoice({
       patientId: '',
       patientName: '',
@@ -162,6 +197,17 @@ export default function BillingPage() {
     });
     setNotification(`Invoice #${created.id} recorded successfully.`);
     setTimeout(() => setNotification(''), 4000);
+
+    billingApi
+      .createInvoice(invoicePayload)
+      .then((res) => {
+        if (res?.data?.invoiceNumber) {
+          refreshInvoices();
+        }
+      })
+      .catch((err) => {
+        console.warn('Backend invoice creation warning:', err.message);
+      });
   };
 
   const markInvoicePaid = (id) => {
@@ -171,6 +217,10 @@ export default function BillingPage() {
     saveInvoices(updated);
     setNotification(`Invoice #${id} updated to Paid.`);
     setTimeout(() => setNotification(''), 4000);
+
+    billingApi.updateStatus(id, { status: 'PAID' }).catch((err) => {
+      console.warn('Backend mark paid warning:', err.message);
+    });
   };
 
   return (
@@ -413,7 +463,7 @@ export default function BillingPage() {
                   <option value="">-- Choose registered patient or enter below --</option>
                   {patients.map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.name} ({p.id})
+                      {p.name} {p.mrn ? `(${p.mrn})` : `(${p.id})`}
                     </option>
                   ))}
                 </select>
