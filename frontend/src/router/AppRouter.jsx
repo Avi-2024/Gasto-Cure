@@ -41,6 +41,7 @@ function AppRouter() {
     <Routes>
       <Route path="/" element={<RoleHomeRedirect />} />
       <Route path="/auth/login" element={<LoginPage />} />
+      <Route path="/login" element={<LoginPage />} />
       <Route path="/book/:clinicSlug" element={<PublicBookingPage />} />
       <Route path="/book" element={<PublicBookingPage />} />
 
