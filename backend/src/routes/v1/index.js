@@ -9,6 +9,7 @@ const appointmentRoutes = require('./appointmentRoutes');
 const prescriptionRoutes = require('./prescriptionRoutes');
 const formularyRoutes = require('./formularyRoutes');
 const invoiceRoutes = require('./invoiceRoutes');
+const analyticsRoutes = require('./analyticsRoutes');
 const adminRoutes = require('./admin.routes');
 
 router.get('/health', async (req, res) => {
@@ -54,6 +55,7 @@ router.use('/appointments', appointmentRoutes);
 router.use('/prescriptions', prescriptionRoutes);
 router.use('/formulary', formularyRoutes);
 router.use('/invoices', invoiceRoutes);
+router.use('/analytics', analyticsRoutes);
 router.use('/admin', adminRoutes);
 
 module.exports = router;

@@ -15,6 +15,7 @@ import StatCard from '../../components/ui/StatCard';
 import StatusBadge from '../../components/ui/StatusBadge';
 import { localAppointments, localPatients, localVisits } from '../../services/localStore';
 import FollowUpRemindersWidget from './components/FollowUpRemindersWidget';
+import ClinicAnalyticsWidget from '../../components/analytics/ClinicAnalyticsWidget';
 
 const statusToVariant = {
   waiting: 'warning',
@@ -42,7 +43,7 @@ const formatDoctorName = (u) => {
 };
 
 function DashboardPage() {
-  const { user } = useAuth();
+  const { user, activeClinic } = useAuth();
   const doctorTitle = formatDoctorName(user);
   const [queue, setQueue] = useState([]);
   const [queueSearch, setQueueSearch] = useState('');
@@ -376,6 +377,13 @@ function DashboardPage() {
             <p className="mt-1 text-xs text-[#4E6460]">Manage standard dosages & formulations</p>
           </Link>
         </div>
+      </section>
+
+      {/* OPD Performance & Clinical Analytics */}
+      <section>
+        <ClinicAnalyticsWidget
+          clinicName={activeClinic?.name || activeClinic?.shortName || 'Current Practice'}
+        />
       </section>
     </div>
   );

@@ -19,6 +19,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { appointmentApi } from '../../services/appointmentApi';
 import { patientApi } from '../../services/patientApi';
 import { localAppointments, localMedicines, localPatients, localVisits } from '../../services/localStore';
+import ClinicAnalyticsWidget from '../../components/analytics/ClinicAnalyticsWidget';
 
 export default function DoctorDashboardPage() {
   const { user, activeClinicId, activeClinic } = useAuth();
@@ -329,6 +330,13 @@ export default function DoctorDashboardPage() {
             </table>
           </div>
         )}
+      </section>
+
+      {/* OPD Clinical & Financial Intelligence Engine */}
+      <section>
+        <ClinicAnalyticsWidget
+          clinicName={activeClinic?.name || activeClinic?.shortName || 'Current Practice'}
+        />
       </section>
     </div>
   );
