@@ -51,6 +51,23 @@ export const adminApi = {
   },
 
   /**
+   * Register a doctor for an existing clinic
+   */
+  async registerDoctor(clinicId, doctorData) {
+    return apiRequest(`/admin/clinics/${clinicId}/doctors`, {
+      method: 'POST',
+      body: doctorData,
+    });
+  },
+
+  /**
+   * List doctors registered to a clinic
+   */
+  async getClinicDoctors(clinicId) {
+    return apiRequest(`/admin/clinics/${clinicId}/doctors`);
+  },
+
+  /**
    * Toggle clinic active/suspended status
    */
   async toggleClinicStatus(clinicId, isActive) {
