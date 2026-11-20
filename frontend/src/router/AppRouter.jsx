@@ -18,6 +18,7 @@ import DoctorDashboardPage from '../pages/Doctor/DoctorDashboardPage';
 import ConsultationPage from '../pages/Doctor/ConsultationPage';
 import ReceptionistDashboardPage from '../pages/Receptionist/ReceptionistDashboardPage';
 import SuperAdminPage from '../pages/Admin/SuperAdminPage';
+import PublicBookingPage from '../pages/Public/PublicBookingPage';
 import { useAuth } from '../contexts/AuthContext';
 
 /**
@@ -40,6 +41,8 @@ function AppRouter() {
     <Routes>
       <Route path="/" element={<RoleHomeRedirect />} />
       <Route path="/auth/login" element={<LoginPage />} />
+      <Route path="/book/:clinicSlug" element={<PublicBookingPage />} />
+      <Route path="/book" element={<PublicBookingPage />} />
 
       {/* Shared Clinic Operations (All authenticated roles) */}
       <Route element={<ProtectedRoute allowedRoles={['CLINIC_OWNER', 'DOCTOR', 'RECEPTIONIST']} />}>

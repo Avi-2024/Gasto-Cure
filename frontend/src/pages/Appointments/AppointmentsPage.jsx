@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import {
   AlertCircle,
@@ -8,24 +9,40 @@ import {
   CheckCircle2,
   Clock3,
   Filter,
+  MapPin,
+  Phone,
   Plus,
   Search,
   Stethoscope,
+  Ticket,
   User,
+  Users,
+  X,
+  XCircle,
 } from 'lucide-react';
 import StatusBadge from '../../components/ui/StatusBadge';
 import { useAuth } from '../../contexts/AuthContext';
 import { appointmentApi } from '../../services/appointmentApi';
+import { patientApi } from '../../services/patientApi';
 import { localAppointments, localPatients } from '../../services/localStore';
 
 const statusVariantMap = {
   waiting: 'warning',
+  in_consultation: 'info',
   completed: 'success',
   cancelled: 'danger',
 };
 
+const COMMON_REASONS = [
+  'General Consultation & Follow-up',
+  'Acid Peptic Disease / GERD Workup',
+  'Abdominal Pain & Bloating',
+  'Fatty Liver Checkup',
+  'Routine Prescription Refill',
+];
+
 export default function AppointmentsPage() {
-  const { activeClinicId } = useAuth();
+  const { activeClinicId, activeClinic } = useAuth();
   const [appointments, setAppointments] = useState(() => {
     return JSON.parse(localStorage.getItem('ds_appointments') || '[]');
   });
@@ -34,12 +51,28 @@ export default function AppointmentsPage() {
   const [dateFilter, setDateFilter] = useState('');
   const [notification, setNotification] = useState('');
 
+  // Booking Modal State
+  const [showBookModal, setShowBookModal] = useState(false);
+  const [patients, setPatients] = useState(() => localPatients.getAll());
+  const [isWalkIn, setIsWalkIn] = useState(false);
+  const [bookingForm, setBookingForm] = useState({
+    patientId: '',
+    patientName: '',
+    patientPhone: '',
+    patientAge: '',
+    patientGender: 'MALE',
+    appointmentDate: new Date().toISOString().split('T')[0],
+    timeSlot: 'Morning OPD (10:00 AM - 01:00 PM)',
+    chiefComplaint: 'General Outpatient Follow-up',
+  });
+
   const reloadAppointments = async () => {
     if (import.meta.env.MODE !== 'test') {
       try {
         const res = await appointmentApi.getTodayQueue('all');
         if (res?.appointments && res.appointments.length > 0) {
           setAppointments(res.appointments);
+          localStorage.setItem('ds_appointments', JSON.stringify(res.appointments));
           return;
         }
       } catch (err) {
@@ -52,6 +85,15 @@ export default function AppointmentsPage() {
 
   useEffect(() => {
     reloadAppointments();
+
+    patientApi
+      .getPatients({ limit: 100 })
+      .then((res) => {
+        if (res?.patients?.length > 0) {
+          setPatients(res.patients);
+        }
+      })
+      .catch(() => {});
   }, [activeClinicId]);
 
   const filteredAppointments = useMemo(
@@ -60,11 +102,14 @@ export default function AppointmentsPage() {
         const matchesSearch =
           (appointment.patientName || '').toLowerCase().includes(search.toLowerCase()) ||
           (appointment.reason || '').toLowerCase().includes(search.toLowerCase()) ||
-          (appointment.id || '').toLowerCase().includes(search.toLowerCase());
+          (appointment.id || '').toLowerCase().includes(search.toLowerCase()) ||
+          (appointment.tokenFormatted || '').toLowerCase().includes(search.toLowerCase());
 
-        const matchesStatus = statusFilter === 'all' || appointment.status === statusFilter;
+        const matchesStatus =
+          statusFilter === 'all' ||
+          (appointment.status || '').toLowerCase() === statusFilter.toLowerCase();
 
-        const appointmentDate = appointment.createdAt ? appointment.createdAt.split('T')[0] : '';
+        const appointmentDate = appointment.appointmentDate || (appointment.createdAt ? appointment.createdAt.split('T')[0] : '');
         const matchesDate = !dateFilter || appointmentDate === dateFilter;
 
         return matchesSearch && matchesStatus && matchesDate;
@@ -95,14 +140,84 @@ export default function AppointmentsPage() {
   ];
   const monthLabel = monthStart.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
+  // Handle Full Appointment Booking
+  const handleConfirmBooking = async (e) => {
+    e.preventDefault();
+
+    if (!isWalkIn && !bookingForm.patientId) {
+      alert('Please select a registered patient or switch to register a walk-in patient.');
+      return;
+    }
+    if (isWalkIn && (!bookingForm.patientName.trim() || !bookingForm.patientPhone.trim())) {
+      alert('Please enter patient name and phone number for the walk-in registration.');
+      return;
+    }
+
+    const payload = isWalkIn
+      ? {
+          patientName: bookingForm.patientName.trim(),
+          patientPhone: bookingForm.patientPhone.trim(),
+          patientAge: bookingForm.patientAge ? Number(bookingForm.patientAge) : null,
+          patientGender: bookingForm.patientGender,
+          appointmentDate: bookingForm.appointmentDate,
+          chiefComplaint: `${bookingForm.chiefComplaint} (${bookingForm.timeSlot})`,
+        }
+      : {
+          patientId: bookingForm.patientId,
+          appointmentDate: bookingForm.appointmentDate,
+          chiefComplaint: `${bookingForm.chiefComplaint} (${bookingForm.timeSlot})`,
+        };
+
+    try {
+      const res = await appointmentApi.createAppointment(payload);
+      setShowBookModal(false);
+      await reloadAppointments();
+      setNotification(`Appointment confirmed! Token #${res?.data?.tokenNumber || 'allocated'} issued.`);
+      setTimeout(() => setNotification(''), 4500);
+
+      // Reset form
+      setBookingForm({
+        patientId: '',
+        patientName: '',
+        patientPhone: '',
+        patientAge: '',
+        patientGender: 'MALE',
+        appointmentDate: new Date().toISOString().split('T')[0],
+        timeSlot: 'Morning OPD (10:00 AM - 01:00 PM)',
+        chiefComplaint: 'General Outpatient Follow-up',
+      });
+      setIsWalkIn(false);
+    } catch (err) {
+      console.warn('Booking error:', err);
+      alert('Failed to book appointment: ' + err.message);
+    }
+  };
+
+  // Status transition handler
+  const handleUpdateStatus = async (appointmentId, newStatus) => {
+    try {
+      await appointmentApi.updateStatus(appointmentId, newStatus);
+      const updated = appointments.map((a) =>
+        a.id === appointmentId ? { ...a, status: newStatus.toLowerCase(), rawStatus: newStatus } : a
+      );
+      setAppointments(updated);
+      localStorage.setItem('ds_appointments', JSON.stringify(updated));
+      setNotification(`Appointment status updated to ${newStatus}.`);
+      setTimeout(() => setNotification(''), 3500);
+    } catch (err) {
+      console.warn('Status update error:', err);
+    }
+  };
+
+  // Legacy fallback function preserved for zero test regressions
   const handleAddDemoAppointment = async () => {
-    const patients = localPatients.getAll();
-    if (patients.length === 0) {
+    const pList = localPatients.getAll();
+    if (pList.length === 0) {
       setNotification('Please register at least one patient first before scheduling an appointment.');
       setTimeout(() => setNotification(''), 4000);
       return;
     }
-    const randomPatient = patients[Math.floor(Math.random() * patients.length)];
+    const randomPatient = pList[Math.floor(Math.random() * pList.length)];
 
     if (import.meta.env.MODE !== 'test') {
       try {
@@ -126,16 +241,18 @@ export default function AppointmentsPage() {
     setTimeout(() => setNotification(''), 4000);
   };
 
+  const clinicSlug = activeClinic?.slug || 'gastrocure';
+
   return (
     <div className="space-y-6">
-      {/* Page Title & Search Header */}
+      {/* Page Title & Booking Action Header */}
       <section className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-clinixpulse-xs">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-[#287C75]/25 bg-[#287C75]/10 px-2.5 py-0.5 text-xs font-semibold text-[#287C75]">
                 <Calendar size={13} />
-                Outpatient Scheduling
+                Outpatient Scheduling & Queue Control
               </span>
               <span className="text-xs font-semibold text-[#7D908C]">
                 {appointments.length} total scheduled
@@ -145,18 +262,32 @@ export default function AppointmentsPage() {
               Appointments Timeline
             </h1>
             <p className="mt-1 text-sm text-[#4E6460]">
-              Filter consultation bookings, monitor queue statuses, and review monthly attendance.
+              Filter consultation bookings, monitor queue statuses, and issue verified digital tokens.
             </p>
           </div>
 
-          <button
-            type="button"
-            onClick={handleAddDemoAppointment}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#123A3A] px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-[#287C75] transition shrink-0"
-          >
-            <Plus size={16} />
-            <span>Add Demo Appointment</span>
-          </button>
+          <div className="flex flex-wrap items-center gap-2.5">
+            {/* Public Portal Link */}
+            <Link
+              to={`/book/${clinicSlug}`}
+              target="_blank"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-[#D9E6E2] bg-[#F7FAF8] px-3 py-2 text-xs font-bold text-[#123A3A] hover:bg-white hover:border-[#287C75] transition"
+              title="Open Public Online Booking Page for Patients"
+            >
+              <Ticket size={14} className="text-[#287C75]" />
+              <span>Public Booking Portal</span>
+            </Link>
+
+            {/* Book Appointment Modal Trigger */}
+            <button
+              type="button"
+              onClick={() => setShowBookModal(true)}
+              className="inline-flex items-center gap-2 rounded-xl bg-[#123A3A] px-4 py-2.5 text-xs sm:text-sm font-bold text-white shadow-sm hover:bg-[#287C75] transition shrink-0"
+            >
+              <Plus size={16} />
+              <span>Book Appointment</span>
+            </button>
+          </div>
         </div>
 
         {notification && (
@@ -229,69 +360,101 @@ export default function AppointmentsPage() {
           </div>
 
           <ul className="mt-4 space-y-3">
-            {filteredAppointments.map((appointment) => (
-              <li
-                key={appointment.id}
-                className="group rounded-2xl border border-[#D9E6E2] bg-white p-4 transition hover:border-[#287C75] hover:bg-[#F7FAF8]/70 hover:shadow-xs"
-              >
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="font-heading text-sm font-bold text-[#10201F]">
-                        {appointment.patientName || 'Patient'}
-                      </span>
-                      <span className="rounded-md border border-[#D9E6E2] bg-[#F7FAF8] px-1.5 py-0.5 font-mono text-[10px] font-semibold text-[#7D908C]">
-                        {appointment.id}
-                      </span>
-                    </div>
-                    <p className="mt-1 text-xs text-[#4E6460]">
-                      {appointment.reason || 'General Outpatient Consultation'}
-                    </p>
-                  </div>
+            {filteredAppointments.map((appointment) => {
+              const isWaiting = (appointment.status || '').toLowerCase() === 'waiting';
+              const isCompleted = (appointment.status || '').toLowerCase() === 'completed';
 
-                  <div className="flex items-center gap-3 sm:text-right">
-                    <div>
-                      <p className="text-xs font-semibold text-[#10201F] flex items-center sm:justify-end gap-1">
-                        <Clock3 size={12} className="text-[#287C75]" />
-                        {appointment.startTime || '10:00 AM'}
-                      </p>
-                      <p className="text-[11px] text-[#7D908C]">
-                        {appointment.createdAt
-                          ? new Date(appointment.createdAt).toLocaleDateString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                              year: 'numeric',
-                            })
-                          : 'Today'}
+              return (
+                <li
+                  key={appointment.id}
+                  className="group rounded-2xl border border-[#D9E6E2] bg-white p-4 transition hover:border-[#287C75] hover:bg-[#F7FAF8]/70 hover:shadow-xs"
+                >
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        {appointment.tokenFormatted && (
+                          <span className="inline-flex items-center justify-center rounded-lg bg-[#FDF6E2] border border-[#EBD7A9] px-2 py-0.5 text-[11px] font-mono font-bold text-[#8C6B1F]">
+                            {appointment.tokenFormatted}
+                          </span>
+                        )}
+                        <span className="font-heading text-sm font-bold text-[#10201F]">
+                          {appointment.patientName || 'Patient'}
+                        </span>
+                        <span className="rounded-md border border-[#D9E6E2] bg-[#F7FAF8] px-1.5 py-0.5 font-mono text-[10px] font-semibold text-[#7D908C]">
+                          {appointment.patientMrn || appointment.id}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-xs text-[#4E6460]">
+                        {appointment.reason || 'General Outpatient Consultation'}
                       </p>
                     </div>
 
-                    <div className="shrink-0 flex items-center gap-2">
-                      <StatusBadge
-                        label={appointment.status || 'waiting'}
-                        variant={statusVariantMap[appointment.status] || 'warning'}
-                        className="capitalize"
-                      />
-                      {appointment.status === 'waiting' && (
-                        <Link
-                          to={`/prescription/new?patientId=${encodeURIComponent(
-                            appointment.patientId || appointment.id
-                          )}`}
-                          className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#287C75]/10 text-[#287C75] hover:bg-[#123A3A] hover:text-white transition"
-                          title="Open Prescription Studio"
-                        >
-                          <Stethoscope size={14} />
-                        </Link>
-                      )}
+                    <div className="flex items-center gap-3 sm:text-right">
+                      <div>
+                        <p className="text-xs font-semibold text-[#10201F] flex items-center sm:justify-end gap-1">
+                          <Clock3 size={12} className="text-[#287C75]" />
+                          {appointment.startTime || '10:00 AM'}
+                        </p>
+                        <p className="text-[11px] text-[#7D908C]">
+                          {appointment.appointmentDate ||
+                            (appointment.createdAt
+                              ? new Date(appointment.createdAt).toLocaleDateString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  year: 'numeric',
+                                })
+                              : 'Today')}
+                        </p>
+                      </div>
+
+                      <div className="shrink-0 flex items-center gap-2">
+                        <StatusBadge
+                          label={appointment.status || 'waiting'}
+                          variant={statusVariantMap[appointment.status] || 'warning'}
+                          className="capitalize"
+                        />
+
+                        {isWaiting && (
+                          <>
+                            <Link
+                              to={`/prescription/new?patientId=${encodeURIComponent(
+                                appointment.patientId || appointment.id
+                              )}`}
+                              className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#287C75]/10 text-[#287C75] hover:bg-[#123A3A] hover:text-white transition"
+                              title="Start Consultation & Prescribe"
+                            >
+                              <Stethoscope size={14} />
+                            </Link>
+
+                            <button
+                              type="button"
+                              onClick={() => handleUpdateStatus(appointment.id, 'COMPLETED')}
+                              className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white transition cursor-pointer"
+                              title="Mark Completed"
+                            >
+                              <CheckCircle2 size={14} />
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleUpdateStatus(appointment.id, 'CANCELLED')}
+                              className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition cursor-pointer"
+                              title="Cancel Appointment"
+                            >
+                              <XCircle size={14} />
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </li>
-            ))}
+                </li>
+              );
+            })}
 
             {filteredAppointments.length === 0 && (
               <li className="rounded-2xl border border-dashed border-[#D9E6E2] bg-[#F7FAF8] p-8 text-center text-xs text-[#7D908C]">
-                No appointments matched your search filters. Click "Add Demo Appointment" to create one.
+                No appointments matched your search filters. Click "+ Book Appointment" to schedule a patient.
               </li>
             )}
           </ul>
@@ -362,14 +525,223 @@ export default function AppointmentsPage() {
           <div className="mt-5 rounded-2xl border border-[#D9E6E2] bg-[#F7FAF8] p-3 text-xs text-[#4E6460]">
             <p className="font-bold text-[#10201F] flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-emerald-500" />
-              Offline Practice Synchronized
+              Live Multi-Tenant OPD Queue
             </p>
             <p className="mt-0.5 text-[11px]">
-              Appointment data is persisted locally and synchronizes automatically upon network reconnect.
+              Tokens are dynamically allocated per operational calendar date and synced across front desk and doctor consult rooms.
             </p>
           </div>
         </article>
       </section>
+
+      {/* Book Appointment Modal */}
+      {showBookModal && typeof document !== 'undefined' &&
+        createPortal(
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs">
+            <div className="w-full max-w-lg rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between border-b border-[#D9E6E2]/60 pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#287C75]/10 text-[#287C75]">
+                    <Calendar size={18} />
+                  </div>
+                  <div>
+                    <h2 className="font-heading text-lg font-bold text-[#10201F]">
+                      Book Clinic Appointment
+                    </h2>
+                    <p className="text-xs text-[#4E6460]">
+                      Schedule consultation and allocate sequential OPD token.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowBookModal(false)}
+                  className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#D9E6E2] text-[#4E6460] hover:bg-[#F7FAF8]"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              {/* Mode Toggle: Existing vs New Walk-in */}
+              <div className="mt-4 flex rounded-xl border border-[#D9E6E2] bg-[#F7FAF8] p-1 text-xs font-semibold">
+                <button
+                  type="button"
+                  onClick={() => setIsWalkIn(false)}
+                  className={`flex-1 rounded-lg py-1.5 transition ${
+                    !isWalkIn ? 'bg-white text-[#123A3A] shadow-xs font-bold' : 'text-[#4E6460]'
+                  }`}
+                >
+                  Registered Patient
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsWalkIn(true)}
+                  className={`flex-1 rounded-lg py-1.5 transition ${
+                    isWalkIn ? 'bg-white text-[#123A3A] shadow-xs font-bold' : 'text-[#4E6460]'
+                  }`}
+                >
+                  + New Walk-in Patient
+                </button>
+              </div>
+
+              <form onSubmit={handleConfirmBooking} className="mt-4 space-y-3.5 text-xs">
+                {/* Existing Patient Selector */}
+                {!isWalkIn ? (
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[#4E6460] mb-1">
+                      Select Patient *
+                    </label>
+                    <select
+                      value={bookingForm.patientId}
+                      onChange={(e) => setBookingForm({ ...bookingForm, patientId: e.target.value })}
+                      className="w-full rounded-xl border border-[#D9E6E2] bg-[#F7FAF8] p-2.5 text-xs font-semibold text-[#10201F] focus:border-[#287C75] focus:bg-white focus:outline-none"
+                    >
+                      <option value="">-- Choose patient from clinic registry --</option>
+                      {patients.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.name} {p.mrn ? `(${p.mrn})` : `(${p.id})`} • {p.phone}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ) : (
+                  /* Walk-in Registration Inputs */
+                  <div className="space-y-3 rounded-2xl border border-[#D9E6E2] bg-[#F7FAF8]/50 p-3.5">
+                    <div>
+                      <label className="block text-[11px] font-bold uppercase tracking-wider text-[#4E6460] mb-1">
+                        Walk-in Patient Name *
+                      </label>
+                      <input
+                        required
+                        placeholder="Full Name"
+                        value={bookingForm.patientName}
+                        onChange={(e) =>
+                          setBookingForm({ ...bookingForm, patientName: e.target.value })
+                        }
+                        className="w-full rounded-xl border border-[#D9E6E2] bg-white p-2.5 text-xs font-semibold text-[#10201F]"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-[#4E6460] mb-1">
+                          Mobile Number *
+                        </label>
+                        <input
+                          required
+                          type="tel"
+                          placeholder="Phone Number"
+                          value={bookingForm.patientPhone}
+                          onChange={(e) =>
+                            setBookingForm({ ...bookingForm, patientPhone: e.target.value })
+                          }
+                          className="w-full rounded-xl border border-[#D9E6E2] bg-white p-2.5 text-xs font-semibold text-[#10201F]"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-[#4E6460] mb-1">
+                          Age
+                        </label>
+                        <input
+                          type="number"
+                          placeholder="Years"
+                          value={bookingForm.patientAge}
+                          onChange={(e) =>
+                            setBookingForm({ ...bookingForm, patientAge: e.target.value })
+                          }
+                          className="w-full rounded-xl border border-[#D9E6E2] bg-white p-2.5 text-xs font-semibold text-[#10201F]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Date & Shift */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[#4E6460] mb-1">
+                      Consultation Date *
+                    </label>
+                    <input
+                      type="date"
+                      min={new Date().toISOString().split('T')[0]}
+                      value={bookingForm.appointmentDate}
+                      onChange={(e) =>
+                        setBookingForm({ ...bookingForm, appointmentDate: e.target.value })
+                      }
+                      className="w-full rounded-xl border border-[#D9E6E2] bg-white p-2.5 text-xs font-semibold text-[#10201F]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[#4E6460] mb-1">
+                      OPD Shift *
+                    </label>
+                    <select
+                      value={bookingForm.timeSlot}
+                      onChange={(e) =>
+                        setBookingForm({ ...bookingForm, timeSlot: e.target.value })
+                      }
+                      className="w-full rounded-xl border border-[#D9E6E2] bg-white p-2.5 text-xs font-semibold text-[#10201F]"
+                    >
+                      <option value="Morning OPD (10:00 AM - 01:00 PM)">Morning OPD</option>
+                      <option value="Afternoon OPD (02:00 PM - 04:30 PM)">Afternoon OPD</option>
+                      <option value="Evening OPD (05:00 PM - 08:00 PM)">Evening OPD</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Reason for Visit */}
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#4E6460] mb-1">
+                    Chief Complaint / Reason *
+                  </label>
+                  <input
+                    value={bookingForm.chiefComplaint}
+                    onChange={(e) =>
+                      setBookingForm({ ...bookingForm, chiefComplaint: e.target.value })
+                    }
+                    className="w-full rounded-xl border border-[#D9E6E2] bg-white p-2.5 text-xs font-semibold text-[#10201F]"
+                  />
+
+                  {/* Quick Chips */}
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {COMMON_REASONS.map((reason) => (
+                      <button
+                        key={reason}
+                        type="button"
+                        onClick={() =>
+                          setBookingForm({ ...bookingForm, chiefComplaint: reason })
+                        }
+                        className="rounded-lg border border-[#D9E6E2] bg-[#F7FAF8] px-2 py-0.5 text-[10px] font-medium text-[#4E6460] hover:border-[#287C75] hover:text-[#123A3A] transition"
+                      >
+                        {reason}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#D9E6E2]">
+                  <button
+                    type="button"
+                    onClick={() => setShowBookModal(false)}
+                    className="rounded-xl border border-[#D9E6E2] px-4 py-2 text-xs font-semibold text-[#4E6460] hover:bg-[#F7FAF8]"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="rounded-xl bg-[#123A3A] px-5 py-2 text-xs font-bold text-white shadow-sm hover:bg-[#287C75] transition"
+                  >
+                    Confirm Booking & Issue Token
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 }
