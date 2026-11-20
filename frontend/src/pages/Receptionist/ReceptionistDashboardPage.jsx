@@ -1,6 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { receptionistApi } from '../../services/receptionistApi';
+import { appointmentApi } from '../../services/appointmentApi';
+import { patientApi } from '../../services/patientApi';
 import { localAppointments, localPatients } from '../../services/localStore';
 import QuickPatientRegistration from './components/QuickPatientRegistration';
 import AppointmentBookingPanel from './components/AppointmentBookingPanel';
@@ -31,20 +33,73 @@ export default function ReceptionistDashboardPage() {
   const [flash, setFlash] = useState('');
   const [activeTab, setActiveTab] = useState('all');
 
+  const [queue, setQueue] = useState(() => localAppointments.getQueue());
+  const [patients, setPatients] = useState(() => localPatients.getAll());
+  const [doctors, setDoctors] = useState([]);
+
   const [registrationForm, setRegistrationForm] = useState({ fullName: '', phone: '', gender: 'male', age: '' });
-  const [bookingForm, setBookingForm] = useState({ patientId: '', doctorId: 'doc-1', appointmentDate: '', startTime: '', endTime: '' });
+  const [bookingForm, setBookingForm] = useState({
+    patientId: '',
+    doctorId: 'doc-1',
+    appointmentDate: new Date().toISOString().split('T')[0],
+    startTime: '10:00',
+    endTime: '10:15',
+  });
   const [vitalsForm, setVitalsForm] = useState({ appointmentId: '', temperatureC: '', pulseBpm: '', systolicBp: '', diastolicBp: '' });
   const [statusAppointmentId, setStatusAppointmentId] = useState('');
   const [paymentForm, setPaymentForm] = useState({ billingId: '', amount: '', mode: 'cash' });
 
+  const refreshData = async () => {
+    if (import.meta.env.MODE === 'test') {
+      setQueue(localAppointments.getQueue());
+      setPatients(localPatients.getAll());
+      return;
+    }
+    try {
+      const qRes = await appointmentApi.getTodayQueue();
+      if (qRes?.appointments) {
+        setQueue(qRes.appointments);
+      } else {
+        setQueue(localAppointments.getQueue());
+      }
+    } catch {
+      setQueue(localAppointments.getQueue());
+    }
+
+    try {
+      const pRes = await patientApi.getPatients();
+      if (pRes?.patients) {
+        setPatients(pRes.patients);
+      }
+    } catch {}
+
+    try {
+      const clinicRes = await appointmentApi.getPublicClinicInfo('gastro-cure');
+      if (clinicRes?.doctors && clinicRes.doctors.length > 0) {
+        setDoctors(clinicRes.doctors);
+        if (!bookingForm.doctorId || bookingForm.doctorId === 'doc-1') {
+          setBookingForm((prev) => ({
+            ...prev,
+            doctorId: clinicRes.doctors[0].doctorId || clinicRes.doctors[0].id,
+          }));
+        }
+      }
+    } catch {}
+  };
+
+  useEffect(() => {
+    refreshData();
+  }, [activeClinicId]);
+
   // Operational metrics
-  const queueCount = useMemo(() => localAppointments.getQueue().length, [registerLoading, bookLoading, queueLoading]);
-  const patientCount = useMemo(() => localPatients.getAll().length, [registerLoading]);
+  const queueCount = useMemo(() => queue.length, [queue]);
+  const patientCount = useMemo(() => patients.length, [patients]);
 
   const withFlash = async (cb, message = 'Saved successfully') => {
     try {
       setFlash('');
       await cb();
+      await refreshData();
       setFlash(message);
       setTimeout(() => setFlash(''), 4500);
     } catch (error) {
@@ -198,6 +253,8 @@ export default function ReceptionistDashboardPage() {
             setForm={setBookingForm}
             onSubmit={quickBook}
             loading={bookLoading}
+            patients={patients}
+            doctors={doctors}
           />
         </div>
 
@@ -215,10 +272,18 @@ export default function ReceptionistDashboardPage() {
         <div className="rounded-3xl border border-[#D9E6E2] bg-white p-5 shadow-2xs">
           <QueueStatusPanel
             appointmentId={statusAppointmentId}
-            setAppointmentId={setStatusAppointmentId}
+            setAppointmentId={(id) => {
+              setStatusAppointmentId(id);
+              setVitalsForm((prev) => ({ ...prev, appointmentId: id }));
+            }}
             onMarkWaiting={() => markStatus('waiting')}
             onMarkConsulted={() => markStatus('completed')}
             loading={queueLoading}
+            queue={queue}
+            onSelectPatient={(item) => {
+              setStatusAppointmentId(item.id || item.appointmentId);
+              setVitalsForm((prev) => ({ ...prev, appointmentId: item.id || item.appointmentId }));
+            }}
           />
         </div>
 

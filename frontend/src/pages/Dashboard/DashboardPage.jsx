@@ -14,6 +14,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import StatCard from '../../components/ui/StatCard';
 import StatusBadge from '../../components/ui/StatusBadge';
 import { localAppointments, localPatients, localVisits } from '../../services/localStore';
+import { appointmentApi } from '../../services/appointmentApi';
+import { patientApi } from '../../services/patientApi';
 import FollowUpRemindersWidget from './components/FollowUpRemindersWidget';
 import ClinicAnalyticsWidget from '../../components/analytics/ClinicAnalyticsWidget';
 
@@ -119,7 +121,28 @@ function DashboardPage() {
       completedToday: visitsToday.length,
       followUpsDue: followUpKeys.size,
     });
-  }, []);
+
+    if (import.meta.env.MODE !== 'test') {
+      appointmentApi.getTodayQueue().then((res) => {
+        if (res?.appointments && Array.isArray(res.appointments) && res.appointments.length > 0) {
+          setQueue(res.appointments);
+          setStats((prev) => ({
+            ...prev,
+            pendingConsultations: res.appointments.length,
+          }));
+        }
+      }).catch(() => {});
+
+      patientApi.getPatients().then((res) => {
+        if (res?.total !== undefined) {
+          setStats((prev) => ({
+            ...prev,
+            totalPatients: res.total,
+          }));
+        }
+      }).catch(() => {});
+    }
+  }, [activeClinic?.id]);
 
   const filteredQueue = queue.filter((p) => {
     if (!queueSearch.trim()) return true;
@@ -155,11 +178,11 @@ function DashboardPage() {
       trend: { label: '1-2 Days Ahead & Overdue', positive: true },
     },
     {
-      label: 'Offline Mode',
-      value: 'Active',
+      label: 'Cloud Sync',
+      value: 'Online',
       icon: ShieldCheck,
       tone: 'secondary',
-      trend: { label: 'No backend required', positive: true },
+      trend: { label: 'Supabase PostgreSQL', positive: true },
     },
   ];
 
@@ -188,7 +211,7 @@ function DashboardPage() {
         <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#126857]">
-              Doctor Dashboard · Gastro Cure Digestive & Liver Centre
+              Doctor Dashboard · {activeClinic?.name || 'Gastro Cure Digestive & Liver Centre'}
             </p>
             <h1 className="mt-1 font-heading text-2xl font-bold text-[#10201F] tracking-tight sm:text-3xl">
               Welcome back, {doctorTitle}
@@ -200,7 +223,7 @@ function DashboardPage() {
 
           <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1.5 text-xs font-semibold text-[#126857] shrink-0 self-start md:self-auto shadow-2xs">
             <span className="h-2 w-2 rounded-full bg-[#25D366] animate-pulse" />
-            <span>Gastro & Liver OPD Ready</span>
+            <span>{activeClinic?.shortName || 'OPD'} Session Live</span>
           </div>
         </div>
       </section>

@@ -13,6 +13,8 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { localVisits, localPatients, localSettings } from '../../services/localStore';
+import { prescriptionApi } from '../../services/prescriptionApi';
+import { useAuth } from '../../contexts/AuthContext';
 import { generatePrescriptionWhatsAppLink } from '../../utils/whatsappHelper';
 
 /**
@@ -61,6 +63,7 @@ const formatDisplayDate = (dateInput) => {
  */
 function PrescriptionsPage() {
   const navigate = useNavigate();
+  const { activeClinicId } = useAuth();
 
   const [prescriptions, setPrescriptions] = useState([]);
   const [clinicSettings, setClinicSettings] = useState(() => localSettings.get());
@@ -68,12 +71,49 @@ function PrescriptionsPage() {
   const [dateFilter, setDateFilter] = useState('all'); // 'all' | 'today' | 'week'
   const [copiedId, setCopiedId] = useState(null);
 
-  // Load visits
+  // Load visits & Cloud Prescriptions
   useEffect(() => {
-    const visits = localVisits.getAll();
+    const visits = localVisits.getAll() || [];
     setPrescriptions(visits);
     setClinicSettings(localSettings.get());
-  }, []);
+
+    if (import.meta.env.MODE !== 'test') {
+      prescriptionApi.getPrescriptions().then((res) => {
+        if (res?.prescriptions && Array.isArray(res.prescriptions)) {
+          const cloudNormalized = res.prescriptions.map((p) => ({
+            id: p.id,
+            rxNumber: p.rxNumber,
+            date: p.visitDate || p.createdAt,
+            patientId: p.patientId,
+            patientName: p.patient?.name || p.patientName || 'Patient',
+            patientMobile: p.patient?.phone || p.patientMobile || '',
+            patientAge: p.patient?.age || p.patientAge || null,
+            patientGender: p.patient?.gender || p.patientGender || null,
+            patientMrn: p.patient?.mrn || null,
+            doctorName: p.doctor?.fullName || null,
+            diagnosis: Array.isArray(p.diagnosis) ? p.diagnosis.join(', ') : p.diagnosis || '',
+            symptoms: Array.isArray(p.symptoms) ? p.symptoms.join(', ') : p.symptoms || '',
+            advice: Array.isArray(p.advice) ? p.advice.join('. ') : p.advice || '',
+            medicines: p.medicines || [],
+            followUpDate: p.followUpDate,
+            brandingSnapshot: p.brandingSnapshot,
+            isCloud: true,
+          }));
+
+          const map = new Map();
+          cloudNormalized.forEach((p) => map.set(p.id, p));
+          visits.forEach((v) => {
+            if (!map.has(v.id)) {
+              map.set(v.id, v);
+            }
+          });
+          setPrescriptions(Array.from(map.values()));
+        }
+      }).catch((err) => {
+        console.warn('Live prescriptions fetch failed, keeping local:', err);
+      });
+    }
+  }, [activeClinicId]);
 
   const todayStr = useMemo(() => toLocalDateStr(new Date()), []);
 
@@ -91,9 +131,10 @@ function PrescriptionsPage() {
       const matchesSearch =
         !q ||
         (rx.id && rx.id.toLowerCase().includes(q)) ||
+        (rx.rxNumber && rx.rxNumber.toLowerCase().includes(q)) ||
         (rx.patientName && rx.patientName.toLowerCase().includes(q)) ||
         (rx.patientMobile && rx.patientMobile.includes(q)) ||
-        (rx.diagnosis && rx.diagnosis.toLowerCase().includes(q));
+        (rx.diagnosis && String(rx.diagnosis).toLowerCase().includes(q));
 
       if (!matchesSearch) return false;
 
@@ -283,7 +324,13 @@ function PrescriptionsPage() {
                     <tr key={rx.id} className="hover:bg-slate-50/70 transition-colors">
                       {/* Rx ID */}
                       <td className="py-3.5 px-4 font-mono font-bold text-xs text-[#123A3A]">
-                        {rx.id}
+                        <div>{rx.rxNumber || rx.id}</div>
+                        {rx.isCloud && (
+                          <span className="inline-flex items-center gap-1 text-[10px] text-emerald-700 font-sans font-medium">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                            Cloud Synced
+                          </span>
+                        )}
                       </td>
 
                       {/* Date */}

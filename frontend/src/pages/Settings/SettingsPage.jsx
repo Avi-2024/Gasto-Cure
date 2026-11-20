@@ -25,7 +25,7 @@ export function SettingsPage() {
       const a = document.createElement('a');
       const dateStr = new Date().toISOString().split('T')[0];
       a.href = url;
-      a.download = `clinicrx-backup-${dateStr}.json`;
+      a.download = `clinixpulse-backup-${dateStr}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -127,7 +127,7 @@ export function SettingsPage() {
               Offline Data Backup & Restore
             </h3>
             <p className="text-xs text-[#4E6460] mt-1.5 leading-relaxed">
-              ClinicRx stores all clinical data locally in your browser. Regularly export a backup to safeguard patient records.
+              ClinixPulse™ stores all clinical data with high-resilience local caching and cloud synchronization. Regularly export a backup to safeguard patient records.
             </p>
           </div>
 

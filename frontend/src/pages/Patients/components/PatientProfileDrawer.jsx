@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -17,6 +17,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { localVisits, localSettings } from '../../../services/localStore';
+import { prescriptionApi } from '../../../services/prescriptionApi';
 import { cleanPhoneNumber, generatePrescriptionWhatsAppLink } from '../../../utils/whatsappHelper';
 import PatientAvatar from '../../../components/common/PatientAvatar';
 
@@ -57,9 +58,48 @@ function PatientProfileDrawer({ isOpen, patient, onClose, onEdit, clinicSettings
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  const visits = useMemo(() => {
+  const [visits, setVisits] = useState(() => {
     if (!patient?.id) return [];
     return localVisits.getByPatient(patient.id);
+  });
+
+  useEffect(() => {
+    if (!patient?.id || !isOpen) return;
+    const local = localVisits.getByPatient(patient.id);
+    setVisits(local);
+
+    if (import.meta.env.MODE !== 'test') {
+      prescriptionApi.getPrescriptions({ patientId: patient.id }).then((res) => {
+        if (res?.prescriptions && Array.isArray(res.prescriptions)) {
+          const cloudNormalized = res.prescriptions.map((p) => ({
+            id: p.id,
+            rxNumber: p.rxNumber,
+            date: p.visitDate || p.createdAt,
+            patientId: p.patientId,
+            patientName: p.patient?.name || patient.name,
+            patientMobile: p.patient?.phone || patient.contact,
+            diagnosis: Array.isArray(p.diagnosis) ? p.diagnosis.join(', ') : p.diagnosis || '',
+            symptoms: Array.isArray(p.symptoms) ? p.symptoms.join(', ') : p.symptoms || '',
+            advice: Array.isArray(p.advice) ? p.advice.join('. ') : p.advice || '',
+            medicines: p.medicines || [],
+            followUpDate: p.followUpDate,
+            brandingSnapshot: p.brandingSnapshot,
+            isCloud: true,
+          }));
+
+          const map = new Map();
+          cloudNormalized.forEach((p) => map.set(p.id, p));
+          local.forEach((v) => {
+            if (!map.has(v.id)) {
+              map.set(v.id, v);
+            }
+          });
+          setVisits(Array.from(map.values()));
+        }
+      }).catch((err) => {
+        console.warn('Could not load patient live visits:', err);
+      });
+    }
   }, [patient?.id, isOpen]);
 
   if (!isOpen || !patient) return null;

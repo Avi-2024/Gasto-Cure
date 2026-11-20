@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import {
   MessageSquare,
   Search,
@@ -21,26 +22,8 @@ import { localPatients, localSettings } from '../../services/localStore';
 import { formatDisplayDate } from '../../services/automatedRemindersService';
 import PatientAvatar from '../../components/common/PatientAvatar';
 
-const QUICK_TEMPLATES = [
-  {
-    label: 'Follow-up Confirmation',
-    text: "Hi! This is Gastro Cure Clinic. We would like to confirm your follow-up appointment scheduled for tomorrow with Dr. Snehal Makwana. * Tap 'Yes' to confirm. * Tap 'No' if you are not coming.",
-  },
-  {
-    label: 'Prescription Ready',
-    text: 'Hello! Your prescription and medication advice from Dr. Snehal Makwana have been processed. Please take medicines as directed.',
-  },
-  {
-    label: 'Clinic Address & Timings',
-    text: 'Gastro Cure Clinic OPD Timings: 10:00 AM - 02:00 PM and 05:00 PM - 09:00 PM. Location: Shop No. 4, Ground Floor, Gastro Cure Medical Centre, Unchehra.',
-  },
-  {
-    label: 'Test Reports Follow-up',
-    text: 'Namaste! Please bring your latest LFT / Endoscopy investigation reports during your consultation checkup.',
-  },
-];
-
 export default function ChatPage() {
+  const { activeClinic, user } = useAuth();
   const [searchParams] = useSearchParams();
   const initialPatientId = searchParams.get('patientId');
 
@@ -52,6 +35,30 @@ export default function ChatPage() {
 
   const messagesEndRef = useRef(null);
   const clinic = localSettings.get();
+
+  const clinicName = activeClinic?.name || clinic?.clinicName || 'ClinixPulse Clinic';
+  const doctorName = user?.fullName || activeClinic?.doctorName || clinic?.doctorName || 'Dr. Snehal Makwana';
+  const clinicAddress = activeClinic?.addressLine1 ? `${activeClinic.addressLine1}, ${activeClinic.city}` : clinic?.address || 'Clinic OPD Center';
+  const timings = activeClinic?.timings || clinic?.timing || '10:00 AM - 02:00 PM and 05:00 PM - 09:00 PM';
+
+  const quickTemplates = useMemo(() => [
+    {
+      label: 'Follow-up Confirmation',
+      text: `Hi! This is ${clinicName}. We would like to confirm your follow-up appointment scheduled for tomorrow with ${doctorName}. * Tap 'Yes' to confirm. * Tap 'No' if you are not coming.`,
+    },
+    {
+      label: 'Prescription Ready',
+      text: `Hello! Your prescription and medication advice from ${doctorName} at ${clinicName} have been processed. Please take medicines as directed.`,
+    },
+    {
+      label: 'Clinic Address & Timings',
+      text: `${clinicName} OPD Timings: ${timings}. Location: ${clinicAddress}.`,
+    },
+    {
+      label: 'Test Reports Follow-up',
+      text: `Namaste! Please bring your latest investigation/lab reports during your consultation checkup at ${clinicName}.`,
+    },
+  ], [clinicName, doctorName, clinicAddress, timings]);
 
   const loadConversations = () => {
     const list = chatService.getConversations();
@@ -348,7 +355,7 @@ export default function ChatPage() {
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[#637C76] shrink-0 pl-1">
                   Quick Templates:
                 </span>
-                {QUICK_TEMPLATES.map((tmpl, idx) => (
+                {quickTemplates.map((tmpl, idx) => (
                   <button
                     key={idx}
                     type="button"
