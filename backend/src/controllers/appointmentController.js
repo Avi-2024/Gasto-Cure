@@ -1,4 +1,8 @@
 const prisma = require('../config/prisma');
+const {
+  dispatchDualMode,
+  getWhatsAppCredentials,
+} = require('../services/whatsapp/whatsappSender');
 
 /**
  * Public: Get Clinic Public Booking Profile by Slug
@@ -230,6 +234,17 @@ exports.publicBookAppointment = async (req, res) => {
       };
     });
 
+    const phoneToUse = bookingResult.patient.phone || patientPhone;
+    const doctorName = bookingResult.appointment.doctor?.fullName || 'Consultant Physician';
+    const clinicName = bookingResult.clinic.name;
+    const tokenFormatted = bookingResult.tokenFormatted;
+    const targetDateStr = targetDate.toISOString().split('T')[0];
+
+    const passMessage = `Namaste ${bookingResult.patient.name}!\n\nYour appointment at *${clinicName}* has been successfully booked.\n\n*Token Number:* ${tokenFormatted}\n*Doctor:* ${doctorName}\n*Date:* ${targetDateStr}\n*Slot:* ${timeSlot}\n*Address:* ${bookingResult.clinic.addressLine1}, ${bookingResult.clinic.city}\n\nPlease arrive 15 minutes before your slot and present this token pass at reception.`;
+
+    // Dual-Mode: Sends automatically if WhatsApp Cloud API configured, else prepares 1-Click Pass
+    const dispatchResult = await dispatchDualMode({ phone: phoneToUse, text: passMessage });
+
     return res.status(201).json({
       success: true,
       message: `Appointment confirmed with Token #${bookingResult.appointment.tokenNumber}!`,
@@ -237,7 +252,7 @@ exports.publicBookAppointment = async (req, res) => {
         tokenNumber: bookingResult.appointment.tokenNumber,
         tokenFormatted: bookingResult.tokenFormatted,
         appointmentId: bookingResult.appointment.id,
-        appointmentDate: targetDate.toISOString().split('T')[0],
+        appointmentDate: targetDateStr,
         timeSlot,
         patient: {
           id: bookingResult.patient.id,
@@ -245,11 +260,18 @@ exports.publicBookAppointment = async (req, res) => {
           phone: bookingResult.patient.phone,
           mrn: bookingResult.patient.mrn,
         },
-        doctorName: bookingResult.appointment.doctor?.fullName || 'Consultant Physician',
+        doctorName,
         clinic: {
           name: bookingResult.clinic.name,
           phone: bookingResult.clinic.phone,
           address: `${bookingResult.clinic.addressLine1}, ${bookingResult.clinic.city}`,
+        },
+        whatsapp: {
+          deliveryMode: dispatchResult.deliveryMode,
+          status: dispatchResult.status,
+          apiConfigured: dispatchResult.apiConfigured,
+          apiMessageId: dispatchResult.apiMessageId || null,
+          waPassUrl: dispatchResult.waUrl,
         },
       },
     });
@@ -523,6 +545,9 @@ exports.updateAppointmentStatus = async (req, res) => {
 /**
  * Automated WhatsApp Appointment Reminders Engine
  * Scans upcoming appointments (today and tomorrow) and dispatches reminder notifications.
+ * Dual-Mode Engine:
+ *   - Automatic via Meta WhatsApp Cloud API if credentials exist (Zero clicks required)
+ *   - 1-Click assisted WhatsApp link with zero fees if API is not configured or fails
  */
 exports.dispatchAppointmentReminders = async (req, res) => {
   try {
@@ -556,8 +581,6 @@ exports.dispatchAppointmentReminders = async (req, res) => {
     const dispatchedList = [];
 
     for (const appt of upcomingAppointments) {
-      const patientPhone = (appt.patient?.phone || '').replace(/[^\d]/g, '');
-      const cleanPhone = patientPhone.slice(-10);
       const isTomorrow = new Date(appt.appointmentDate).getDate() === tomorrow.getDate();
       const dayLabel = isTomorrow ? 'tomorrow' : 'today';
 
@@ -566,25 +589,40 @@ exports.dispatchAppointmentReminders = async (req, res) => {
       const tokenFormatted = `Token #${appt.tokenNumber}`;
 
       const message = `Namaste ${appt.patient?.name}!\n\nThis is an automated reminder that your OPD appointment at *${clinicName}* with *${doctorName}* is scheduled for *${dayLabel}*.\n\n*Token Number:* ${tokenFormatted}\n*Complaint / Slot:* ${appt.chiefComplaint || 'Consultation'}\n\nPlease arrive 15 minutes prior to your token checkup. Reply 'YES' to confirm or 'NO' to reschedule.`;
-      const waUrl = cleanPhone ? `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(message)}` : null;
+
+      // Dual-Mode Dispatch: Direct API if configured; 1-Click fallback otherwise
+      const dispatchResult = await dispatchDualMode({
+        phone: appt.patient?.phone || '',
+        text: message,
+      });
 
       dispatchedList.push({
         appointmentId: appt.id,
         patientName: appt.patient?.name,
-        patientPhone: cleanPhone ? `+91 ${cleanPhone}` : 'N/A',
+        patientPhone: dispatchResult.cleanPhone ? `+91 ${dispatchResult.cleanPhone}` : 'N/A',
         tokenFormatted,
         doctorName,
         scheduledDate: appt.appointmentDate.toISOString().split('T')[0],
         dayLabel,
-        waUrl,
-        status: 'REMINDER_GENERATED',
+        deliveryMode: dispatchResult.deliveryMode,
+        status: dispatchResult.status,
+        apiConfigured: dispatchResult.apiConfigured,
+        apiMessageId: dispatchResult.apiMessageId || null,
+        apiError: dispatchResult.apiError || null,
+        waUrl: dispatchResult.waUrl,
       });
     }
 
+    const { isConfigured } = getWhatsAppCredentials();
+
     return res.status(200).json({
       success: true,
-      message: `Processed ${dispatchedList.length} automated appointment reminders for ${req.clinic?.name || 'clinic'}.`,
+      message: isConfigured
+        ? `Processed ${dispatchedList.length} reminders automatically via WhatsApp API for ${req.clinic?.name || 'clinic'}.`
+        : `WhatsApp API not configured. Generated ${dispatchedList.length} 1-Click WhatsApp reminders ready for instant delivery for ${req.clinic?.name || 'clinic'}.`,
       data: {
+        mode: isConfigured ? 'AUTOMATIC_API' : 'ONE_CLICK_MANUAL',
+        apiConfigured: isConfigured,
         totalReminders: dispatchedList.length,
         reminders: dispatchedList,
       },

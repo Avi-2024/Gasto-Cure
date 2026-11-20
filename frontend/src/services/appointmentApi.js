@@ -284,4 +284,22 @@ export const appointmentApi = {
       return { success: true, status: normalized.toLowerCase(), isOfflineFallback: true };
     }
   },
+
+  /**
+   * Dispatch Automated WhatsApp Reminders (Dual-Mode: Auto API if configured, 1-Click fallback otherwise)
+   */
+  async dispatchReminders() {
+    try {
+      const res = await apiRequest('/appointments/reminders/dispatch', {
+        method: 'POST',
+      });
+      return res;
+    } catch (err) {
+      console.warn('Backend reminders dispatch error:', err.message);
+      return {
+        success: false,
+        error: err.message,
+      };
+    }
+  },
 };

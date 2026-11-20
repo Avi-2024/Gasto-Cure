@@ -12,6 +12,7 @@ import {
 import { localPatients, localVisits, localSettings } from '../../../services/localStore';
 import { generateFollowUpReminderWhatsAppLink } from '../../../utils/whatsappHelper';
 import { automatedRemindersService } from '../../../services/automatedRemindersService';
+import { appointmentApi } from '../../../services/appointmentApi';
 import PatientAvatar from '../../../components/common/PatientAvatar';
 
 /**
@@ -191,11 +192,14 @@ export default function FollowUpRemindersWidget() {
     ).length;
   }, [followUps, remindedIds]);
 
-  const handleAutoSendAll = () => {
+  const handleAutoSendAll = async () => {
     const eligible = followUps.filter(
       (item) => item.daysLeft >= 0 && item.daysLeft <= 2 && !remindedIds.includes(item.key)
     );
     if (eligible.length === 0) return;
+
+    // Trigger backend dual-mode automated reminder dispatch in background
+    appointmentApi.dispatchReminders().catch(() => {});
 
     const newRemindedKeys = [...remindedIds];
     const newAutoSent = [...autoSentKeys];
@@ -219,8 +223,8 @@ export default function FollowUpRemindersWidget() {
 
     const firstPatientName = eligible[0]?.name || 'Patient';
     setAutoAlert({
-      title: `Automated WhatsApp Reminders Dispatched (${sentCount} patient${sentCount > 1 ? 's' : ''})`,
-      message: `Delivered follow-up confirmation to ${firstPatientName} and pending cohort via WhatsApp.`,
+      title: `WhatsApp Reminders Active (${sentCount} patient${sentCount > 1 ? 's' : ''})`,
+      message: `Dispatched follow-up reminders (Automatic API if configured, 1-Click ready) for ${firstPatientName} and pending cohort.`,
     });
   };
 
