@@ -326,10 +326,59 @@ describe('PatientSearchSelector & Senior Appointment Booking UX', () => {
       const saveBtn = screen.getByRole('button', { name: /Save Patient Name/i });
       fireEvent.click(saveBtn);
 
-      // Patient name should now update on the card
+      // Patient name should now update on the card/table
       await waitFor(() => {
         expect(screen.getByText('Suresh Kumar')).toBeTruthy();
       });
+    });
+
+    it('renders Clinical Table View by default and toggles between Table and Cards view', () => {
+      const storedAppts = [
+        {
+          id: 'test-tbl-1',
+          tokenNumber: 1,
+          tokenFormatted: 'Token #1',
+          patientId: 'pt-001',
+          patientName: 'Aarav Sharma',
+          patientMrn: 'MLC-2026-0001',
+          patientPhone: '9876543210',
+          reason: 'Acid Peptic Disease / GERD Workup',
+          chiefComplaint: 'Acid Peptic Disease / GERD Workup (Morning OPD)',
+          status: 'waiting',
+          appointmentDate: '2026-11-20',
+          createdAt: '2026-11-20T10:00:00.000Z',
+        },
+      ];
+      localStorage.setItem('ds_appointments', JSON.stringify(storedAppts));
+
+      render(
+        <MemoryRouter>
+          <AppointmentsPage />
+        </MemoryRouter>
+      );
+
+      // Verify Table View headers are present
+      expect(screen.getByText('Token')).toBeTruthy();
+      expect(screen.getByText('Patient Details')).toBeTruthy();
+      expect(screen.getByText('Complaint / Shift')).toBeTruthy();
+      expect(screen.getByText('Schedule')).toBeTruthy();
+
+      // Verify Table view shows patient details
+      expect(screen.getByText('Aarav Sharma')).toBeTruthy();
+      expect(screen.getByText('MLC-2026-0001')).toBeTruthy();
+      expect(screen.getByText(/9876543210/)).toBeTruthy();
+
+      // Click Cards view button
+      const cardsBtn = screen.getByRole('button', { name: /Cards/i });
+      fireEvent.click(cardsBtn);
+
+      // Verify Cards view is active and displays patient card
+      expect(screen.getByText('Aarav Sharma')).toBeTruthy();
+
+      // Switch back to Table view
+      const tableBtn = screen.getByRole('button', { name: /Table/i });
+      fireEvent.click(tableBtn);
+      expect(screen.getByText('Patient Details')).toBeTruthy();
     });
   });
 });

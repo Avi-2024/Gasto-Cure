@@ -12,12 +12,14 @@ import {
   Clock3,
   Edit3,
   Filter,
+  LayoutGrid,
   Loader2,
   MapPin,
   Phone,
   Plus,
   Search,
   Stethoscope,
+  Table,
   Ticket,
   User,
   Users,
@@ -25,6 +27,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import StatusBadge from '../../components/ui/StatusBadge';
+import PatientAvatar from '../../components/common/PatientAvatar';
 import PatientSearchSelector from '../../components/common/PatientSearchSelector';
 import { useAuth } from '../../contexts/AuthContext';
 import { appointmentApi } from '../../services/appointmentApi';
@@ -55,6 +58,9 @@ export default function AppointmentsPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('');
   const [notification, setNotification] = useState('');
+
+  // View Mode: 'table' (Clinical Queue Table) or 'cards'
+  const [viewMode, setViewMode] = useState('table');
 
   // Calendar Navigation State
   const [viewDate, setViewDate] = useState(() => new Date());
@@ -429,150 +435,374 @@ export default function AppointmentsPage() {
       </section>
 
       {/* Grid: Appointments List & Calendar */}
-      <section className="grid gap-6 xl:grid-cols-[1.3fr_1fr]">
-        {/* Left Column: Appointments List */}
-        <article className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-clinixpulse-xs">
-          <div className="flex items-center justify-between border-b border-[#D9E6E2]/60 pb-3">
-            <h2 className="font-heading text-base font-bold text-[#10201F]">
-              Appointment Register
-            </h2>
-            <StatusBadge label={`${filteredAppointments.length} Appointments`} variant="info" />
+      <section className="grid gap-6 xl:grid-cols-[1.85fr_1fr]">
+        {/* Left Column: Appointments Register (Table & Card View Modes) */}
+        <article className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-clinixpulse-xs flex flex-col">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#D9E6E2]/60 pb-3.5">
+            <div className="flex items-center gap-3">
+              <h2 className="font-heading text-base font-bold text-[#10201F]">
+                Appointment Register
+              </h2>
+              <StatusBadge label={`${filteredAppointments.length} Appointments`} variant="info" />
+            </div>
+
+            {/* View Mode Toggle Switcher */}
+            <div className="flex items-center gap-1 rounded-xl border border-[#D9E6E2] bg-[#F7FAF8] p-1">
+              <button
+                type="button"
+                onClick={() => setViewMode('table')}
+                className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
+                  viewMode === 'table'
+                    ? 'bg-white text-[#287C75] shadow-xs'
+                    : 'text-[#4E6460] hover:text-[#10201F]'
+                }`}
+                title="Clinical Queue Table View"
+              >
+                <Table size={13} />
+                <span>Table</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('cards')}
+                className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
+                  viewMode === 'cards'
+                    ? 'bg-white text-[#287C75] shadow-xs'
+                    : 'text-[#4E6460] hover:text-[#10201F]'
+                }`}
+                title="Cards View"
+              >
+                <LayoutGrid size={13} />
+                <span>Cards</span>
+              </button>
+            </div>
           </div>
 
-          <ul className="mt-4 space-y-3">
-            {filteredAppointments.map((appointment) => {
-              const isWaiting = (appointment.status || '').toLowerCase() === 'waiting';
-              const isCompleted = (appointment.status || '').toLowerCase() === 'completed';
+          {/* Table View */}
+          {viewMode === 'table' ? (
+            <div className="mt-4 overflow-x-auto rounded-2xl border border-[#D9E6E2] bg-white">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-[#D9E6E2] bg-[#F7FAF8] text-[11px] font-bold uppercase tracking-wider text-[#4E6460]">
+                    <th className="py-3 px-3 text-center w-16">Token</th>
+                    <th className="py-3 px-3">Patient Details</th>
+                    <th className="py-3 px-3">Contact</th>
+                    <th className="py-3 px-3">Complaint / Shift</th>
+                    <th className="py-3 px-3 whitespace-nowrap">Schedule</th>
+                    <th className="py-3 px-3 text-center">Status</th>
+                    <th className="py-3 px-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#D9E6E2]/70 text-xs">
+                  {filteredAppointments.map((appointment) => {
+                    const isWaiting = (appointment.status || '').toLowerCase() === 'waiting';
+                    const rawDate = appointment.appointmentDate || (appointment.createdAt ? appointment.createdAt.split('T')[0] : '');
+                    const formattedDate = rawDate
+                      ? new Date(`${rawDate}T00:00:00`).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                        })
+                      : 'Today';
 
-              return (
-                <li
-                  key={appointment.id}
-                  className="group rounded-2xl border border-[#D9E6E2] bg-white p-4 transition hover:border-[#287C75] hover:bg-[#F7FAF8]/70 hover:shadow-xs"
-                >
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        {appointment.tokenFormatted && (
-                          <span className="inline-flex items-center justify-center rounded-lg bg-[#FDF6E2] border border-[#EBD7A9] px-2 py-0.5 text-[11px] font-mono font-bold text-[#8C6B1F]">
-                            {appointment.tokenFormatted}
+                    return (
+                      <tr
+                        key={appointment.id}
+                        className="group hover:bg-[#F7FAF8]/80 transition-colors"
+                      >
+                        {/* Token */}
+                        <td className="py-3 px-3 text-center align-middle whitespace-nowrap">
+                          <span className="inline-flex items-center justify-center rounded-lg bg-[#FDF6E2] border border-[#EBD7A9] px-2 py-1 text-xs font-mono font-bold text-[#8C6B1F] shadow-xs">
+                            {appointment.tokenFormatted || `#${appointment.tokenNumber || '—'}`}
                           </span>
-                        )}
-                        <span className="font-heading text-sm font-bold text-[#10201F]">
-                          {appointment.patientName || 'Patient'}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setEditingPatientModal({
-                              appointmentId: appointment.id,
-                              patientId: appointment.patientId,
-                              currentName: appointment.patientName === 'Walk-in Patient' ? '' : appointment.patientName,
-                              currentPhone: appointment.patientPhone || '',
-                            });
-                            setEditPatientName(appointment.patientName === 'Walk-in Patient' ? '' : (appointment.patientName || ''));
-                            setEditPatientPhone(appointment.patientPhone || '');
-                          }}
-                          className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-semibold text-[#287C75] hover:bg-[#287C75]/10 hover:text-[#123A3A] transition cursor-pointer"
-                          title={appointment.patientName === 'Walk-in Patient' ? 'Set Real Patient Name' : 'Edit Patient Name'}
-                        >
-                          <Edit3 size={11} />
-                          <span>{appointment.patientName === 'Walk-in Patient' ? 'Set Name' : 'Edit'}</span>
-                        </button>
-                        {appointment.patientMrn ? (
-                          <span className="rounded-md border border-[#287C75]/20 bg-[#287C75]/10 px-1.5 py-0.5 font-mono text-[10px] font-bold text-[#123A3A]">
-                            {appointment.patientMrn}
+                        </td>
+
+                        {/* Patient Details */}
+                        <td className="py-3 px-3 align-middle">
+                          <div className="flex items-center gap-2.5">
+                            <PatientAvatar
+                              name={appointment.patientName || 'Patient'}
+                              size="sm"
+                            />
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="font-heading text-xs font-bold text-[#10201F]">
+                                  {appointment.patientName || 'Patient'}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setEditingPatientModal({
+                                      appointmentId: appointment.id,
+                                      patientId: appointment.patientId,
+                                      currentName: appointment.patientName === 'Walk-in Patient' ? '' : appointment.patientName,
+                                      currentPhone: appointment.patientPhone || '',
+                                    });
+                                    setEditPatientName(appointment.patientName === 'Walk-in Patient' ? '' : (appointment.patientName || ''));
+                                    setEditPatientPhone(appointment.patientPhone || '');
+                                  }}
+                                  className="inline-flex items-center gap-0.5 rounded px-1 py-0.5 text-[10px] font-semibold text-[#287C75] hover:bg-[#287C75]/10 transition cursor-pointer"
+                                  title={appointment.patientName === 'Walk-in Patient' ? 'Set Patient Name' : 'Edit Name'}
+                                >
+                                  <Edit3 size={10} />
+                                  <span>{appointment.patientName === 'Walk-in Patient' ? 'Set Name' : 'Edit'}</span>
+                                </button>
+                              </div>
+                              <div className="mt-0.5 flex items-center gap-1.5 flex-wrap">
+                                {appointment.patientMrn && (
+                                  <span className="rounded border border-[#287C75]/20 bg-[#287C75]/10 px-1 py-0.2 font-mono text-[10px] font-bold text-[#123A3A]">
+                                    {appointment.patientMrn}
+                                  </span>
+                                )}
+                                {(appointment.patientAge || appointment.age) && (
+                                  <span className="text-[11px] text-[#7D908C]">
+                                    {appointment.patientAge || appointment.age} Yrs
+                                    {appointment.patientGender || appointment.gender ? ` • ${appointment.patientGender || appointment.gender}` : ''}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Contact Phone */}
+                        <td className="py-3 px-3 align-middle whitespace-nowrap">
+                          {appointment.patientPhone ? (
+                            <span className="inline-flex items-center gap-1 font-mono text-xs text-[#287C75] bg-[#287C75]/5 px-2 py-0.5 rounded-md border border-[#287C75]/15">
+                              <Phone size={10} />
+                              {appointment.patientPhone}
+                            </span>
+                          ) : (
+                            <span className="text-[11px] text-[#7D908C] italic">No phone</span>
+                          )}
+                        </td>
+
+                        {/* Complaint / Shift */}
+                        <td className="py-3 px-3 align-middle max-w-[200px]">
+                          <p className="font-medium text-[#10201F] truncate text-xs" title={appointment.reason}>
+                            {appointment.reason || 'General Outpatient Consultation'}
+                          </p>
+                          <p className="text-[10px] text-[#7D908C] truncate">
+                            {appointment.chiefComplaint?.includes('(')
+                              ? appointment.chiefComplaint.split('(')[1]?.replace(')', '')
+                              : 'Morning OPD'}
+                          </p>
+                        </td>
+
+                        {/* Schedule */}
+                        <td className="py-3 px-3 align-middle whitespace-nowrap">
+                          <div className="flex items-center gap-1 font-semibold text-[#10201F] whitespace-nowrap">
+                            <Clock3 size={11} className="text-[#287C75]" />
+                            <span>{appointment.startTime || '10:00 AM'}</span>
+                          </div>
+                          <div className="text-[11px] text-[#7D908C] mt-0.5 whitespace-nowrap">
+                            {formattedDate}
+                          </div>
+                        </td>
+
+                        {/* Status */}
+                        <td className="py-3 px-3 text-center align-middle whitespace-nowrap">
+                          <StatusBadge
+                            label={appointment.status || 'waiting'}
+                            variant={statusVariantMap[appointment.status] || 'warning'}
+                            className="capitalize text-[11px]"
+                          />
+                        </td>
+
+                        {/* Actions */}
+                        <td className="py-3 px-3 text-right align-middle whitespace-nowrap">
+                          <div className="inline-flex items-center gap-1.5 justify-end">
+                            {isWaiting ? (
+                              <>
+                                <Link
+                                  to={`/prescription/new?patientId=${encodeURIComponent(
+                                    appointment.patientId || appointment.id
+                                  )}`}
+                                  className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#287C75]/10 text-[#287C75] hover:bg-[#123A3A] hover:text-white transition shadow-xs"
+                                  title="Start Consultation & Prescribe"
+                                >
+                                  <Stethoscope size={13} />
+                                </Link>
+                                <button
+                                  type="button"
+                                  onClick={() => handleUpdateStatus(appointment.id, 'COMPLETED')}
+                                  className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white transition cursor-pointer shadow-xs"
+                                  title="Mark Completed"
+                                >
+                                  <CheckCircle2 size={13} />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleUpdateStatus(appointment.id, 'CANCELLED')}
+                                  className="flex h-7 w-7 items-center justify-center rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition cursor-pointer shadow-xs"
+                                  title="Cancel Appointment"
+                                >
+                                  <XCircle size={13} />
+                                </button>
+                              </>
+                            ) : (
+                              <Link
+                                to={`/prescription/new?patientId=${encodeURIComponent(
+                                  appointment.patientId || appointment.id
+                                )}`}
+                                className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#F7FAF8] text-[#4E6460] hover:bg-[#287C75] hover:text-white transition"
+                                title="View Patient Record"
+                              >
+                                <User size={13} />
+                              </Link>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+
+                  {filteredAppointments.length === 0 && (
+                    <tr>
+                      <td colSpan={7} className="py-8 text-center text-xs text-[#7D908C]">
+                        No appointments matched your search filters. Click "+ Book Appointment" to schedule a patient.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            /* Card View with Whitespace-nowrap on Schedule */
+            <ul className="mt-4 space-y-3">
+              {filteredAppointments.map((appointment) => {
+                const isWaiting = (appointment.status || '').toLowerCase() === 'waiting';
+                const rawDate = appointment.appointmentDate || (appointment.createdAt ? appointment.createdAt.split('T')[0] : '');
+                const formattedDate = rawDate
+                  ? new Date(`${rawDate}T00:00:00`).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })
+                  : 'Today';
+
+                return (
+                  <li
+                    key={appointment.id}
+                    className="group rounded-2xl border border-[#D9E6E2] bg-white p-4 transition hover:border-[#287C75] hover:bg-[#F7FAF8]/70 hover:shadow-xs"
+                  >
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          {appointment.tokenFormatted && (
+                            <span className="inline-flex items-center justify-center rounded-lg bg-[#FDF6E2] border border-[#EBD7A9] px-2 py-0.5 text-[11px] font-mono font-bold text-[#8C6B1F]">
+                              {appointment.tokenFormatted}
+                            </span>
+                          )}
+                          <span className="font-heading text-sm font-bold text-[#10201F]">
+                            {appointment.patientName || 'Patient'}
                           </span>
-                        ) : appointment.patientPhone ? (
-                          <span className="rounded-md border border-[#D9E6E2] bg-[#F7FAF8] px-1.5 py-0.5 font-mono text-[10px] font-semibold text-[#4E6460] flex items-center gap-1">
-                            <Phone size={10} className="text-[#287C75]" />
-                            {appointment.patientPhone}
-                          </span>
-                        ) : (
-                          <span className="rounded-md border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">
-                            Walk-in
-                          </span>
-                        )}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingPatientModal({
+                                appointmentId: appointment.id,
+                                patientId: appointment.patientId,
+                                currentName: appointment.patientName === 'Walk-in Patient' ? '' : appointment.patientName,
+                                currentPhone: appointment.patientPhone || '',
+                              });
+                              setEditPatientName(appointment.patientName === 'Walk-in Patient' ? '' : (appointment.patientName || ''));
+                              setEditPatientPhone(appointment.patientPhone || '');
+                            }}
+                            className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-semibold text-[#287C75] hover:bg-[#287C75]/10 hover:text-[#123A3A] transition cursor-pointer"
+                            title={appointment.patientName === 'Walk-in Patient' ? 'Set Real Patient Name' : 'Edit Patient Name'}
+                          >
+                            <Edit3 size={11} />
+                            <span>{appointment.patientName === 'Walk-in Patient' ? 'Set Name' : 'Edit'}</span>
+                          </button>
+                          {appointment.patientMrn ? (
+                            <span className="rounded-md border border-[#287C75]/20 bg-[#287C75]/10 px-1.5 py-0.5 font-mono text-[10px] font-bold text-[#123A3A]">
+                              {appointment.patientMrn}
+                            </span>
+                          ) : appointment.patientPhone ? (
+                            <span className="rounded-md border border-[#D9E6E2] bg-[#F7FAF8] px-1.5 py-0.5 font-mono text-[10px] font-semibold text-[#4E6460] flex items-center gap-1">
+                              <Phone size={10} className="text-[#287C75]" />
+                              {appointment.patientPhone}
+                            </span>
+                          ) : (
+                            <span className="rounded-md border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">
+                              Walk-in
+                            </span>
+                          )}
+                        </div>
+                        <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[#4E6460]">
+                          <span>{appointment.reason || 'General Outpatient Consultation'}</span>
+                          {(appointment.patientAge || appointment.age) && (
+                            <span className="text-[11px] text-[#7D908C]">
+                              • {appointment.patientAge || appointment.age} Yrs
+                              {appointment.patientGender || appointment.gender ? ` (${appointment.patientGender || appointment.gender})` : ''}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[#4E6460]">
-                        <span>{appointment.reason || 'General Outpatient Consultation'}</span>
-                        {(appointment.patientAge || appointment.age) && (
-                          <span className="text-[11px] text-[#7D908C]">
-                            • {appointment.patientAge || appointment.age} Yrs
-                            {appointment.patientGender || appointment.gender ? ` (${appointment.patientGender || appointment.gender})` : ''}
-                          </span>
-                        )}
+
+                      <div className="flex items-center gap-3 sm:text-right shrink-0">
+                        <div className="whitespace-nowrap">
+                          <p className="text-xs font-semibold text-[#10201F] flex items-center sm:justify-end gap-1 whitespace-nowrap">
+                            <Clock3 size={12} className="text-[#287C75]" />
+                            {appointment.startTime || '10:00 AM'}
+                          </p>
+                          <p className="text-[11px] text-[#7D908C] whitespace-nowrap">
+                            {formattedDate}
+                          </p>
+                        </div>
+
+                        <div className="shrink-0 flex items-center gap-2">
+                          <StatusBadge
+                            label={appointment.status || 'waiting'}
+                            variant={statusVariantMap[appointment.status] || 'warning'}
+                            className="capitalize"
+                          />
+
+                          {isWaiting && (
+                            <>
+                              <Link
+                                to={`/prescription/new?patientId=${encodeURIComponent(
+                                  appointment.patientId || appointment.id
+                                )}`}
+                                className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#287C75]/10 text-[#287C75] hover:bg-[#123A3A] hover:text-white transition"
+                                title="Start Consultation & Prescribe"
+                              >
+                                <Stethoscope size={14} />
+                              </Link>
+
+                              <button
+                                type="button"
+                                onClick={() => handleUpdateStatus(appointment.id, 'COMPLETED')}
+                                className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white transition cursor-pointer"
+                                title="Mark Completed"
+                              >
+                                <CheckCircle2 size={14} />
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handleUpdateStatus(appointment.id, 'CANCELLED')}
+                                className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition cursor-pointer"
+                                title="Cancel Appointment"
+                              >
+                                <XCircle size={14} />
+                              </button>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </div>
+                  </li>
+                );
+              })}
 
-                    <div className="flex items-center gap-3 sm:text-right">
-                      <div>
-                        <p className="text-xs font-semibold text-[#10201F] flex items-center sm:justify-end gap-1">
-                          <Clock3 size={12} className="text-[#287C75]" />
-                          {appointment.startTime || '10:00 AM'}
-                        </p>
-                        <p className="text-[11px] text-[#7D908C]">
-                          {appointment.appointmentDate ||
-                            (appointment.createdAt
-                              ? new Date(appointment.createdAt).toLocaleDateString('en-US', {
-                                  month: 'short',
-                                  day: 'numeric',
-                                  year: 'numeric',
-                                })
-                              : 'Today')}
-                        </p>
-                      </div>
-
-                      <div className="shrink-0 flex items-center gap-2">
-                        <StatusBadge
-                          label={appointment.status || 'waiting'}
-                          variant={statusVariantMap[appointment.status] || 'warning'}
-                          className="capitalize"
-                        />
-
-                        {isWaiting && (
-                          <>
-                            <Link
-                              to={`/prescription/new?patientId=${encodeURIComponent(
-                                appointment.patientId || appointment.id
-                              )}`}
-                              className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#287C75]/10 text-[#287C75] hover:bg-[#123A3A] hover:text-white transition"
-                              title="Start Consultation & Prescribe"
-                            >
-                              <Stethoscope size={14} />
-                            </Link>
-
-                            <button
-                              type="button"
-                              onClick={() => handleUpdateStatus(appointment.id, 'COMPLETED')}
-                              className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white transition cursor-pointer"
-                              title="Mark Completed"
-                            >
-                              <CheckCircle2 size={14} />
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() => handleUpdateStatus(appointment.id, 'CANCELLED')}
-                              className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition cursor-pointer"
-                              title="Cancel Appointment"
-                            >
-                              <XCircle size={14} />
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+              {filteredAppointments.length === 0 && (
+                <li className="rounded-2xl border border-dashed border-[#D9E6E2] bg-[#F7FAF8] p-8 text-center text-xs text-[#7D908C]">
+                  No appointments matched your search filters. Click "+ Book Appointment" to schedule a patient.
                 </li>
-              );
-            })}
-
-            {filteredAppointments.length === 0 && (
-              <li className="rounded-2xl border border-dashed border-[#D9E6E2] bg-[#F7FAF8] p-8 text-center text-xs text-[#7D908C]">
-                No appointments matched your search filters. Click "+ Book Appointment" to schedule a patient.
-              </li>
-            )}
-          </ul>
+              )}
+            </ul>
+          )}
         </article>
 
         {/* Right Column: Month Calendar View */}
