@@ -128,6 +128,7 @@ function PrescriptionPage() {
 
   // Preview Modal
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewPastVisit, setPreviewPastVisit] = useState(null);
 
   // 1-Click Clinical Rx Protocols (Protocol Kits) & Patient History Drawer
   const [enableProtocols, setEnableProtocols] = useState(() => rxProtocolsService.isEnabled());
@@ -2133,7 +2134,30 @@ function PrescriptionPage() {
         patient={patient}
         currentVisitId={visitIdParam}
         onRepeatRx={handleRepeatRx}
+        onPreviewVisit={(visit) => setPreviewPastVisit(visit)}
       />
+
+      {/* Print Preview Modal for Past Visit */}
+      {previewPastVisit && (
+        <PrintPreviewModal
+          isOpen={Boolean(previewPastVisit)}
+          onClose={() => setPreviewPastVisit(null)}
+          patient={patient}
+          prescriptionDate={previewPastVisit.date || previewPastVisit.createdAt}
+          vitals={previewPastVisit.vitals || {}}
+          symptoms={previewPastVisit.symptoms || ''}
+          diagnosis={previewPastVisit.diagnosis || ''}
+          advice={previewPastVisit.advice || ''}
+          medicines={previewPastVisit.medicines || []}
+          followUpDate={previewPastVisit.followUpDate ? (new Date(previewPastVisit.followUpDate).toLocaleDateString('en-IN')) : ''}
+          rxId={previewPastVisit.id || ''}
+          printSettings={printSettings}
+          clinicSettings={clinicSettings}
+          onPrint={() => {
+            setTimeout(() => window.print(), 100);
+          }}
+        />
+      )}
 
       {/* Print Preview Modal */}
       <PrintPreviewModal

@@ -14,6 +14,7 @@ import {
   Stethoscope,
   ChevronRight,
   Printer,
+  Eye,
 } from 'lucide-react';
 import { localVisits } from '../../../services/localStore';
 
@@ -43,9 +44,10 @@ function formatDate(dateStr) {
  *
  * Features:
  * 1. View all previous visits, diagnoses, vitals, and prescribed medicines
- * 2. 1-Click "Repeat This Rx" to copy past medicines directly into active prescription
- * 3. Immunity to layout stacking context via React Portal (z-[9999])
- * 4. Keyboard accessible (ESC closes)
+ * 2. 1-Click "Preview Rx" to view realistic A4 prescription preview
+ * 3. 1-Click "Repeat Rx" to copy past medicines directly into active prescription
+ * 4. Immunity to layout stacking context via React Portal (z-[9999])
+ * 5. Keyboard accessible (ESC closes)
  */
 export default function PatientPastHistoryDrawer({
   isOpen,
@@ -53,6 +55,7 @@ export default function PatientPastHistoryDrawer({
   patient,
   currentVisitId = null,
   onRepeatRx,
+  onPreviewVisit,
 }) {
   // Handle ESC key
   useEffect(() => {
@@ -95,7 +98,7 @@ export default function PatientPastHistoryDrawer({
       aria-labelledby="past-history-drawer-title"
     >
       <div
-        className="w-full max-w-2xl bg-white h-full border-l border-[#D9E6E2] shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-200"
+        className="w-full max-w-xl md:max-w-[560px] bg-white h-full border-l border-[#D9E6E2] shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Drawer Header */}
@@ -124,7 +127,7 @@ export default function PatientPastHistoryDrawer({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl p-2 text-[#7D908C] hover:bg-[#EBF1EE] hover:text-[#10201F] transition"
+            className="rounded-xl p-2 text-[#7D908C] hover:bg-[#EBF1EE] hover:text-[#10201F] transition cursor-pointer"
             aria-label="Close past history drawer"
           >
             <X size={20} />
@@ -145,7 +148,9 @@ export default function PatientPastHistoryDrawer({
             )}
           </div>
           {patient.contact && (
-            <span className="text-[#5E8A83] font-mono">📱 {patient.contact}</span>
+            <span className="text-[#287C75] font-mono text-xs whitespace-nowrap pl-2 font-semibold">
+              📱 {patient.contact}
+            </span>
           )}
         </div>
 
@@ -160,7 +165,7 @@ export default function PatientPastHistoryDrawer({
                 No Previous Clinical History
               </h3>
               <p className="mt-1 text-xs text-[#7D908C] max-w-sm">
-                This is {patient.name}’s first consultation or digital prescription in Gastro Cure. Once saved, previous prescriptions will appear here for 1-click re-prescribing.
+                This is {patient.name}’s first consultation or digital prescription in Gastro Cure. Once saved, previous prescriptions will appear here for 1-click re-prescribing and preview.
               </p>
             </div>
           ) : (
@@ -195,21 +200,33 @@ export default function PatientPastHistoryDrawer({
                       </div>
                     </div>
 
-                    {/* 1-Click Repeat Prescription Button */}
-                    {meds.length > 0 && onRepeatRx && (
+                    {/* Action Buttons: Preview Rx & Repeat Rx */}
+                    <div className="flex items-center gap-1.5 shrink-0">
                       <button
                         type="button"
-                        onClick={() => {
-                          onRepeatRx(meds, visit);
-                          onClose?.();
-                        }}
-                        className="inline-flex items-center gap-1.5 rounded-xl bg-teal-50 px-3 py-1.5 text-xs font-bold text-[#287C75] border border-teal-200 hover:bg-[#287C75] hover:text-white transition shadow-clinixpulse-xs"
-                        title={`Copy ${meds.length} medicines from this visit to current prescription`}
+                        onClick={() => onPreviewVisit?.(visit)}
+                        className="inline-flex items-center gap-1 rounded-lg bg-white px-2.5 py-1.5 text-xs font-semibold text-[#10201F] border border-[#D9E6E2] hover:bg-[#F7FAF8] hover:border-[#287C75] hover:text-[#287C75] transition shadow-2xs cursor-pointer"
+                        title="View realistic A4 prescription preview for this past visit"
                       >
-                        <Copy size={13} />
-                        <span>Repeat This Rx</span>
+                        <Eye size={13} className="text-[#287C75]" />
+                        <span>Preview Rx</span>
                       </button>
-                    )}
+
+                      {meds.length > 0 && onRepeatRx && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onRepeatRx(meds, visit);
+                            onClose?.();
+                          }}
+                          className="inline-flex items-center gap-1.5 rounded-lg bg-teal-50 px-2.5 py-1.5 text-xs font-semibold text-[#287C75] border border-teal-200 hover:bg-[#287C75] hover:text-white transition shadow-2xs cursor-pointer"
+                          title={`Copy ${meds.length} medicines to active prescription`}
+                        >
+                          <Copy size={13} />
+                          <span>Repeat This Rx</span>
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   {/* Diagnosis & Symptoms */}
@@ -235,30 +252,30 @@ export default function PatientPastHistoryDrawer({
 
                   {/* Vitals Snapshot */}
                   {visit.vitals && Object.values(visit.vitals).some(Boolean) && (
-                    <div className="mb-3 rounded-lg bg-[#F7FAF8] p-2 text-xs flex flex-wrap gap-x-4 gap-y-1 border border-[#EBF1EE]">
+                    <div className="mb-3 rounded-xl bg-[#F7FAF8] p-2.5 text-xs flex flex-wrap gap-2 border border-[#EBF1EE]">
                       {visit.vitals.bloodPressure && (
-                        <span>
-                          <strong className="text-[#123A3A]">BP:</strong> {visit.vitals.bloodPressure}
+                        <span className="inline-flex items-center gap-1 rounded-md bg-white px-2 py-0.5 border border-[#D9E6E2] text-[11px] font-semibold text-[#10201F]">
+                          <span className="text-[#7D908C]">BP:</span> {visit.vitals.bloodPressure}
                         </span>
                       )}
                       {visit.vitals.weight && (
-                        <span>
-                          <strong className="text-[#123A3A]">Wt:</strong> {visit.vitals.weight} kg
+                        <span className="inline-flex items-center gap-1 rounded-md bg-white px-2 py-0.5 border border-[#D9E6E2] text-[11px] font-semibold text-[#10201F]">
+                          <span className="text-[#7D908C]">Wt:</span> {visit.vitals.weight} kg
                         </span>
                       )}
                       {visit.vitals.bloodSugar && (
-                        <span>
-                          <strong className="text-[#123A3A]">Sugar:</strong> {visit.vitals.bloodSugar} mg/dL
+                        <span className="inline-flex items-center gap-1 rounded-md bg-white px-2 py-0.5 border border-[#D9E6E2] text-[11px] font-semibold text-[#10201F]">
+                          <span className="text-[#7D908C]">Sugar:</span> {visit.vitals.bloodSugar} mg/dL
                         </span>
                       )}
                       {visit.vitals.pulseRate && (
-                        <span>
-                          <strong className="text-[#123A3A]">Pulse:</strong> {visit.vitals.pulseRate} bpm
+                        <span className="inline-flex items-center gap-1 rounded-md bg-white px-2 py-0.5 border border-[#D9E6E2] text-[11px] font-semibold text-[#10201F]">
+                          <span className="text-[#7D908C]">Pulse:</span> {visit.vitals.pulseRate} bpm
                         </span>
                       )}
                       {visit.vitals.spo2 && (
-                        <span>
-                          <strong className="text-[#123A3A]">SpO2:</strong> {visit.vitals.spo2}%
+                        <span className="inline-flex items-center gap-1 rounded-md bg-white px-2 py-0.5 border border-[#D9E6E2] text-[11px] font-semibold text-[#10201F]">
+                          <span className="text-[#7D908C]">SpO2:</span> {visit.vitals.spo2}%
                         </span>
                       )}
                     </div>
@@ -275,18 +292,18 @@ export default function PatientPastHistoryDrawer({
                           Schedule • Duration
                         </span>
                       </div>
-                      <div className="divide-y divide-[#EBF1EE] rounded-xl border border-[#EBF1EE] overflow-hidden text-xs">
+                      <div className="divide-y divide-[#EBF1EE] rounded-xl border border-[#EBF1EE] overflow-hidden text-xs bg-white">
                         {meds.map((m, mIdx) => (
                           <div
                             key={m.id || mIdx}
-                            className="flex items-center justify-between p-2 hover:bg-[#F7FAF8] transition"
+                            className="flex items-center justify-between p-2.5 hover:bg-[#F7FAF8] transition"
                           >
-                            <div className="flex items-center gap-2">
-                              <span className="text-[#7D908C] font-mono text-[11px] w-4">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <span className="text-[#7D908C] font-mono text-[11px] w-4 shrink-0">
                                 {mIdx + 1}.
                               </span>
-                              <div>
-                                <span className="font-semibold text-[#10201F]">
+                              <div className="min-w-0">
+                                <span className="font-bold text-[#10201F]">
                                   {m.name}
                                 </span>
                                 {m.remarks && (
@@ -296,12 +313,12 @@ export default function PatientPastHistoryDrawer({
                                 )}
                               </div>
                             </div>
-                            <div className="text-right shrink-0">
-                              <span className="font-mono font-semibold text-[#287C75] bg-teal-50 px-1.5 py-0.5 rounded border border-teal-100">
+                            <div className="text-right shrink-0 flex items-center gap-1.5">
+                              <span className="font-mono font-bold text-[#287C75] bg-teal-50 px-2 py-0.5 rounded-md border border-teal-100 text-xs">
                                 {m.frequency || '-'}
                               </span>
                               {m.duration && (
-                                <span className="ml-1.5 text-[11px] text-[#4E6460]">
+                                <span className="text-[11px] font-medium text-[#4E6460] bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">
                                   {m.duration}
                                 </span>
                               )}
@@ -316,14 +333,17 @@ export default function PatientPastHistoryDrawer({
 
                   {/* Advice & Follow-up */}
                   {(visit.advice || visit.followUpDate) && (
-                    <div className="mt-2.5 pt-2 border-t border-[#EBF1EE] flex items-center justify-between text-xs text-[#5E8A83]">
+                    <div className="mt-3 pt-2.5 border-t border-[#EBF1EE] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
                       {visit.advice ? (
-                        <span className="truncate max-w-[320px]" title={visit.advice}>
-                          💡 {visit.advice}
-                        </span>
+                        <div className="flex items-start gap-1.5 text-[#287C75]">
+                          <span className="shrink-0 text-amber-500">💡</span>
+                          <span className="font-medium text-[#123A3A] leading-relaxed">
+                            {visit.advice}
+                          </span>
+                        </div>
                       ) : <span />}
                       {visit.followUpDate && (
-                        <span className="font-medium text-[#123A3A] shrink-0">
+                        <span className="font-semibold text-[#287C75] bg-teal-50 px-2 py-0.5 rounded-md border border-teal-100 whitespace-nowrap shrink-0">
                           Follow-up: {formatDate(visit.followUpDate)}
                         </span>
                       )}
@@ -343,7 +363,7 @@ export default function PatientPastHistoryDrawer({
           <button
             type="button"
             onClick={onClose}
-            className="btn-secondary px-4 py-1.5 text-xs font-semibold text-[#10201F]"
+            className="btn-secondary px-4 py-1.5 text-xs font-semibold text-[#10201F] cursor-pointer"
           >
             Close
           </button>
