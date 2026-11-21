@@ -429,6 +429,28 @@ function PrescriptionPage() {
     setTimeout(() => setSaveFeedback(null), 3500);
   };
 
+  // 1-Click Repeat Single Medicine from Past Visit
+  const handleAddSingleMed = (med) => {
+    if (!med || !med.name) return;
+    const newMed = {
+      id: Date.now() + Math.random(),
+      name: med.name || '',
+      dosage: med.dosage || '',
+      frequency: med.frequency || '1-0-1',
+      timing: med.timing || 'After Food',
+      duration: med.duration || '5 Days',
+      remarks: med.remarks || '',
+    };
+    setMedicines((prev) => {
+      const isOnlyEmpty = prev.length === 1 && !prev[0].name?.trim();
+      return isOnlyEmpty ? [newMed] : [...prev, newMed];
+    });
+    setSaveFeedback({
+      message: `+ Added ${med.name} (${med.frequency || '1-0-1'}) to active prescription`,
+    });
+    setTimeout(() => setSaveFeedback(null), 3000);
+  };
+
   // Quick Chips Management Handlers
   const handleOpenManageChips = (category = 'symptoms') => {
     setManageActiveTab(category);
@@ -2134,6 +2156,7 @@ function PrescriptionPage() {
         patient={patient}
         currentVisitId={visitIdParam}
         onRepeatRx={handleRepeatRx}
+        onAddSingleMed={handleAddSingleMed}
         onPreviewVisit={(visit) => setPreviewPastVisit(visit)}
       />
 

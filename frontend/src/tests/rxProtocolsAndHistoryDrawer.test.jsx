@@ -168,4 +168,35 @@ describe('Prescription Studio - 1-Click Rx Protocols & Patient Past History Draw
     expect(screen.getByDisplayValue('Pantoprazole 40mg')).toBeTruthy();
     expect(screen.getByDisplayValue('Domperidone 10mg')).toBeTruthy();
   });
+
+  it('supports searching past records, collapsible timeline, and adding individual medicines', async () => {
+    renderStudio();
+
+    // Open Past History Drawer
+    const pastHistoryBtn = screen.getByRole('button', { name: /Patient Past Visits History/i });
+    fireEvent.click(pastHistoryBtn);
+
+    await screen.findByText(/Past Visit Records/i);
+
+    // Search bar is rendered
+    const searchInput = screen.getByPlaceholderText(/Search past medicines, diagnosis, symptoms, or date/i);
+    expect(searchInput).toBeTruthy();
+
+    // Type "Domperidone" into search
+    fireEvent.change(searchInput, { target: { value: 'Domperidone' } });
+    expect(screen.getByText(/RX-PAST-101/i)).toBeTruthy();
+
+    // Verify "Preview Rx" button exists
+    const previewBtns = screen.getAllByRole('button', { name: /Preview Rx/i });
+    expect(previewBtns.length).toBeGreaterThan(0);
+
+    // Verify "+ Add" individual medicine button exists and click it
+    const addMedBtn = screen.getByRole('button', {
+      name: /Add Pantoprazole 40mg to active prescription/i,
+    });
+    expect(addMedBtn).toBeTruthy();
+    fireEvent.click(addMedBtn);
+
+    expect(screen.getByDisplayValue('Pantoprazole 40mg')).toBeTruthy();
+  });
 });
