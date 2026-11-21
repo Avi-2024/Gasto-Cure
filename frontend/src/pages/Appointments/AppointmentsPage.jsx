@@ -435,12 +435,12 @@ export default function AppointmentsPage() {
       </section>
 
       {/* Grid: Appointments List & Calendar */}
-      <section className="grid gap-6 xl:grid-cols-[1.85fr_1fr]">
+      <section className="grid gap-6 xl:grid-cols-[1fr_340px] 2xl:grid-cols-[1fr_360px]">
         {/* Left Column: Appointments Register (Table & Card View Modes) */}
         <article className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-clinixpulse-xs flex flex-col">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#D9E6E2]/60 pb-3.5">
             <div className="flex items-center gap-3">
-              <h2 className="font-heading text-base font-bold text-[#10201F]">
+              <h2 className="font-heading text-base font-bold text-[#10201F] whitespace-nowrap">
                 Appointment Register
               </h2>
               <StatusBadge label={`${filteredAppointments.length} Appointments`} variant="info" />
@@ -479,17 +479,17 @@ export default function AppointmentsPage() {
 
           {/* Table View */}
           {viewMode === 'table' ? (
-            <div className="mt-4 overflow-x-auto rounded-2xl border border-[#D9E6E2] bg-white">
-              <table className="w-full text-left border-collapse">
+            <div className="mt-4 overflow-x-auto rounded-2xl border border-[#D9E6E2] bg-white shadow-2xs">
+              <table className="w-full text-left border-collapse min-w-[820px]">
                 <thead>
                   <tr className="border-b border-[#D9E6E2] bg-[#F7FAF8] text-[11px] font-bold uppercase tracking-wider text-[#4E6460]">
-                    <th className="py-3 px-3 text-center w-16">Token</th>
-                    <th className="py-3 px-3">Patient Details</th>
-                    <th className="py-3 px-3">Contact</th>
-                    <th className="py-3 px-3">Complaint / Shift</th>
-                    <th className="py-3 px-3 whitespace-nowrap">Schedule</th>
-                    <th className="py-3 px-3 text-center">Status</th>
-                    <th className="py-3 px-3 text-right">Actions</th>
+                    <th className="py-3 px-3 text-center w-20 min-w-[70px] whitespace-nowrap">Token</th>
+                    <th className="py-3 px-4 min-w-[220px] whitespace-nowrap">Patient Details</th>
+                    <th className="py-3 px-4 min-w-[130px] whitespace-nowrap">Contact</th>
+                    <th className="py-3 px-4 min-w-[180px] whitespace-nowrap">Complaint / Shift</th>
+                    <th className="py-3 px-4 min-w-[130px] whitespace-nowrap">Schedule</th>
+                    <th className="py-3 px-3 text-center min-w-[100px] whitespace-nowrap">Status</th>
+                    <th className="py-3 px-4 text-right min-w-[110px] whitespace-nowrap">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#D9E6E2]/70 text-xs">
@@ -510,22 +510,23 @@ export default function AppointmentsPage() {
                         className="group hover:bg-[#F7FAF8]/80 transition-colors"
                       >
                         {/* Token */}
-                        <td className="py-3 px-3 text-center align-middle whitespace-nowrap">
-                          <span className="inline-flex items-center justify-center rounded-lg bg-[#FDF6E2] border border-[#EBD7A9] px-2 py-1 text-xs font-mono font-bold text-[#8C6B1F] shadow-xs">
+                        <td className="py-3.5 px-3 text-center align-middle whitespace-nowrap">
+                          <span className="inline-flex items-center justify-center rounded-lg bg-[#FDF6E2] border border-[#EBD7A9] px-2.5 py-1 text-xs font-mono font-bold text-[#8C6B1F] shadow-2xs">
                             {appointment.tokenFormatted || `#${appointment.tokenNumber || '—'}`}
                           </span>
                         </td>
 
                         {/* Patient Details */}
-                        <td className="py-3 px-3 align-middle">
-                          <div className="flex items-center gap-2.5">
+                        <td className="py-3.5 px-4 align-middle whitespace-nowrap">
+                          <div className="flex items-center gap-3">
                             <PatientAvatar
+                              gender={appointment.patientGender || appointment.gender || ''}
                               name={appointment.patientName || 'Patient'}
-                              size="sm"
+                              className="h-9 w-9 shrink-0"
                             />
                             <div className="min-w-0">
-                              <div className="flex items-center gap-1.5 flex-wrap">
-                                <span className="font-heading text-xs font-bold text-[#10201F]">
+                              <div className="flex items-center gap-1.5 whitespace-nowrap">
+                                <span className="font-heading text-sm font-bold text-[#10201F] whitespace-nowrap">
                                   {appointment.patientName || 'Patient'}
                                 </span>
                                 <button
@@ -540,24 +541,26 @@ export default function AppointmentsPage() {
                                     setEditPatientName(appointment.patientName === 'Walk-in Patient' ? '' : (appointment.patientName || ''));
                                     setEditPatientPhone(appointment.patientPhone || '');
                                   }}
-                                  className="inline-flex items-center gap-0.5 rounded px-1 py-0.5 text-[10px] font-semibold text-[#287C75] hover:bg-[#287C75]/10 transition cursor-pointer"
+                                  className="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] font-semibold text-[#287C75] bg-[#287C75]/10 hover:bg-[#287C75]/20 transition cursor-pointer whitespace-nowrap"
                                   title={appointment.patientName === 'Walk-in Patient' ? 'Set Patient Name' : 'Edit Name'}
                                 >
                                   <Edit3 size={10} />
                                   <span>{appointment.patientName === 'Walk-in Patient' ? 'Set Name' : 'Edit'}</span>
                                 </button>
                               </div>
-                              <div className="mt-0.5 flex items-center gap-1.5 flex-wrap">
+                              <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-[#7D908C] whitespace-nowrap">
                                 {appointment.patientMrn && (
-                                  <span className="rounded border border-[#287C75]/20 bg-[#287C75]/10 px-1 py-0.2 font-mono text-[10px] font-bold text-[#123A3A]">
+                                  <span className="rounded border border-[#287C75]/20 bg-[#287C75]/10 px-1.5 py-0.2 font-mono text-[10px] font-bold text-[#123A3A] whitespace-nowrap">
                                     {appointment.patientMrn}
                                   </span>
                                 )}
-                                {(appointment.patientAge || appointment.age) && (
-                                  <span className="text-[11px] text-[#7D908C]">
+                                {(appointment.patientAge || appointment.age) ? (
+                                  <span className="whitespace-nowrap">
                                     {appointment.patientAge || appointment.age} Yrs
                                     {appointment.patientGender || appointment.gender ? ` • ${appointment.patientGender || appointment.gender}` : ''}
                                   </span>
+                                ) : (
+                                  <span className="text-amber-700 bg-amber-50 px-1 rounded border border-amber-200 text-[10px] whitespace-nowrap">Walk-in</span>
                                 )}
                               </div>
                             </div>
@@ -565,23 +568,23 @@ export default function AppointmentsPage() {
                         </td>
 
                         {/* Contact Phone */}
-                        <td className="py-3 px-3 align-middle whitespace-nowrap">
+                        <td className="py-3.5 px-4 align-middle whitespace-nowrap">
                           {appointment.patientPhone ? (
-                            <span className="inline-flex items-center gap-1 font-mono text-xs text-[#287C75] bg-[#287C75]/5 px-2 py-0.5 rounded-md border border-[#287C75]/15">
+                            <span className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-[#287C75] bg-[#287C75]/5 px-2.5 py-1 rounded-md border border-[#287C75]/15 whitespace-nowrap">
                               <Phone size={10} />
                               {appointment.patientPhone}
                             </span>
                           ) : (
-                            <span className="text-[11px] text-[#7D908C] italic">No phone</span>
+                            <span className="text-[11px] text-[#7D908C] italic whitespace-nowrap">No phone</span>
                           )}
                         </td>
 
                         {/* Complaint / Shift */}
-                        <td className="py-3 px-3 align-middle max-w-[200px]">
-                          <p className="font-medium text-[#10201F] truncate text-xs" title={appointment.reason}>
+                        <td className="py-3.5 px-4 align-middle max-w-[220px]">
+                          <p className="font-semibold text-xs text-[#10201F] truncate" title={appointment.reason}>
                             {appointment.reason || 'General Outpatient Consultation'}
                           </p>
-                          <p className="text-[10px] text-[#7D908C] truncate">
+                          <p className="text-[10px] text-[#7D908C] truncate mt-0.5">
                             {appointment.chiefComplaint?.includes('(')
                               ? appointment.chiefComplaint.split('(')[1]?.replace(')', '')
                               : 'Morning OPD'}
@@ -589,8 +592,8 @@ export default function AppointmentsPage() {
                         </td>
 
                         {/* Schedule */}
-                        <td className="py-3 px-3 align-middle whitespace-nowrap">
-                          <div className="flex items-center gap-1 font-semibold text-[#10201F] whitespace-nowrap">
+                        <td className="py-3.5 px-4 align-middle whitespace-nowrap">
+                          <div className="flex items-center gap-1.5 font-semibold text-xs text-[#10201F] whitespace-nowrap">
                             <Clock3 size={11} className="text-[#287C75]" />
                             <span>{appointment.startTime || '10:00 AM'}</span>
                           </div>
@@ -600,16 +603,16 @@ export default function AppointmentsPage() {
                         </td>
 
                         {/* Status */}
-                        <td className="py-3 px-3 text-center align-middle whitespace-nowrap">
+                        <td className="py-3.5 px-3 text-center align-middle whitespace-nowrap">
                           <StatusBadge
                             label={appointment.status || 'waiting'}
                             variant={statusVariantMap[appointment.status] || 'warning'}
-                            className="capitalize text-[11px]"
+                            className="capitalize text-xs font-medium"
                           />
                         </td>
 
                         {/* Actions */}
-                        <td className="py-3 px-3 text-right align-middle whitespace-nowrap">
+                        <td className="py-3.5 px-4 text-right align-middle whitespace-nowrap">
                           <div className="inline-flex items-center gap-1.5 justify-end">
                             {isWaiting ? (
                               <>
@@ -617,7 +620,7 @@ export default function AppointmentsPage() {
                                   to={`/prescription/new?patientId=${encodeURIComponent(
                                     appointment.patientId || appointment.id
                                   )}`}
-                                  className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#287C75]/10 text-[#287C75] hover:bg-[#123A3A] hover:text-white transition shadow-xs"
+                                  className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#287C75]/10 text-[#287C75] hover:bg-[#123A3A] hover:text-white transition shadow-2xs"
                                   title="Start Consultation & Prescribe"
                                 >
                                   <Stethoscope size={13} />
@@ -625,7 +628,7 @@ export default function AppointmentsPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleUpdateStatus(appointment.id, 'COMPLETED')}
-                                  className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white transition cursor-pointer shadow-xs"
+                                  className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white transition cursor-pointer shadow-2xs"
                                   title="Mark Completed"
                                 >
                                   <CheckCircle2 size={13} />
@@ -633,7 +636,7 @@ export default function AppointmentsPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleUpdateStatus(appointment.id, 'CANCELLED')}
-                                  className="flex h-7 w-7 items-center justify-center rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition cursor-pointer shadow-xs"
+                                  className="flex h-7 w-7 items-center justify-center rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition cursor-pointer shadow-2xs"
                                   title="Cancel Appointment"
                                 >
                                   <XCircle size={13} />
@@ -807,11 +810,11 @@ export default function AppointmentsPage() {
 
         {/* Right Column: Month Calendar View */}
         <article className="rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-clinixpulse-xs">
-          <div className="flex items-center justify-between border-b border-[#D9E6E2]/60 pb-3">
-            <h2 className="font-heading text-base font-bold text-[#10201F]">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#D9E6E2]/60 pb-3">
+            <h2 className="font-heading text-base font-bold text-[#10201F] whitespace-nowrap">
               Monthly Schedule
             </h2>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1 shrink-0">
               <button
                 type="button"
                 onClick={() => setViewDate(new Date(viewYear, viewMonth - 1, 1))}
@@ -820,8 +823,8 @@ export default function AppointmentsPage() {
               >
                 <ChevronLeft size={14} />
               </button>
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-[#D9E6E2] bg-[#F7FAF8] px-3 py-1 text-xs font-semibold text-[#10201F]">
-                <CalendarClock size={13} className="text-[#287C75]" />
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-[#D9E6E2] bg-[#F7FAF8] px-2.5 py-1 text-xs font-semibold text-[#10201F] whitespace-nowrap">
+                <CalendarClock size={12} className="text-[#287C75]" />
                 <span>{monthLabel}</span>
               </div>
               <button
