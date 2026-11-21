@@ -244,5 +244,92 @@ describe('PatientSearchSelector & Senior Appointment Booking UX', () => {
         ).toBeTruthy();
       });
     });
+
+    it('filters appointments when clicking on a calendar date cell and toggles filter', () => {
+      const todayDate = new Date();
+      const dayNum = todayDate.getDate();
+      const monthStr = String(todayDate.getMonth() + 1).padStart(2, '0');
+      const dateStr = `${todayDate.getFullYear()}-${monthStr}-${String(dayNum).padStart(2, '0')}`;
+
+      const storedAppts = [
+        {
+          id: 'apt-today-1',
+          tokenNumber: 1,
+          tokenFormatted: 'Token #1',
+          patientName: 'Kavita Roy',
+          reason: 'General Consultation',
+          status: 'waiting',
+          appointmentDate: dateStr,
+          createdAt: new Date().toISOString(),
+        },
+      ];
+      localStorage.setItem('ds_appointments', JSON.stringify(storedAppts));
+
+      render(
+        <MemoryRouter>
+          <AppointmentsPage />
+        </MemoryRouter>
+      );
+
+      // Find calendar button for today
+      const dayButtons = screen.getAllByRole('button');
+      const dayBtn = dayButtons.find((btn) => btn.textContent.trim().startsWith(String(dayNum)));
+      expect(dayBtn).toBeTruthy();
+
+      // Click the calendar date
+      fireEvent.click(dayBtn);
+
+      // Banner should display filtered date
+      expect(screen.getByText(/Filtered to:/i)).toBeTruthy();
+
+      // Click "Show All Dates" to clear
+      const clearBtn = screen.getByRole('button', { name: /Show All Dates/i });
+      fireEvent.click(clearBtn);
+      expect(screen.queryByText(/Filtered to:/i)).toBeNull();
+    });
+
+    it('allows setting/editing patient name for a walk-in appointment', async () => {
+      const storedAppts = [
+        {
+          id: 'apt-walkin-1',
+          patientId: 'pt-walkin-1',
+          tokenNumber: 1,
+          tokenFormatted: 'Token #1',
+          patientName: 'Walk-in Patient',
+          reason: 'General Consultation',
+          status: 'waiting',
+          appointmentDate: '2026-11-20',
+          createdAt: '2026-11-20T10:00:00.000Z',
+        },
+      ];
+      localStorage.setItem('ds_appointments', JSON.stringify(storedAppts));
+
+      render(
+        <MemoryRouter>
+          <AppointmentsPage />
+        </MemoryRouter>
+      );
+
+      // Button to set patient name
+      const setNameBtn = screen.getByRole('button', { name: /Set Name/i });
+      expect(setNameBtn).toBeTruthy();
+      fireEvent.click(setNameBtn);
+
+      // Modal should appear
+      expect(screen.getByText('Set Patient Information')).toBeTruthy();
+
+      // Enter real name
+      const nameInput = screen.getByPlaceholderText(/Enter patient full name/i);
+      fireEvent.change(nameInput, { target: { value: 'Suresh Kumar' } });
+
+      // Save
+      const saveBtn = screen.getByRole('button', { name: /Save Patient Name/i });
+      fireEvent.click(saveBtn);
+
+      // Patient name should now update on the card
+      await waitFor(() => {
+        expect(screen.getByText('Suresh Kumar')).toBeTruthy();
+      });
+    });
   });
 });

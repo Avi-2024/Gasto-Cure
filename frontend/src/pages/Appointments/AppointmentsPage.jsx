@@ -7,7 +7,10 @@ import {
   CalendarClock,
   CalendarRange,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   Clock3,
+  Edit3,
   Filter,
   Loader2,
   MapPin,
@@ -52,6 +55,15 @@ export default function AppointmentsPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('');
   const [notification, setNotification] = useState('');
+
+  // Calendar Navigation State
+  const [viewDate, setViewDate] = useState(() => new Date());
+
+  // Quick Edit Patient Modal State
+  const [editingPatientModal, setEditingPatientModal] = useState(null);
+  const [editPatientName, setEditPatientName] = useState('');
+  const [editPatientPhone, setEditPatientPhone] = useState('');
+  const [isUpdatingPatient, setIsUpdatingPatient] = useState(false);
 
   // Booking Modal State
   const [showBookModal, setShowBookModal] = useState(false);
@@ -123,27 +135,42 @@ export default function AppointmentsPage() {
   );
 
   const today = new Date();
-  const year = today.getFullYear();
-  const month = today.getMonth();
-  const monthStart = new Date(year, month, 1);
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const viewYear = viewDate.getFullYear();
+  const viewMonth = viewDate.getMonth();
+  const monthStart = new Date(viewYear, viewMonth, 1);
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
   const offset = (monthStart.getDay() + 6) % 7;
 
-  const appointmentCountByDay = filteredAppointments.reduce((acc, appointment) => {
-    if (!appointment.createdAt) return acc;
-    const date = new Date(appointment.createdAt);
-    if (date.getMonth() === month && date.getFullYear() === year) {
-      const day = date.getDate();
-      acc[day] = (acc[day] || 0) + 1;
-    }
-    return acc;
-  }, {});
+  // Compute daily appointment counts for the current calendar month view
+  const appointmentCountByDay = useMemo(() => {
+    return appointments.reduce((acc, appointment) => {
+      const rawDate = appointment.appointmentDate || (appointment.createdAt ? appointment.createdAt.split('T')[0] : '');
+      if (!rawDate) return acc;
+      const d = new Date(rawDate);
+      if (d.getFullYear() === viewYear && d.getMonth() === viewMonth) {
+        const day = d.getDate();
+        acc[day] = (acc[day] || 0) + 1;
+      }
+      return acc;
+    }, {});
+  }, [appointments, viewYear, viewMonth]);
 
   const calendarCells = [
     ...Array(offset).fill(null),
     ...Array.from({ length: daysInMonth }, (_, idx) => idx + 1),
   ];
   const monthLabel = monthStart.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+  // Handle clicking a day in the monthly schedule
+  const handleCalendarDayClick = (day) => {
+    if (!day) return;
+    const clickedDateStr = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    if (dateFilter === clickedDateStr) {
+      setDateFilter(''); // Toggle off
+    } else {
+      setDateFilter(clickedDateStr); // Filter to this day
+    }
+  };
 
   // Handle Full Appointment Booking
   const handleConfirmBooking = async (e) => {
@@ -162,26 +189,22 @@ export default function AppointmentsPage() {
     if (isSubmitting) return;
     setIsSubmitting(true);
 
-    const payload = isWalkIn
-      ? {
-          patientName: bookingForm.patientName.trim(),
-          patientPhone: bookingForm.patientPhone.trim(),
-          patientAge: bookingForm.patientAge ? Number(bookingForm.patientAge) : null,
-          patientGender: bookingForm.patientGender,
-          appointmentDate: bookingForm.appointmentDate,
-          chiefComplaint: `${bookingForm.chiefComplaint} (${bookingForm.timeSlot})`,
-        }
-      : {
-          patientId: bookingForm.patientId,
-          appointmentDate: bookingForm.appointmentDate,
-          chiefComplaint: `${bookingForm.chiefComplaint} (${bookingForm.timeSlot})`,
-        };
+    // Always include patientName, patientPhone, age, gender so patient is never created as "Walk-in Patient"
+    const payload = {
+      patientId: !isWalkIn ? bookingForm.patientId : undefined,
+      patientName: bookingForm.patientName.trim(),
+      patientPhone: bookingForm.patientPhone.trim(),
+      patientAge: bookingForm.patientAge ? Number(bookingForm.patientAge) : null,
+      patientGender: bookingForm.patientGender || 'OTHER',
+      appointmentDate: bookingForm.appointmentDate,
+      chiefComplaint: `${bookingForm.chiefComplaint} (${bookingForm.timeSlot})`,
+    };
 
     try {
       const res = await appointmentApi.createAppointment(payload);
       setShowBookModal(false);
       await reloadAppointments();
-      setNotification(`Appointment confirmed! Token #${res?.data?.tokenNumber || 'allocated'} issued.`);
+      setNotification(`Appointment confirmed for ${bookingForm.patientName.trim()}! Token #${res?.data?.tokenNumber || 'allocated'} issued.`);
       setTimeout(() => setNotification(''), 4500);
 
       // Reset form
@@ -203,6 +226,50 @@ export default function AppointmentsPage() {
       setBookingError(err.message || 'Failed to book appointment. Please try again.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // Handle Updating Existing Patient Name (e.g. for walk-in appointments)
+  const handleSavePatientName = async (e) => {
+    e.preventDefault();
+    if (!editPatientName.trim() || !editingPatientModal) return;
+
+    setIsUpdatingPatient(true);
+    try {
+      if (editingPatientModal.patientId) {
+        await patientApi.updatePatient(editingPatientModal.patientId, {
+          name: editPatientName.trim(),
+          phone: editPatientPhone.trim(),
+        });
+      }
+
+      // Update state immediately
+      setAppointments((prev) =>
+        prev.map((a) =>
+          a.id === editingPatientModal.appointmentId || a.patientId === editingPatientModal.patientId
+            ? { ...a, patientName: editPatientName.trim(), patientPhone: editPatientPhone.trim() }
+            : a
+        )
+      );
+
+      // Sync local storage
+      const stored = JSON.parse(localStorage.getItem('ds_appointments') || '[]');
+      const updatedStored = stored.map((a) =>
+        a.id === editingPatientModal.appointmentId || a.patientId === editingPatientModal.patientId
+          ? { ...a, patientName: editPatientName.trim(), patientPhone: editPatientPhone.trim() }
+          : a
+      );
+      localStorage.setItem('ds_appointments', JSON.stringify(updatedStored));
+
+      setEditingPatientModal(null);
+      setNotification(`Patient name updated to "${editPatientName.trim()}".`);
+      setTimeout(() => setNotification(''), 4000);
+      reloadAppointments();
+    } catch (err) {
+      console.warn('Update patient name error:', err);
+      alert('Failed to update patient name: ' + err.message);
+    } finally {
+      setIsUpdatingPatient(false);
     }
   };
 
@@ -393,6 +460,24 @@ export default function AppointmentsPage() {
                         <span className="font-heading text-sm font-bold text-[#10201F]">
                           {appointment.patientName || 'Patient'}
                         </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingPatientModal({
+                              appointmentId: appointment.id,
+                              patientId: appointment.patientId,
+                              currentName: appointment.patientName === 'Walk-in Patient' ? '' : appointment.patientName,
+                              currentPhone: appointment.patientPhone || '',
+                            });
+                            setEditPatientName(appointment.patientName === 'Walk-in Patient' ? '' : (appointment.patientName || ''));
+                            setEditPatientPhone(appointment.patientPhone || '');
+                          }}
+                          className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-semibold text-[#287C75] hover:bg-[#287C75]/10 hover:text-[#123A3A] transition cursor-pointer"
+                          title={appointment.patientName === 'Walk-in Patient' ? 'Set Real Patient Name' : 'Edit Patient Name'}
+                        >
+                          <Edit3 size={11} />
+                          <span>{appointment.patientName === 'Walk-in Patient' ? 'Set Name' : 'Edit'}</span>
+                        </button>
                         {appointment.patientMrn ? (
                           <span className="rounded-md border border-[#287C75]/20 bg-[#287C75]/10 px-1.5 py-0.5 font-mono text-[10px] font-bold text-[#123A3A]">
                             {appointment.patientMrn}
@@ -496,11 +581,46 @@ export default function AppointmentsPage() {
             <h2 className="font-heading text-base font-bold text-[#10201F]">
               Monthly Schedule
             </h2>
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-[#D9E6E2] bg-[#F7FAF8] px-3 py-1 text-xs font-semibold text-[#10201F]">
-              <CalendarClock size={13} className="text-[#287C75]" />
-              <span>{monthLabel}</span>
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setViewDate(new Date(viewYear, viewMonth - 1, 1))}
+                className="flex h-7 w-7 items-center justify-center rounded-lg border border-[#D9E6E2] text-[#4E6460] hover:bg-[#F7FAF8] hover:text-[#123A3A] transition cursor-pointer"
+                title="Previous Month"
+              >
+                <ChevronLeft size={14} />
+              </button>
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-[#D9E6E2] bg-[#F7FAF8] px-3 py-1 text-xs font-semibold text-[#10201F]">
+                <CalendarClock size={13} className="text-[#287C75]" />
+                <span>{monthLabel}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setViewDate(new Date(viewYear, viewMonth + 1, 1))}
+                className="flex h-7 w-7 items-center justify-center rounded-lg border border-[#D9E6E2] text-[#4E6460] hover:bg-[#F7FAF8] hover:text-[#123A3A] transition cursor-pointer"
+                title="Next Month"
+              >
+                <ChevronRight size={14} />
+              </button>
             </div>
           </div>
+
+          {/* Active Date Filter Banner */}
+          {dateFilter && (
+            <div className="mt-3 flex items-center justify-between rounded-xl border border-[#287C75]/30 bg-[#287C75]/10 px-3 py-1.5 text-xs text-[#123A3A] animate-fadeIn">
+              <span className="font-medium flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-[#287C75]" />
+                <span>Filtered to: <strong>{new Date(dateFilter).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</strong></span>
+              </span>
+              <button
+                type="button"
+                onClick={() => setDateFilter('')}
+                className="text-[11px] font-bold text-[#287C75] hover:underline cursor-pointer"
+              >
+                Show All Dates ✕
+              </button>
+            </div>
+          )}
 
           <div className="mt-4 grid grid-cols-7 gap-1.5 text-center text-[11px] font-bold uppercase tracking-wider text-[#7D908C]">
             {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
@@ -521,33 +641,48 @@ export default function AppointmentsPage() {
                 );
               }
 
+              const cellDateStr = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
               const count = appointmentCountByDay[day] || 0;
-              const isToday = day === today.getDate();
+              const isToday = day === today.getDate() && viewMonth === today.getMonth() && viewYear === today.getFullYear();
+              const isSelected = dateFilter === cellDateStr;
 
               return (
-                <div
+                <button
                   key={day}
-                  className={`h-14 rounded-xl border p-1.5 text-left transition flex flex-col justify-between ${
-                    isToday
-                      ? 'border-[#287C75] bg-teal-50/50 ring-1 ring-[#287C75]/30'
+                  type="button"
+                  onClick={() => handleCalendarDayClick(day)}
+                  className={`h-14 rounded-xl border p-1.5 text-left transition flex flex-col justify-between cursor-pointer group ${
+                    isSelected
+                      ? 'border-[#287C75] bg-[#287C75]/15 ring-2 ring-[#287C75] shadow-xs'
+                      : isToday
+                      ? 'border-[#287C75] bg-teal-50/50 ring-1 ring-[#287C75]/30 hover:bg-teal-50'
                       : count > 0
-                      ? 'border-emerald-200 bg-emerald-50/40'
-                      : 'border-[#D9E6E2] bg-white'
+                      ? 'border-emerald-200 bg-emerald-50/40 hover:border-emerald-400 hover:bg-emerald-50'
+                      : 'border-[#D9E6E2] bg-white hover:border-[#287C75]/60 hover:bg-[#F7FAF8]'
                   }`}
+                  title={count > 0 ? `${count} appointment(s) on ${cellDateStr} - Click to filter` : `Click to filter to ${cellDateStr}`}
                 >
                   <span
                     className={`text-xs font-bold ${
-                      isToday ? 'text-[#123A3A]' : 'text-[#4E6460]'
+                      isSelected
+                        ? 'text-[#123A3A]'
+                        : isToday
+                        ? 'text-[#123A3A]'
+                        : 'text-[#4E6460]'
                     }`}
                   >
                     {day}
                   </span>
-                  {count > 0 && (
-                    <span className="self-end rounded-md bg-[#287C75] px-1 py-0.2 text-[9px] font-bold text-white">
+                  {count > 0 ? (
+                    <span className="self-end rounded-md bg-[#287C75] px-1 py-0.2 text-[9px] font-bold text-white shadow-2xs group-hover:scale-105 transition">
                       {count} {count === 1 ? 'appt' : 'appts'}
                     </span>
-                  )}
-                </div>
+                  ) : isSelected ? (
+                    <span className="self-end text-[9px] font-medium text-[#287C75]">
+                      Selected
+                    </span>
+                  ) : null}
+                </button>
               );
             })}
           </div>
@@ -809,6 +944,92 @@ export default function AppointmentsPage() {
                       </>
                     ) : (
                       'Confirm Booking & Issue Token'
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>,
+          document.body
+        )}
+
+      {/* Quick Edit Patient Name Modal */}
+      {editingPatientModal && typeof document !== 'undefined' &&
+        createPortal(
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs">
+            <div className="w-full max-w-md rounded-3xl border border-[#D9E6E2] bg-white p-6 shadow-2xl">
+              <div className="flex items-center justify-between border-b border-[#D9E6E2]/60 pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#287C75]/10 text-[#287C75]">
+                    <User size={18} />
+                  </div>
+                  <div>
+                    <h2 className="font-heading text-base font-bold text-[#10201F]">
+                      Set Patient Information
+                    </h2>
+                    <p className="text-xs text-[#4E6460]">
+                      Update patient name and phone number for this appointment.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEditingPatientModal(null)}
+                  className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#D9E6E2] text-[#4E6460] hover:bg-[#F7FAF8] cursor-pointer"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              <form onSubmit={handleSavePatientName} className="mt-4 space-y-3.5 text-xs">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#4E6460] mb-1">
+                    Patient Full Name *
+                  </label>
+                  <input
+                    required
+                    placeholder="Enter patient full name (e.g. Ramesh Kumar)"
+                    value={editPatientName}
+                    onChange={(e) => setEditPatientName(e.target.value)}
+                    className="w-full rounded-xl border border-[#D9E6E2] bg-[#F7FAF8] p-2.5 text-xs font-semibold text-[#10201F] focus:border-[#287C75] focus:bg-white focus:outline-none"
+                    autoFocus
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#4E6460] mb-1">
+                    Mobile Number
+                  </label>
+                  <input
+                    type="tel"
+                    placeholder="10-digit mobile number"
+                    value={editPatientPhone}
+                    onChange={(e) => setEditPatientPhone(e.target.value)}
+                    className="w-full rounded-xl border border-[#D9E6E2] bg-[#F7FAF8] p-2.5 text-xs font-semibold text-[#10201F] focus:border-[#287C75] focus:bg-white focus:outline-none"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#D9E6E2]">
+                  <button
+                    type="button"
+                    disabled={isUpdatingPatient}
+                    onClick={() => setEditingPatientModal(null)}
+                    className="rounded-xl border border-[#D9E6E2] px-4 py-2 text-xs font-semibold text-[#4E6460] hover:bg-[#F7FAF8] cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isUpdatingPatient}
+                    className="rounded-xl bg-[#123A3A] px-5 py-2 text-xs font-bold text-white shadow-sm hover:bg-[#287C75] transition disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
+                  >
+                    {isUpdatingPatient ? (
+                      <>
+                        <Loader2 className="animate-spin" size={14} />
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      'Save Patient Name'
                     )}
                   </button>
                 </div>

@@ -430,8 +430,8 @@ exports.createAppointment = async (req, res) => {
             lastVisitDate: targetDate,
           },
         });
-      } else if (!resolvedPatient.mrn) {
-        // Auto-assign clean clinical MRN if patient previously lacked one
+      } else if (!resolvedPatient.mrn || (patientName && resolvedPatient.name === 'Walk-in Patient')) {
+        // Auto-assign clean clinical MRN or upgrade placeholder name with real patient name
         const pCount = await tx.patient.count({ where: { clinicId: req.clinicId } });
         const clinic = await tx.clinic.findUnique({
           where: { id: req.clinicId },
@@ -439,11 +439,15 @@ exports.createAppointment = async (req, res) => {
         });
         const year = new Date().getFullYear();
         const seq = String(pCount + 1).padStart(4, '0');
-        const generatedMrn = `${clinic?.code || 'PX'}-${year}-${seq}`;
+        const generatedMrn = resolvedPatient.mrn || `${clinic?.code || 'PX'}-${year}-${seq}`;
         try {
           resolvedPatient = await tx.patient.update({
             where: { id: resolvedPatient.id },
-            data: { mrn: generatedMrn },
+            data: {
+              mrn: generatedMrn,
+              ...(patientName && patientName.trim() !== 'Walk-in Patient' ? { name: patientName.trim() } : {}),
+              ...(patientPhone ? { phone: patientPhone.trim() } : {}),
+            },
           });
         } catch {
           // non-blocking
