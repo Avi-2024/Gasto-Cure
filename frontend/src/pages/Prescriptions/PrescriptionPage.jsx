@@ -1734,14 +1734,6 @@ function PrescriptionPage() {
               <span className="text-[#287C75] font-black text-base">Rx</span>
               <span>Medicines</span>
             </h3>
-            <button
-              type="button"
-              className="btn-add-medicine no-print"
-              onClick={addMedicineRow}
-            >
-              <Plus size={14} />
-              <span>Add Another Medicine</span>
-            </button>
           </div>
 
           <MedicineTable
