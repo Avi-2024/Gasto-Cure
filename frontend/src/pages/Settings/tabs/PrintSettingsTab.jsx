@@ -11,10 +11,12 @@ import {
   Upload,
   Trash2,
   Sparkles,
+  Zap,
 } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { clinicApi } from '../../../services/clinicApi';
 import { localSettings } from '../../../services/localStore';
+import { rxProtocolsService } from '../../../services/rxProtocolsService';
 import {
   applyPrintSettings,
   DEFAULT_PRINT_SETTINGS,
@@ -24,7 +26,10 @@ import TestPrintSheet from '../components/TestPrintSheet';
 
 export function PrintSettingsTab() {
   const { activeClinicId } = useAuth();
-  const [settings, setSettings] = useState(() => localSettings.get());
+  const [settings, setSettings] = useState(() => ({
+    ...localSettings.get(),
+    enableRxProtocols: rxProtocolsService.isEnabled(),
+  }));
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [showTestSheet, setShowTestSheet] = useState(false);
   const [logoError, setLogoError] = useState('');
@@ -133,6 +138,9 @@ export function PrintSettingsTab() {
 
   const handleSave = () => {
     const sanitizedPrint = sanitizePrintSettings(settings.print);
+    const isProtoEnabled = settings.enableRxProtocols !== false;
+    rxProtocolsService.setEnabled(isProtoEnabled);
+
     const updated = localSettings.update({
       clinicName: settings.clinicName,
       clinicTagline: settings.clinicTagline,
@@ -147,6 +155,7 @@ export function PrintSettingsTab() {
       address: settings.address,
       timing: settings.timing,
       print: sanitizedPrint,
+      enableRxProtocols: isProtoEnabled,
     });
 
     applyPrintSettings(sanitizedPrint);
@@ -324,6 +333,63 @@ export function PrintSettingsTab() {
                   Plain A4 Paper
                 </span>
               </button>
+            </div>
+          </div>
+
+          {/* Section: 1-Click Clinical Rx Protocols (Protocol Kits) Toggle */}
+          <div className="bg-white p-6 rounded-2xl border border-[#D9E6E2] shadow-clinixpulse-xs space-y-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2.5">
+                <span className="p-2 rounded-xl bg-teal-50 text-[#287C75] border border-teal-100/80">
+                  <Zap size={18} className="fill-[#287C75]" />
+                </span>
+                <div>
+                  <h3 className="font-heading text-base font-bold text-[#10201F]">
+                    1-Click Clinical Rx Protocols (Protocol Kits)
+                  </h3>
+                  <p className="text-xs text-[#4E6460]">
+                    Show or hide rapid clinical protocol kits (GERD, Gastritis, IBS, APD) in Prescription Studio
+                  </p>
+                </div>
+              </div>
+
+              {/* Toggle Button */}
+              <button
+                type="button"
+                role="switch"
+                aria-checked={settings.enableRxProtocols !== false}
+                onClick={() => {
+                  const nextVal = settings.enableRxProtocols === false;
+                  rxProtocolsService.setEnabled(nextVal);
+                  setSettings((prev) => ({ ...prev, enableRxProtocols: nextVal }));
+                  setSavedSuccess(false);
+                }}
+                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#287C75] ${
+                  settings.enableRxProtocols !== false ? 'bg-[#287C75]' : 'bg-slate-300'
+                }`}
+                title="Toggle 1-Click Clinical Protocols on/off"
+              >
+                <span
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                    settings.enableRxProtocols !== false ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+
+            <div className="p-3.5 bg-[#F7FAF8] rounded-xl border border-[#D9E6E2] flex items-center justify-between text-xs">
+              <span className="font-medium text-[#4E6460]">
+                Status in Prescription Studio:
+              </span>
+              <span
+                className={`px-2.5 py-0.5 rounded-full font-bold text-[11px] ${
+                  settings.enableRxProtocols !== false
+                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                    : 'bg-slate-100 text-slate-600 border border-slate-300'
+                }`}
+              >
+                {settings.enableRxProtocols !== false ? 'ON - Active in Studio' : 'OFF - Hidden in Studio'}
+              </span>
             </div>
           </div>
 

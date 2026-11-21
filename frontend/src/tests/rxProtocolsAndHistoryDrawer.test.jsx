@@ -4,6 +4,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import PrescriptionPage from '../pages/Prescriptions/PrescriptionPage';
 import { localPatients, localVisits, localMedicines, localSettings } from '../services/localStore';
+import { rxProtocolsService } from '../services/rxProtocolsService';
 
 describe('Prescription Studio - 1-Click Rx Protocols & Patient Past History Drawer', () => {
   const mockPatient = {
@@ -114,6 +115,17 @@ describe('Prescription Studio - 1-Click Rx Protocols & Patient Past History Draw
 
     // Verify medicines were added to the prescription table
     expect(screen.getByDisplayValue('Pantoprazole 40mg')).toBeTruthy();
+  });
+
+  it('hides 1-Click Clinical Rx Protocols section when disabled via settings', () => {
+    rxProtocolsService.setEnabled(false);
+    renderStudio();
+
+    expect(screen.queryByLabelText('Clinical Rx Protocols')).toBeNull();
+    expect(screen.queryByText(/1-Click Clinical Rx Protocols/i)).toBeNull();
+
+    // Re-enable for subsequent tests
+    rxProtocolsService.setEnabled(true);
   });
 
   it('renders Past History trigger button with past visit count badge', () => {

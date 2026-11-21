@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Printer,
   Database,
@@ -9,13 +10,35 @@ import {
   Sliders,
   ShieldCheck,
   HardDrive,
+  Zap,
+  Sparkles,
+  RotateCcw,
+  ExternalLink,
+  Check,
 } from 'lucide-react';
 import PrintSettingsTab from './tabs/PrintSettingsTab';
-import { dataBackup } from '../../services/localStore';
+import { dataBackup, localSettings } from '../../services/localStore';
+import { rxProtocolsService } from '../../services/rxProtocolsService';
 
 export function SettingsPage() {
   const [activeTab, setActiveTab] = useState('print');
   const [backupStatus, setBackupStatus] = useState(null);
+  const [isProtoEnabled, setIsProtoEnabled] = useState(() => rxProtocolsService.isEnabled());
+  const [protocolsList, setProtocolsList] = useState(() => rxProtocolsService.getAll());
+  const [protocolResetMsg, setProtocolResetMsg] = useState('');
+
+  const handleToggleProtocols = () => {
+    const next = !isProtoEnabled;
+    rxProtocolsService.setEnabled(next);
+    setIsProtoEnabled(next);
+  };
+
+  const handleResetProtocols = () => {
+    const defaults = rxProtocolsService.reset();
+    setProtocolsList(defaults);
+    setProtocolResetMsg('Clinical Rx Protocols restored to standard gastro defaults.');
+    setTimeout(() => setProtocolResetMsg(''), 3500);
+  };
 
   const handleExportBackup = () => {
     try {
@@ -102,6 +125,19 @@ export function SettingsPage() {
 
         <button
           type="button"
+          onClick={() => setActiveTab('clinical')}
+          className={`pb-3 pt-2.5 px-4 text-sm font-semibold flex items-center gap-2 border-b-2 transition-all rounded-t-xl ${
+            activeTab === 'clinical'
+              ? 'border-[#287C75] text-[#123A3A] bg-teal-50/40'
+              : 'border-transparent text-[#7D908C] hover:text-[#10201F] hover:bg-slate-50/80'
+          }`}
+        >
+          <Zap size={16} className={activeTab === 'clinical' ? 'text-[#287C75] fill-[#287C75]' : ''} />
+          Clinical Protocols (Kits)
+        </button>
+
+        <button
+          type="button"
           onClick={() => setActiveTab('backup')}
           className={`pb-3 pt-2.5 px-4 text-sm font-semibold flex items-center gap-2 border-b-2 transition-all rounded-t-xl ${
             activeTab === 'backup'
@@ -116,6 +152,140 @@ export function SettingsPage() {
 
       {/* Tab Contents */}
       {activeTab === 'print' && <PrintSettingsTab />}
+
+      {activeTab === 'clinical' && (
+        <div className="space-y-6 max-w-4xl">
+          {/* Main ON/OFF Toggle Card */}
+          <div className="bg-white p-6 sm:p-7 rounded-2xl border border-[#D9E6E2] shadow-clinixpulse-xs space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-[#D9E6E2]">
+              <div className="flex items-center gap-3">
+                <span className="p-2.5 rounded-xl bg-teal-50 text-[#287C75] border border-teal-100/80">
+                  <Zap size={22} className="fill-[#287C75]" />
+                </span>
+                <div>
+                  <h3 className="font-heading text-lg font-bold text-[#10201F]">
+                    1-Click Clinical Rx Protocols (Protocol Kits)
+                  </h3>
+                  <p className="text-xs text-[#4E6460] mt-0.5">
+                    Show or hide rapid clinical protocol kits in Prescription Studio
+                  </p>
+                </div>
+              </div>
+
+              {/* Master ON/OFF Switch */}
+              <div className="flex items-center gap-3 self-end sm:self-auto">
+                <span className="text-xs font-bold text-[#10201F]">
+                  {isProtoEnabled ? 'ENABLED' : 'DISABLED'}
+                </span>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={isProtoEnabled}
+                  onClick={handleToggleProtocols}
+                  className={`relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#287C75] ${
+                    isProtoEnabled ? 'bg-[#287C75]' : 'bg-slate-300'
+                  }`}
+                  title="Toggle 1-Click Clinical Protocols on/off"
+                >
+                  <span
+                    className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                      isProtoEnabled ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+
+            {/* Explanation / Status Alert */}
+            <div
+              className={`p-4 rounded-xl border flex items-start gap-3 transition-colors ${
+                isProtoEnabled
+                  ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950'
+                  : 'bg-amber-50/70 border-amber-200 text-amber-950'
+              }`}
+            >
+              {isProtoEnabled ? (
+                <CheckCircle size={18} className="text-emerald-700 mt-0.5 shrink-0" />
+              ) : (
+                <AlertCircle size={18} className="text-amber-700 mt-0.5 shrink-0" />
+              )}
+              <div className="text-xs leading-relaxed">
+                <span className="font-bold block mb-0.5">
+                  {isProtoEnabled
+                    ? 'Protocols are ACTIVE in Prescription Studio'
+                    : 'Protocols are HIDDEN in Prescription Studio'}
+                </span>
+                {isProtoEnabled ? (
+                  <p className="text-emerald-800">
+                    Doctors can click any protocol kit (GERD, Gastritis, IBS, APD) to auto-fill Symptoms, Clinical Diagnosis, standard medicines, and lifestyle advice in 1 second.
+                  </p>
+                ) : (
+                  <p className="text-amber-800">
+                    The 1-Click Protocol bar is now hidden from the consultation screen. The studio displays a clean, blank writing space for doctors who prefer custom prescriptions.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Preview of Protocol Kits */}
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#287C75]">
+                  Active Protocol Kits ({protocolsList.length})
+                </span>
+                <button
+                  type="button"
+                  onClick={handleResetProtocols}
+                  className="inline-flex items-center gap-1.5 text-xs text-[#4E6460] hover:text-[#10201F] font-semibold transition cursor-pointer"
+                >
+                  <RotateCcw size={12} className="text-[#287C75]" />
+                  <span>Restore Standard Defaults</span>
+                </button>
+              </div>
+
+              {protocolResetMsg && (
+                <div className="p-3 bg-teal-50 border border-teal-200 text-[#123A3A] rounded-xl text-xs font-medium animate-in fade-in">
+                  {protocolResetMsg}
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {protocolsList.map((proto) => (
+                  <div
+                    key={proto.id}
+                    className="p-3.5 rounded-xl border border-[#D9E6E2] bg-white shadow-2xs space-y-1.5"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-xs text-[#10201F]">{proto.title}</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-50 text-[#287C75] border border-teal-200/60">
+                        {proto.medicines?.length || 0} meds
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-[#4E6460] line-clamp-1">{proto.diagnosis}</p>
+                    <p className="text-[10px] text-[#7D908C] font-mono">
+                      {proto.medicines?.map((m) => m.name.split(' ')[0]).join(' + ')}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Action Bar */}
+            <div className="pt-4 border-t border-[#D9E6E2] flex items-center justify-between">
+              <span className="text-xs text-[#7D908C]">
+                Changes take effect immediately across all consultation screens.
+              </span>
+              <Link
+                to="/prescription/new"
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-[#123A3A] hover:bg-[#287C75] rounded-xl shadow-sm transition"
+              >
+                <span>Test in Prescription Studio</span>
+                <ExternalLink size={12} />
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       {activeTab === 'backup' && (
         <div className="bg-white p-6 sm:p-7 rounded-2xl border border-[#D9E6E2] shadow-clinixpulse-xs space-y-6 max-w-3xl">

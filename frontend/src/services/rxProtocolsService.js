@@ -1,3 +1,5 @@
+import { localSettings } from './localStore.js';
+
 /**
  * 1-Click Clinical Rx Protocols (Protocol Kits) for Gastro Cure Clinic
  *
@@ -228,8 +230,39 @@ export const DEFAULT_RX_PROTOCOLS = [
 ];
 
 const STORAGE_KEY = 'gastro_cure_rx_protocols';
+const ENABLED_KEY = 'gastro_cure_rx_protocols_enabled';
 
 export const rxProtocolsService = {
+  /**
+   * Checks whether 1-Click Clinical Rx Protocols (Protocol Kits) are enabled in settings
+   */
+  isEnabled: () => {
+    try {
+      const stored = localStorage.getItem(ENABLED_KEY);
+      if (stored !== null) return stored === 'true';
+      const settings = typeof localSettings?.get === 'function' ? localSettings.get() : null;
+      return settings?.enableRxProtocols !== false;
+    } catch {
+      return true;
+    }
+  },
+
+  /**
+   * Toggles 1-Click Clinical Rx Protocols (Protocol Kits) on/off
+   */
+  setEnabled: (val) => {
+    const isEnabled = Boolean(val);
+    try {
+      localStorage.setItem(ENABLED_KEY, isEnabled ? 'true' : 'false');
+      if (typeof localSettings?.update === 'function') {
+        localSettings.update({ enableRxProtocols: isEnabled });
+      }
+    } catch {
+      // storage unavailable
+    }
+    return isEnabled;
+  },
+
   /**
    * Retrieves all available clinical protocols (default + custom)
    */

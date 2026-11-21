@@ -130,6 +130,7 @@ function PrescriptionPage() {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   // 1-Click Clinical Rx Protocols (Protocol Kits) & Patient History Drawer
+  const [enableProtocols, setEnableProtocols] = useState(() => rxProtocolsService.isEnabled());
   const [protocols, setProtocols] = useState(() => rxProtocolsService.getAll());
   const [isHistoryDrawerOpen, setIsHistoryDrawerOpen] = useState(false);
 
@@ -1588,47 +1589,49 @@ function PrescriptionPage() {
           </div>
         </section>
 
-        {/* 1-Click Clinical Rx Protocols (Protocol Kits) */}
-        <section className="prescription-section rx-protocol-section no-print" aria-label="Clinical Rx Protocols">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-2.5">
-            <div className="flex items-center gap-2">
-              <span className="p-1 rounded-md bg-[#287C75]/10 text-[#287C75]">
-                <Zap size={14} className="fill-[#287C75]" />
-              </span>
-              <div>
-                <h3 className="section-title font-heading mb-0 text-[13px] font-bold text-[#10201F]">
-                  1-Click Clinical Rx Protocols (Protocol Kits)
-                </h3>
-                <p className="text-[11px] text-[#7D908C] m-0">
-                  Select a protocol to auto-fill Symptoms, Diagnosis, Standard Meds & Dietary Advice in 1 click
-                </p>
+        {/* 1-Click Clinical Rx Protocols (Protocol Kits) - Configurable via Settings */}
+        {enableProtocols && (
+          <section className="prescription-section rx-protocol-section no-print" aria-label="Clinical Rx Protocols">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-2.5">
+              <div className="flex items-center gap-2">
+                <span className="p-1 rounded-md bg-[#287C75]/10 text-[#287C75]">
+                  <Zap size={14} className="fill-[#287C75]" />
+                </span>
+                <div>
+                  <h3 className="section-title font-heading mb-0 text-[13px] font-bold text-[#10201F]">
+                    1-Click Clinical Rx Protocols (Protocol Kits)
+                  </h3>
+                  <p className="text-[11px] text-[#7D908C] m-0">
+                    Select a protocol to auto-fill Symptoms, Diagnosis, Standard Meds & Dietary Advice in 1 click
+                  </p>
+                </div>
               </div>
+              <span className="text-[11px] font-semibold text-[#287C75] bg-[#E8F3F1] px-2.5 py-0.5 rounded-full self-start sm:self-auto border border-[#287C75]/20">
+                Gastro Specialty Kits
+              </span>
             </div>
-            <span className="text-[11px] font-semibold text-[#287C75] bg-[#E8F3F1] px-2.5 py-0.5 rounded-full self-start sm:self-auto border border-[#287C75]/20">
-              Gastro Specialty Kits
-            </span>
-          </div>
 
-          <div className="rx-protocol-chips-grid">
-            {protocols.map((proto) => (
-              <button
-                key={proto.id}
-                type="button"
-                className="rx-protocol-card-chip"
-                onClick={() => handleApplyProtocol(proto)}
-                title={`Apply ${proto.title} Protocol (${proto.medicines?.length || 0} medicines)`}
-              >
-                <div className="rx-protocol-chip-header">
-                  <span className="rx-protocol-chip-title">{proto.title}</span>
-                  <span className="rx-protocol-chip-count">{proto.medicines?.length || 0} meds</span>
-                </div>
-                <div className="rx-protocol-chip-summary text-truncate">
-                  {proto.medicines?.map((m) => m.name.split(' ')[0]).join(' + ')}
-                </div>
-              </button>
-            ))}
-          </div>
-        </section>
+            <div className="rx-protocol-chips-grid">
+              {protocols.map((proto) => (
+                <button
+                  key={proto.id}
+                  type="button"
+                  className="rx-protocol-card-chip"
+                  onClick={() => handleApplyProtocol(proto)}
+                  title={`Apply ${proto.title} Protocol (${proto.medicines?.length || 0} medicines)`}
+                >
+                  <div className="rx-protocol-chip-header">
+                    <span className="rx-protocol-chip-title">{proto.title}</span>
+                    <span className="rx-protocol-chip-count">{proto.medicines?.length || 0} meds</span>
+                  </div>
+                  <div className="rx-protocol-chip-summary text-truncate">
+                    {proto.medicines?.map((m) => m.name.split(' ')[0]).join(' + ')}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* 3. Chief Complaints / Symptoms */}
         <section className="prescription-section">
