@@ -430,9 +430,47 @@ exports.createAppointment = async (req, res) => {
             lastVisitDate: targetDate,
           },
         });
+      } else if (!resolvedPatient.mrn) {
+        // Auto-assign clean clinical MRN if patient previously lacked one
+        const pCount = await tx.patient.count({ where: { clinicId: req.clinicId } });
+        const clinic = await tx.clinic.findUnique({
+          where: { id: req.clinicId },
+          select: { code: true },
+        });
+        const year = new Date().getFullYear();
+        const seq = String(pCount + 1).padStart(4, '0');
+        const generatedMrn = `${clinic?.code || 'PX'}-${year}-${seq}`;
+        try {
+          resolvedPatient = await tx.patient.update({
+            where: { id: resolvedPatient.id },
+            data: { mrn: generatedMrn },
+          });
+        } catch {
+          // non-blocking
+        }
       }
 
-      // 2. Count highest token allocated for target date in clinic
+      // 2. Prevent Double Booking / Race condition within 60 seconds
+      const sixtySecondsAgo = new Date(Date.now() - 60 * 1000);
+      const recentWaiting = await tx.appointment.findFirst({
+        where: {
+          clinicId: req.clinicId,
+          patientId: resolvedPatient.id,
+          appointmentDate: targetDate,
+          status: 'WAITING',
+          createdAt: { gte: sixtySecondsAgo },
+        },
+        include: {
+          patient: true,
+          doctor: { select: { fullName: true } },
+        },
+      });
+
+      if (recentWaiting) {
+        return { appointment: recentWaiting, patient: resolvedPatient, isDuplicate: true };
+      }
+
+      // 3. Count highest token allocated for target date in clinic
       const highest = await tx.appointment.findFirst({
         where: {
           clinicId: req.clinicId,
@@ -444,7 +482,7 @@ exports.createAppointment = async (req, res) => {
 
       const nextToken = (highest?.tokenNumber || 0) + 1;
 
-      // 3. Create Appointment
+      // 4. Create Appointment
       const appointment = await tx.appointment.create({
         data: {
           clinicId: req.clinicId,
@@ -463,7 +501,7 @@ exports.createAppointment = async (req, res) => {
         },
       });
 
-      return { appointment, patient: resolvedPatient };
+      return { appointment, patient: resolvedPatient, isDuplicate: false };
     });
 
     return res.status(201).json({

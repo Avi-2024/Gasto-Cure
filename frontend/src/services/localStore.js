@@ -800,11 +800,18 @@ export const localAppointments = {
 
   addToQueue: (patientId, patientName, patientAge, reason = 'General consultation') => {
     const appointments = load(KEYS.appointments);
+    const existingPatient = localPatients.getById(patientId);
+    const tokenNum = appointments.length + 1;
     const appt = {
       id: uid(),
+      tokenNumber: tokenNum,
+      tokenFormatted: `Token #${tokenNum}`,
       patientId,
-      patientName,
-      patientAge,
+      patientName: patientName || existingPatient?.name || 'Walk-in Patient',
+      patientPhone: existingPatient?.contact || existingPatient?.phone || '',
+      patientMrn: existingPatient?.mrn || existingPatient?.id || '',
+      patientAge: patientAge !== undefined ? patientAge : existingPatient?.age,
+      patientGender: existingPatient?.gender || '',
       reason,
       status: 'waiting',
       startTime: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),

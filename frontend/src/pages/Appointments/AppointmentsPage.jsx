@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   Clock3,
   Filter,
+  Loader2,
   MapPin,
   Phone,
   Plus,
@@ -21,6 +22,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import StatusBadge from '../../components/ui/StatusBadge';
+import PatientSearchSelector from '../../components/common/PatientSearchSelector';
 import { useAuth } from '../../contexts/AuthContext';
 import { appointmentApi } from '../../services/appointmentApi';
 import { patientApi } from '../../services/patientApi';
@@ -54,6 +56,9 @@ export default function AppointmentsPage() {
   // Booking Modal State
   const [showBookModal, setShowBookModal] = useState(false);
   const [patients, setPatients] = useState(() => localPatients.getAll());
+  const [selectedPatientObj, setSelectedPatientObj] = useState(null);
+  const [bookingError, setBookingError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isWalkIn, setIsWalkIn] = useState(false);
   const [bookingForm, setBookingForm] = useState({
     patientId: '',
@@ -143,15 +148,19 @@ export default function AppointmentsPage() {
   // Handle Full Appointment Booking
   const handleConfirmBooking = async (e) => {
     e.preventDefault();
+    setBookingError('');
 
     if (!isWalkIn && !bookingForm.patientId) {
-      alert('Please select a registered patient or switch to register a walk-in patient.');
+      setBookingError('Please search and select a registered patient, or switch to "+ New Walk-in Patient".');
       return;
     }
     if (isWalkIn && (!bookingForm.patientName.trim() || !bookingForm.patientPhone.trim())) {
-      alert('Please enter patient name and phone number for the walk-in registration.');
+      setBookingError('Please enter Walk-in Patient Name and Mobile Number.');
       return;
     }
+
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
     const payload = isWalkIn
       ? {
@@ -186,10 +195,14 @@ export default function AppointmentsPage() {
         timeSlot: 'Morning OPD (10:00 AM - 01:00 PM)',
         chiefComplaint: 'General Outpatient Follow-up',
       });
+      setSelectedPatientObj(null);
       setIsWalkIn(false);
+      setBookingError('');
     } catch (err) {
       console.warn('Booking error:', err);
-      alert('Failed to book appointment: ' + err.message);
+      setBookingError(err.message || 'Failed to book appointment. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -371,7 +384,7 @@ export default function AppointmentsPage() {
                 >
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         {appointment.tokenFormatted && (
                           <span className="inline-flex items-center justify-center rounded-lg bg-[#FDF6E2] border border-[#EBD7A9] px-2 py-0.5 text-[11px] font-mono font-bold text-[#8C6B1F]">
                             {appointment.tokenFormatted}
@@ -380,13 +393,30 @@ export default function AppointmentsPage() {
                         <span className="font-heading text-sm font-bold text-[#10201F]">
                           {appointment.patientName || 'Patient'}
                         </span>
-                        <span className="rounded-md border border-[#D9E6E2] bg-[#F7FAF8] px-1.5 py-0.5 font-mono text-[10px] font-semibold text-[#7D908C]">
-                          {appointment.patientMrn || appointment.id}
-                        </span>
+                        {appointment.patientMrn ? (
+                          <span className="rounded-md border border-[#287C75]/20 bg-[#287C75]/10 px-1.5 py-0.5 font-mono text-[10px] font-bold text-[#123A3A]">
+                            {appointment.patientMrn}
+                          </span>
+                        ) : appointment.patientPhone ? (
+                          <span className="rounded-md border border-[#D9E6E2] bg-[#F7FAF8] px-1.5 py-0.5 font-mono text-[10px] font-semibold text-[#4E6460] flex items-center gap-1">
+                            <Phone size={10} className="text-[#287C75]" />
+                            {appointment.patientPhone}
+                          </span>
+                        ) : (
+                          <span className="rounded-md border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">
+                            Walk-in
+                          </span>
+                        )}
                       </div>
-                      <p className="mt-1 text-xs text-[#4E6460]">
-                        {appointment.reason || 'General Outpatient Consultation'}
-                      </p>
+                      <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[#4E6460]">
+                        <span>{appointment.reason || 'General Outpatient Consultation'}</span>
+                        {(appointment.patientAge || appointment.age) && (
+                          <span className="text-[11px] text-[#7D908C]">
+                            • {appointment.patientAge || appointment.age} Yrs
+                            {appointment.patientGender || appointment.gender ? ` (${appointment.patientGender || appointment.gender})` : ''}
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     <div className="flex items-center gap-3 sm:text-right">
@@ -585,24 +615,57 @@ export default function AppointmentsPage() {
               </div>
 
               <form onSubmit={handleConfirmBooking} className="mt-4 space-y-3.5 text-xs">
+                {/* Inline Validation & API Error Banner (No native alerts!) */}
+                {bookingError && (
+                  <div className="flex items-start gap-2.5 rounded-2xl border border-rose-200 bg-rose-50/90 p-3 text-xs text-rose-800 animate-fadeIn">
+                    <AlertCircle size={16} className="mt-0.5 shrink-0 text-rose-600" />
+                    <div>
+                      <p className="font-bold">Required Information Missing</p>
+                      <p className="mt-0.5 text-[11px] text-rose-700">{bookingError}</p>
+                    </div>
+                  </div>
+                )}
+
                 {/* Existing Patient Selector */}
                 {!isWalkIn ? (
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-[#4E6460] mb-1">
-                      Select Patient *
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[#4E6460] mb-1.5 flex items-center justify-between">
+                      <span>Select Registered Patient *</span>
+                      <span className="text-[10px] text-[#7D908C] font-normal lowercase">Search across clinic database</span>
                     </label>
-                    <select
-                      value={bookingForm.patientId}
-                      onChange={(e) => setBookingForm({ ...bookingForm, patientId: e.target.value })}
-                      className="w-full rounded-xl border border-[#D9E6E2] bg-[#F7FAF8] p-2.5 text-xs font-semibold text-[#10201F] focus:border-[#287C75] focus:bg-white focus:outline-none"
-                    >
-                      <option value="">-- Choose patient from clinic registry --</option>
-                      {patients.map((p) => (
-                        <option key={p.id} value={p.id}>
-                          {p.name} {p.mrn ? `(${p.mrn})` : `(${p.id})`} • {p.phone}
-                        </option>
-                      ))}
-                    </select>
+                    <PatientSearchSelector
+                      selectedPatientId={bookingForm.patientId}
+                      selectedPatient={selectedPatientObj}
+                      onSelectPatient={(p) => {
+                        setSelectedPatientObj(p);
+                        setBookingForm((prev) => ({
+                          ...prev,
+                          patientId: p.id,
+                          patientName: p.name,
+                          patientPhone: p.phone || p.contact || '',
+                          patientAge: p.age || '',
+                          patientGender: p.gender || 'MALE',
+                        }));
+                        setBookingError('');
+                      }}
+                      onClearPatient={() => {
+                        setSelectedPatientObj(null);
+                        setBookingForm((prev) => ({
+                          ...prev,
+                          patientId: '',
+                          patientName: '',
+                        }));
+                      }}
+                      onSwitchToWalkIn={(suggested) => {
+                        setIsWalkIn(true);
+                        setBookingForm((prev) => ({
+                          ...prev,
+                          patientName: suggested || '',
+                          patientPhone: /^\d+$/.test(suggested) ? suggested : '',
+                        }));
+                        setBookingError('');
+                      }}
+                    />
                   </div>
                 ) : (
                   /* Walk-in Registration Inputs */
@@ -725,16 +788,28 @@ export default function AppointmentsPage() {
                 <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#D9E6E2]">
                   <button
                     type="button"
-                    onClick={() => setShowBookModal(false)}
-                    className="rounded-xl border border-[#D9E6E2] px-4 py-2 text-xs font-semibold text-[#4E6460] hover:bg-[#F7FAF8]"
+                    disabled={isSubmitting}
+                    onClick={() => {
+                      setBookingError('');
+                      setShowBookModal(false);
+                    }}
+                    className="rounded-xl border border-[#D9E6E2] px-4 py-2.5 text-xs font-semibold text-[#4E6460] hover:bg-[#F7FAF8] disabled:opacity-50 cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="rounded-xl bg-[#123A3A] px-5 py-2 text-xs font-bold text-white shadow-sm hover:bg-[#287C75] transition"
+                    disabled={isSubmitting}
+                    className="rounded-xl bg-[#123A3A] px-5 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-[#287C75] transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[210px] cursor-pointer"
                   >
-                    Confirm Booking & Issue Token
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="animate-spin" size={15} />
+                        <span>Allocating Token & Booking...</span>
+                      </>
+                    ) : (
+                      'Confirm Booking & Issue Token'
+                    )}
                   </button>
                 </div>
               </form>

@@ -62,6 +62,7 @@ export default function BillingPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [showModal, setShowModal] = useState(false);
   const [notification, setNotification] = useState('');
+  const [formError, setFormError] = useState('');
 
   // Form state for creating invoice
   const [newInvoice, setNewInvoice] = useState({
@@ -165,8 +166,9 @@ export default function BillingPage() {
 
   const handleCreateInvoice = (e) => {
     e.preventDefault();
+    setFormError('');
     if (!newInvoice.patientName.trim()) {
-      alert('Please enter or select a patient name.');
+      setFormError('Please enter or select a patient name.');
       return;
     }
 
@@ -444,6 +446,12 @@ export default function BillingPage() {
             </div>
 
             <form onSubmit={handleCreateInvoice} className="mt-4 space-y-3.5">
+              {formError && (
+                <div className="flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 p-2.5 text-xs text-rose-800">
+                  <AlertCircle size={15} className="text-rose-600 shrink-0" />
+                  <span>{formError}</span>
+                </div>
+              )}
               <div>
                 <label className="text-xs font-bold uppercase tracking-wider text-[#4E6460] block mb-1">
                   Select Patient
